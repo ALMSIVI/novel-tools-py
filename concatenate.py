@@ -1,56 +1,103 @@
 import argparse
 import os
 from natsort import natsorted
+import json
 
-def concatenate(indir, outdir, title, filename, chapter):
+
+def concatenate(in_dir: str, out_dir: str, title_heading: int, volume_heading: int, chapter_heading: int, append_volume: bool, sort_volume: bool) -> None:
     '''
-    Concatenate pure chapters, without volume subdirectories.
-    Input file should be of type <chapter>.md
+    Concatenate chapters, including volume subdirectories.
+    Input file should be of type <volume>/<chapter>.md
     '''
 
-    book_name = os.path.basename(indir)
+    # Read book metadata
+    with open(os.path.join(in_dir, 'metadata.json'), 'rt') as metadata_file:
+        metadata = json.load(metadata_file)
+        book_name = metadata['title']
 
-    with open(os.path.join(outdir, book_name + '.md'), 'wt') as f:
-        if title == 'yes':
-            f.write(book_name)
-            f.write('\n')
+    # If no out_dir is specified, use in_dir
+    if out_dir is None:
+        out_dir = in_dir
 
-        f.write('\n')
+    with open(os.path.join(out_dir, book_name + '.md'), 'wt') as book_file:
+        # Book title
+        for i in range(title_heading):
+            book_file.write('#')
 
-        for part in natsorted(os.listdir(indir)):
-            part_file = os.path.join(indir, part)
-            if os.path.isdir(part_file) or not part_file.endswith('.md'):
-                continue
-            with open(part_file, 'rt') as c:
-                if filename == 'yes' or filename == 'header':
-                    part_name = part[:part.rindex('.')]
-                    if filename == 'header':
-                        f.write('# ')
-                    f.write(part_name)
-                    f.write('\n\n')
-                for line in c:
-                    if line.startswith('#'): # Header
-                        if chapter == 'indent':
-                            f.write('#')
-                            f.write(line)
-                        elif chapter == 'keep':
-                            f.write(line)
-                        else: # remove
-                            f.write(line[line.index(' ') + 1:])
-                    else:
-                        f.write(line)
-                    f.write('\n')
-                f.write('\n')
+        book_file.write(' ')
+        book_file.write(book_name)
+        book_file.write('\n\n')
+
+        # Book intro (if it exists)
+        intro_file = os.path.join(in_dir, '_intro.txt')
+        if os.path.exists(intro_file):
+            print('Intro file detected. Appending to book...')
+            with open(intro_file, 'rt') as intro:
+                for line in intro:
+                    book_file.write(line)
+            book_file.write('\n\n')
+
+        # Custom volume order
+        if sort_volume:
+            with open(os.path.join(in_dir, 'volumes.json'), 'rt') as order_f:
+                volumes = json.load(order_f)
+        else:
+            volumes = [{'name': volume, 'volume': volume}
+                       for volume in natsorted(os.listdir(in_dir))
+                       if os.path.isdir(os.path.join(in_dir, volume))]
+
+        # Concatenate volume by volume
+        for volume in volumes:
+            volume_dir = os.path.join(in_dir, volume['name'])
+
+            print('Appending volume {}'.format(volume['volume']))
+
+            # Volume title
+            if append_volume:
+                for i in range(volume_heading):
+                    book_file.write('#')
+
+                book_file.write(' ')
+                book_file.write(volume['volume'])
+                book_file.write('\n\n')
+
+            # Concatenate chapter by chapter
+            for chapter in natsorted(os.listdir(volume_dir)):
+                chapter_filename = os.path.join(volume_dir, chapter)
+                with open(chapter_filename, 'rt') as c:
+                    for line in c:
+                        if line == '\n':
+                            continue
+                        if line.startswith('# '):  # Chapter header
+                            for i in range(chapter_heading):
+                                book_file.write('#')
+
+                            book_file.write(line[line.index(' '):])
+                        else:  # Regular line
+                            book_file.write(line)
+                        book_file.write('\n')
+
+                    book_file.write('\n')  # End of chapter
+
 
 if __name__ == '__main__':
-    default_dir = os.curdir
-
-    parser = argparse.ArgumentParser(description = 'Concatenate chapter files to a single ebook text file.')
-    parser.add_argument('-i', '--indir',  default = default_dir, help = 'Directory for finding chapter files.')
-    parser.add_argument('-o', '--outdir', default = default_dir, help = 'Directory for outputing chapter files.')
-    parser.add_argument('-t', '--title', choices = ['no', 'yes'], default = 'no', help = 'If the title of the book should be included at the beginning of the book file.')
-    parser.add_argument('-f', '--filename', choices = ['no', 'yes', 'header'], default = 'no', help = 'If chapter filename should be included in the book file, and, if included, whether a H1 header is needed.')
-    parser.add_argument('-c', '--chapter', choices = ['indent', 'keep', 'remove'], default = 'keep', help = 'If titles/headers in each chapter file needs to be indented, kept or removed.')
+    parser = argparse.ArgumentParser(
+        description='Concatenate chapter files to a single ebook text file.')
+    parser.add_argument('-i', '--in_dir',  default=os.curdir,
+                        help='Directory for finding chapter files.')
+    parser.add_argument('-o', '--out_dir', default=None,
+                        help='Directory for outputing book file.')
+    parser.add_argument('-t', '--title_heading', type=int,
+                        default=1, help='Heading of book title.')
+    parser.add_argument('-v', '--volume_heading', type=int,
+                        default=2, help="Heading of volume.")
+    parser.add_argument('-c', '--chapter_heading', type=int,
+                        default=3, help='Heading of chapter titles.')
+    parser.add_argument('-a', '--append_volume', action='store_false', default=True,
+                        help="Set to false if the book does not have any volumes or if you do not want to include volume headings.")
+    parser.add_argument('-s', '--sort_volume', action='store_true', default=False,
+                        help='Whether volumes.json will be used as the order for the volumes. By default, natural sort will be used.')
 
     args = parser.parse_args()
-    concatenate(args.indir, args.outdir, args.title, args.filename, args.chapter)
+    concatenate(args.in_dir, args.out_dir, args.title_heading,
+                args.volume_heading, args.chapter_heading, args.append_volume, args.sort_volume)

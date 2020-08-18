@@ -10,11 +10,15 @@ import argparse
 if __name__ == '__main__':
     default_dir = os.curdir
 
-    parser = argparse.ArgumentParser(description = 'Generate a custom order file for volume sorting.')
-    parser.add_argument('-i', '--indir',  default = default_dir, help = 'Parent directory for all the volumes..')
+    parser = argparse.ArgumentParser(
+        description='Generate a custom order file for volume sorting.')
+    parser.add_argument('-d', '--dir',  default=default_dir,
+                        help='Parent directory for all the volumes..')
 
     args = parser.parse_args()
-    
 
-    with open('order.json', 'wt') as f:
-        json.dump([{'name': name, 'volume': name} for name in natsorted(os.listdir(args.indir)) if os.path.isdir(name)], f, indent = 2, ensure_ascii = False)
+    volume_dir = args.dir
+
+    with open(os.path.join(volume_dir, 'volumes.json'), 'wt') as f:
+        json.dump([{'name': name, 'volume': name} for name in natsorted(os.listdir(
+            volume_dir)) if os.path.isdir(os.path.join(volume_dir, name))], f, indent=2, ensure_ascii=False)
