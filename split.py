@@ -5,9 +5,9 @@ import json
 
 # Chinese to Arabic number correspondings
 num_dict = {'零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6,
-            '七': 7, '八': 8, '九': 9, '十': 10, '廿': 20, '卅': 30, '卌': 40, '百': 100, '千': 1000, '两': 2}
+            '七': 7, '八': 8, '九': 9, '十': 10, '廿': 20, '卅': 30, '卌': 40, '百': 100, '千': 1000, '两': 2, '〇': 0}
 # Invalid filename format
-valid_filenames = dict((ord(char), None) for char in '\/*?:"<>|')
+valid_filenames = dict((ord(char), None) for char in '\/*?:"<>|\n')
 
 
 def toNum(num: str) -> int:
@@ -62,6 +62,7 @@ def split(filename: str, sort_volume: bool, out_dir: str) -> None:
                 for volume in volumes:
                     if line.startswith(volume['volume']):
                         is_speical_line = True
+                        curr_dir = volume['name']
                         os.mkdir(os.path.join(out_dir, volume['name']))
                         break
             else:
