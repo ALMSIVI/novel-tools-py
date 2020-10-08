@@ -2,36 +2,7 @@ import argparse
 import re
 import os
 import json
-
-# Chinese to Arabic number correspondings
-num_dict = {'零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6,
-            '七': 7, '八': 8, '九': 9, '十': 10, '廿': 20, '卅': 30, '卌': 40, '百': 100, '千': 1000, '两': 2, '〇': 0}
-# Invalid filename format
-valid_filenames = dict((ord(char), None) for char in '\/*?:"<>|\n')
-
-
-def toNum(num: str) -> int:
-    '''
-    Converts a chinese string to a number.
-    '''
-
-    try:
-        value = int(num)
-    except:
-        value = 0
-        digit = 1
-
-        for i in range(len(num)):
-            v = num_dict[num[i]]
-            if v >= 10:
-                digit *= v
-                value += digit
-            elif i == len(num) - 1:
-                value += v
-            else:
-                digit = v
-
-    return value
+from matchers import getMatcher
 
 
 def split(filename: str, sort_volume: bool, out_dir: str) -> None:
@@ -46,75 +17,61 @@ def split(filename: str, sort_volume: bool, out_dir: str) -> None:
     if out_dir is None:
         out_dir = in_dir
 
+    # Generate all matchers
+    matcher_filename = os.path.join(in_dir, 'matchers.json')
+    if not os.path.isfile(matcher_filename):
+        matcher_filename = os.path.join(os.curdir, 'default_matchers.json')
+
+    with open(matcher_filename, 'rt') as f:
+        matchers = json.load(f)
+
     if sort_volume:
-        with open(os.path.join(in_dir, 'volumes.json'), 'rt') as order_f:
-            volumes = json.load(order_f)
+        with open(os.path.join(in_dir, 'volumes.json'), 'rt') as f:
+            volumes = json.load(f)
+            volume_matchers = [getMatcher(
+                'VolumeMatcher', {'volumes': volumes})]
     else:
-        volumes = None
+        volume_matchers = [getMatcher(matcher['class'], matcher)
+                           for matcher in matchers['volumes']]
+
+    chapter_matchers = [getMatcher(matcher['class'], matcher)
+                        for matcher in matchers['chapters']]
 
     with open(filename, 'rt', encoding='utf8') as file:
         chapter = None
-        curr_dir = './'
+        curr_dir = os.path.join(out_dir, '正文')  # default volume name
         for line in file:
-            is_special_line = False
+            matched = False
+            # First check volume name
+            for matcher in volume_matchers:
+                status, name = matcher.match(line)
+                if status:
+                    curr_dir = os.path.join(out_dir, name)
+                    os.mkdir(curr_dir)
+                    matched = True
+                    break
 
-            if volumes is not None:
-                for volume in volumes:
-                    if line.startswith(volume['volume']):
-                        is_speical_line = True
-                        curr_dir = volume['name']
-                        os.mkdir(os.path.join(out_dir, volume['name']))
-                        break
-            else:
-                if re.match(r'^第.+卷\s.*$', line):
-                    is_special_line = True
-                    end = line.index('卷')
-                    number = str(toNum(line[1: end]))
-                    curr_dir = '第' + number + line[end:-1]
-                    os.mkdir(os.path.join(out_dir, curr_dir))
+            if matched:
+                continue
 
-            if re.match(r'^第.+章\s.*$', line):
-                is_special_line = True
-                # Matches regular chapters with a proper name.
-                if chapter is not None:
-                    # New chapter, close previous chapter file
-                    chapter.close()
+            # Then check chapter name
+            for matcher in chapter_matchers:
+                status, name = matcher.match(line)
+                if status:
+                    # Close previous chapter file
+                    if chapter is not None:
+                        chapter.close()
+                    if not os.path.isdir(curr_dir):
+                        os.mkdir(curr_dir)
 
-                end = line.index('章')
-                number = str(toNum(line[1: end]))
-                line = '第' + number + line[end:-1]
-                filename_line = line.translate(valid_filenames)
-                chapter = open(os.path.join(out_dir, curr_dir,
-                                            filename_line + '.md'), 'w', encoding='utf8')
-                chapter.write('# ' + line + '\n')
+                    chapter = open(os.path.join(
+                        curr_dir, name + '.md'), 'w', encoding='utf8')
+                    chapter.write('# ' + line + '\n')
+                    matched = True
+                    break
 
-            if re.match(r'^第.+章$', line):
-                is_special_line = True
-                # Matches chapters without a proper name
-                if chapter is not None:
-                    chapter.close()
-
-                number = str(toNum(line[1: -2]))
-                line = '第' + number + '章'
-                chapter = open(os.path.join(out_dir, curr_dir,
-                                            line + '.md'), 'w', encoding='utf8')
-                chapter.write('# ' + line + '\n')
-
-            if re.match(r'^(序章|楔子)\s.*$', line):
-                is_special_line = True
-                # Matches preface/intro chapters
-                if chapter is not None:
-                    chapter.close()
-
-                filename_line = line.translate(valid_filenames)
-                chapter = open(os.path.join(out_dir, curr_dir,
-                                            filename_line + '.md'), 'w', encoding='utf8')
-                chapter.write('# ' + line + '\n')
-
-            # You may add more patterns here, like final chapters, etc.
-
-            if chapter is not None and not is_special_line:
-                # Regular chapter line
+            # Regular line
+            if chapter is not None and not matched:
                 chapter.write(line + '\n')
 
         chapter.close()
@@ -123,8 +80,9 @@ def split(filename: str, sort_volume: bool, out_dir: str) -> None:
 if (__name__ == '__main__'):
     parser = argparse.ArgumentParser(
         description='Split ebook file into individual chapters.')
-    parser.add_argument('-f', '--filename', help='Filename of the book file.')
-    parser.add_argument('-s', '--sort_volume', type=bool, default=False,
+    parser.add_argument('-f', '--filename',
+                        help='Filename of the book file.')
+    parser.add_argument('-s', '--sort_volume', action='store_true', default=False,
                         help='Whether volumes.json will be used to detect custom volumes. By default, regular volume names will be supported.')
     parser.add_argument('-o', '--out_dir', default=None,
                         help='Directory of the output files.')
