@@ -5,7 +5,7 @@ import json
 from matchers import getMatcher
 
 
-def split(filename: str, sort_volume: bool, out_dir: str) -> None:
+def split(filename: str, out_dir: str) -> None:
     '''
     Split a whole txt file into individual chapters, with possible volume subdirectories.
     The input file is default to utf8 encoding. If it is encoded in GB2312 you need to convert it first.
@@ -25,8 +25,9 @@ def split(filename: str, sort_volume: bool, out_dir: str) -> None:
     with open(matcher_filename, 'rt') as f:
         matchers = json.load(f)
 
-    if sort_volume:
-        with open(os.path.join(in_dir, 'volumes.json'), 'rt') as f:
+    volumes_filename = os.path.join(in_dir, 'volumes.json')
+    if os.path.isfile(volumes_filename):
+        with open(volumes_filename, 'rt') as f:
             volumes = json.load(f)
             volume_matchers = [getMatcher(
                 'VolumeMatcher', {'volumes': volumes})]
@@ -82,10 +83,8 @@ if (__name__ == '__main__'):
         description='Split ebook file into individual chapters.')
     parser.add_argument('-f', '--filename',
                         help='Filename of the book file.')
-    parser.add_argument('-s', '--sort_volume', action='store_true', default=False,
-                        help='Whether volumes.json will be used to detect custom volumes. By default, regular volume names will be supported.')
     parser.add_argument('-o', '--out_dir', default=None,
                         help='Directory of the output files.')
 
     args = parser.parse_args()
-    split(args.filename, args.sort_volume, args.out_dir)
+    split(args.filename, args.out_dir)

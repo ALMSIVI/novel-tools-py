@@ -4,7 +4,7 @@ from natsort import natsorted
 import json
 
 
-def concatenate(in_dir: str, out_dir: str, title_heading: int, volume_heading: int, chapter_heading: int, append_volume: bool, sort_volume: bool) -> None:
+def concatenate(in_dir: str, out_dir: str, title_heading: int, volume_heading: int, chapter_heading: int, append_volume: bool) -> None:
     '''
     Concatenate chapters, including volume subdirectories.
     Input file should be of type <volume>/<chapter>.md
@@ -18,6 +18,10 @@ def concatenate(in_dir: str, out_dir: str, title_heading: int, volume_heading: i
     # If no out_dir is specified, use in_dir
     if out_dir is None:
         out_dir = in_dir
+
+    # If append_volume is false, decrement chapter_heading
+    if not append_volume:
+        chapter_heading -= 1
 
     with open(os.path.join(out_dir, book_name + '.md'), 'wt') as book_file:
         # Book title
@@ -38,8 +42,9 @@ def concatenate(in_dir: str, out_dir: str, title_heading: int, volume_heading: i
             book_file.write('\n\n')
 
         # Custom volume order
-        if sort_volume:
-            with open(os.path.join(in_dir, 'volumes.json'), 'rt') as order_f:
+        volumes_filename = os.path.join(in_dir, 'volumes.json')
+        if os.path.isfile(volumes_filename):
+            with open(volumes_filename, 'rt') as order_f:
                 volumes = json.load(order_f)
         else:
             volumes = [{'name': volume, 'volume': volume}
@@ -83,7 +88,7 @@ def concatenate(in_dir: str, out_dir: str, title_heading: int, volume_heading: i
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Concatenate chapter files to a single ebook text file.')
-    parser.add_argument('-i', '--in_dir',  default=os.curdir,
+    parser.add_argument('-i', '--in_dir',
                         help='Directory for finding chapter files.')
     parser.add_argument('-o', '--out_dir', default=None,
                         help='Directory for outputing book file.')
@@ -94,10 +99,8 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--chapter_heading', type=int,
                         default=3, help='Heading of chapter titles.')
     parser.add_argument('-a', '--append_volume', action='store_false', default=True,
-                        help="Set to false if the book does not have any volumes or if you do not want to include volume headings.")
-    parser.add_argument('-s', '--sort_volume', action='store_true', default=False,
-                        help='Whether volumes.json will be used as the order for the volumes. By default, natural sort will be used.')
+                        help="Set this argument if there are no volumes or if you do not want to include volume headings.")
 
     args = parser.parse_args()
     concatenate(args.in_dir, args.out_dir, args.title_heading,
-                args.volume_heading, args.chapter_heading, args.append_volume, args.sort_volume)
+                args.volume_heading, args.chapter_heading, args.append_volume)
