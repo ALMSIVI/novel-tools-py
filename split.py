@@ -127,7 +127,7 @@ if (__name__ == '__main__'):
                         help='Filename of the book file.')
     parser.add_argument('-o', '--out_dir', default=None,
                         help='Directory of the output files.')
-    parser.add_argument('-r', '--discard_chapters', action='store_true', default=False,
+    parser.add_argument('-d', '--discard_chapters', action='store_true', default=False,
                         help='Set this argument if you want to discard chapter ids between volumes during duplicate/missing chapter detection.')
 
     args = parser.parse_args()
