@@ -87,14 +87,15 @@ def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
                 status, name, chapter_id = matcher.match(line)
                 if status:
                     if chapter_id in chapter_ids:  # duplicate detection
-                        print('Potential duplicate chapter: {}'.format(name))
+                        print('Potential duplicate chapter in volume {}: {}'.format(
+                            volume_name, name))
 
                     chapter_ids.add(chapter_id)
 
                     if chapter_id > 0:
                         if curr_chapter_id != 0 and curr_chapter_id + 1 != chapter_id:  # missing detection
-                            print('Potential missing chapter: {}'.format(
-                                curr_chapter_id + 1))
+                            print('Potential missing chapter in volume {}: {}'.format(
+                                volume_name, curr_chapter_id + 1))
 
                         curr_chapter_id = chapter_id
 
