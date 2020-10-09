@@ -2,7 +2,13 @@
   "volumes": [
     {
       "class": "NumberedMatcher",
-      "regex": "^第.+卷.*$",
+      "regex": "^第.+卷\\s.*$",
+      "start_index": 1,
+      "end_char": "卷"
+    },
+    {
+      "class": "NumberedMatcher",
+      "regex": "^第.+卷$",
       "start_index": 1,
       "end_char": "卷"
     },
@@ -14,7 +20,13 @@
   "chapters": [
     {
       "class": "NumberedMatcher",
-      "regex": "^第.+章.*$",
+      "regex": "^第.+章\\s.*$",
+      "start_index": 1,
+      "end_char": "章"
+    },
+    {
+      "class": "NumberedMatcher",
+      "regex": "^第.+章$",
       "start_index": 1,
       "end_char": "章"
     },
