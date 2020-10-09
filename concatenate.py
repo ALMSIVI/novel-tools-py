@@ -99,7 +99,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--chapter_heading', type=int,
                         default=3, help='Heading of chapter titles.')
     parser.add_argument('-a', '--append_volume', action='store_false', default=True,
-                        help="Set this argument if there are no volumes or if you do not want to include volume headings.")
+                        help='Set this argument if there are no volumes or if you do not want to include volume headings.')
 
     args = parser.parse_args()
     concatenate(args.in_dir, args.out_dir, args.title_heading,

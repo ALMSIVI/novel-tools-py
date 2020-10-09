@@ -5,7 +5,7 @@ import json
 from matchers import getMatcher
 
 
-def split(filename: str, out_dir: str) -> None:
+def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
     '''
     Split a whole txt file into individual chapters, with possible volume subdirectories.
     The input file is default to utf8 encoding. If it is encoded in GB2312 you need to convert it first.
@@ -40,25 +40,64 @@ def split(filename: str, out_dir: str) -> None:
 
     with open(filename, 'rt', encoding='utf8') as file:
         chapter = None
-        curr_dir = os.path.join(out_dir, '正文')  # default volume name
+        volume_name = '正文'  # Default volume name
+        curr_dir = os.path.join(out_dir, volume_name)
+
+        # Record the positive ids for duplicate/missing title detection
+        # No detection for special titles (those with negative ids)
+        volume_ids = set()
+        chapter_ids = set()
+        curr_volume_id = 0
+        curr_chapter_id = 0
+
         for line in file:
             matched = False
             # First check volume name
             for matcher in volume_matchers:
-                status, name = matcher.match(line)
+                status, name, volume_id = matcher.match(line)
                 if status:
+                    if volume_id in volume_ids:  # duplicate detection
+                        print('Potential duplicate volume: {}'.format(name))
+
+                    volume_ids.add(volume_id)
+
+                    if volume_id > 0:
+                        if curr_volume_id != 0 and curr_volume_id + 1 != volume_id:  # missing detection
+                            print('Potential missing volume: {}'.format(
+                                curr_volume_id + 1))
+
+                            curr_volume_id = volume_id
+
+                    # Discard chapter ids between volumes
+                    if discard_chapters:
+                        chapter_ids.clear()
+                        curr_chapter_id = 0
+
+                    volume_name = name
                     curr_dir = os.path.join(out_dir, name)
                     os.mkdir(curr_dir)
                     matched = True
                     break
 
-            if matched:
+            if matched:  # Early exit
                 continue
 
             # Then check chapter name
             for matcher in chapter_matchers:
-                status, name = matcher.match(line)
+                status, name, chapter_id = matcher.match(line)
                 if status:
+                    if chapter_id in chapter_ids:  # duplicate detection
+                        print('Potential duplicate chapter: {}'.format(name))
+
+                    chapter_ids.add(chapter_id)
+
+                    if chapter_id > 0:
+                        if curr_chapter_id != 0 and curr_chapter_id + 1 != chapter_id:  # missing detection
+                            print('Potential missing chapter: {}'.format(
+                                curr_chapter_id + 1))
+
+                        curr_chapter_id = chapter_id
+
                     # Close previous chapter file
                     if chapter is not None:
                         chapter.close()
@@ -73,7 +112,9 @@ def split(filename: str, out_dir: str) -> None:
 
             # Regular line
             if chapter is not None and not matched:
-                chapter.write(line + '\n')
+                chapter.write(line)
+                if line != '\n' and line != '\r\n':
+                    chapter.write('\n')
 
         chapter.close()
 
@@ -85,6 +126,8 @@ if (__name__ == '__main__'):
                         help='Filename of the book file.')
     parser.add_argument('-o', '--out_dir', default=None,
                         help='Directory of the output files.')
+    parser.add_argument('-r', '--discard_chapters', action='store_true', default=False,
+                        help='Set this argument if you want to discard chapter ids between volumes during duplicate/missing chapter detection.')
 
     args = parser.parse_args()
-    split(args.filename, args.out_dir)
+    split(args.filename, args.out_dir, args.discard_chapters)
