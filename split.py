@@ -76,6 +76,9 @@ def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
                     volume_name = name
                     curr_dir = os.path.join(out_dir, name)
                     os.mkdir(curr_dir)
+                    if chapter is not None:
+                        chapter.close() # Close current chapter
+                        chapter = None
                     matched = True
                     break
 

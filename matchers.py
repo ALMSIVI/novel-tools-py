@@ -35,7 +35,7 @@ valid_filenames = dict((ord(char), None) for char in '\/*?:"<>|\n')
 
 
 def purify_name(filename: str) -> str:
-    return filename.translate(valid_filenames)
+    return filename.translate(valid_filenames).strip()
 
 
 class Matcher(ABC):
@@ -113,12 +113,16 @@ class VolumeMatcher(Matcher):
         - volumes: list of volume-name correspondences.
         '''
         self.volumes = args['volumes']
+        self.index = 0
 
     def match(self, line: str) -> Tuple[bool, str, int]:
-        for i in range(len(self.volumes)):
-            volume = self.volumes[i]
-            if line.startswith(volume['volume']):
-                return (True, volume['name'], i)
+        if self.index >= len(self.volumes):
+            return (False, None, None)
+            
+        volume = self.volumes[self.index]
+        if line.startswith(volume['volume']):
+            self.index += 1
+            return (True, volume['name'], self.index)
 
         return (False, None, None)
 
