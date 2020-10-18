@@ -67,7 +67,21 @@ def concatenate(in_dir: str, out_dir: str, title_heading: int, volume_heading: i
                 book_file.write('\n\n')
 
             # Concatenate chapter by chapter
-            for chapter in natsorted(os.listdir(volume_dir)):
+            chapters = natsorted(os.listdir(volume_dir))
+            # Volume intro
+            if '_intro.txt' in chapters:
+                with open(os.path.join(volume_dir, '_intro.txt'), 'rt') as c:
+                    for line in c:
+                        if line == '\n':
+                            continue
+
+                        book_file.write(line)
+                        book_file.write('\n')
+
+                    book_file.write('\n')  # End of chapter
+                chapters.remove('_intro.txt')
+
+            for chapter in chapters:
                 chapter_filename = os.path.join(volume_dir, chapter)
                 with open(chapter_filename, 'rt') as c:
                     for line in c:
