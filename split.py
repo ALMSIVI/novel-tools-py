@@ -1,5 +1,4 @@
 import argparse
-import re
 import os
 import json
 from matchers import getMatcher, Matcher, MatchResult
@@ -31,9 +30,9 @@ def generate_matchers(in_dir: str):
     return volume_matchers, chapter_matchers
 
 
-def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
+def split(filename: str, out_dir: str, discard_chapters: bool, correct: bool) -> None:
     '''
-    Split a whole txt file into individual chapters, with possible volume subdirectories.
+    Splits a whole txt file into individual chapters, with possible volume subdirectories.
     The input file is default to utf8 encoding. If it is encoded in GB2312 you need to convert it first.
     Ensure that the file starts directly with a volume/chapter name, without anything else.
     '''
@@ -60,7 +59,7 @@ def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
             for matcher in volume_matchers:
                 result = matcher.match(line)
                 if result.status:
-                    volume_validator.validate(matcher, result)
+                    result = volume_validator.validate(matcher, result, correct)
 
                     curr_dir = os.path.join(out_dir, matcher.filename(result))
                     if not os.path.isdir(curr_dir):
@@ -86,7 +85,7 @@ def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
             for matcher in chapter_matchers:
                 result = matcher.match(line)
                 if result.status:
-                    chapter_validator.validate(matcher, result)
+                    result = chapter_validator.validate(matcher, result, correct)
 
                     # Close previous chapter file
                     if chapter is not None:
@@ -118,6 +117,8 @@ if (__name__ == '__main__'):
                         help='Directory of the output files.')
     parser.add_argument('-d', '--discard_chapters', action='store_true', default=False,
                         help='Set this argument if you want to discard chapter ids between volumes during duplicate/missing chapter detection.')
+    parser.add_argument('-c', '--correct', action='store_true', default=False,
+                        help='Set this argument if you want to automatically correct missing or duplicate chapters.')
 
     args = parser.parse_args()
-    split(args.filename, args.out_dir, args.discard_chapters)
+    split(args.filename, args.out_dir, args.discard_chapters, args.correct)
