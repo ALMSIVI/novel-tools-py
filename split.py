@@ -2,7 +2,33 @@ import argparse
 import re
 import os
 import json
-from matchers import getMatcher
+from matchers import getMatcher, Matcher, MatchResult
+from validators import VolumeValidator, ChapterValidator
+
+
+def generate_matchers(in_dir: str):
+    matcher_filename = os.path.join(in_dir, 'matchers.json')
+    if not os.path.isfile(matcher_filename):
+        matcher_filename = os.path.join(os.curdir, 'default_matchers.json')
+
+    with open(matcher_filename, 'rt') as f:
+        matchers = json.load(f)
+
+    # Check if we need custom volume matchers
+    volumes_filename = os.path.join(in_dir, 'volumes.json')
+    if os.path.isfile(volumes_filename):
+        with open(volumes_filename, 'rt') as f:
+            volumes = json.load(f)
+            volume_matchers = [getMatcher(
+                'VolumeMatcher', {'volumes': volumes})]
+    else:
+        volume_matchers = [getMatcher(matcher['class'], matcher)
+                           for matcher in matchers['volumes']]
+
+    chapter_matchers = [getMatcher(matcher['class'], matcher)
+                        for matcher in matchers['chapters']]
+
+    return volume_matchers, chapter_matchers
 
 
 def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
@@ -17,90 +43,50 @@ def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
     if out_dir is None:
         out_dir = in_dir
 
-    # Generate all matchers
-    matcher_filename = os.path.join(in_dir, 'matchers.json')
-    if not os.path.isfile(matcher_filename):
-        matcher_filename = os.path.join(os.curdir, 'default_matchers.json')
-
-    with open(matcher_filename, 'rt') as f:
-        matchers = json.load(f)
-
-    volumes_filename = os.path.join(in_dir, 'volumes.json')
-    if os.path.isfile(volumes_filename):
-        with open(volumes_filename, 'rt') as f:
-            volumes = json.load(f)
-            volume_matchers = [getMatcher(
-                'VolumeMatcher', {'volumes': volumes})]
-    else:
-        volume_matchers = [getMatcher(matcher['class'], matcher)
-                           for matcher in matchers['volumes']]
-
-    chapter_matchers = [getMatcher(matcher['class'], matcher)
-                        for matcher in matchers['chapters']]
+    volume_matchers, chapter_matchers = generate_matchers(in_dir)
 
     with open(filename, 'rt', encoding='utf8') as file:
         chapter = None
-        volume_name = '正文'  # Default volume name
-        curr_dir = os.path.join(out_dir, volume_name)
+        curr_dir = os.path.join(out_dir, '正文')  # Default volume name
 
-        # Record the positive ids for duplicate/missing title detection
-        # No detection for special titles (those with negative ids)
-        volume_ids = set()
-        chapter_ids = set()
-        curr_volume_id = 0
-        curr_chapter_id = 0
+        # Create chapter and volume validators
+        volume_validator = VolumeValidator()
+        chapter_validator = ChapterValidator()
 
         for line in file:
+            line = line.strip()
             matched = False
             # First check volume name
             for matcher in volume_matchers:
-                status, name, volume_id = matcher.match(line)
-                if status:
-                    if volume_id in volume_ids:  # duplicate detection
-                        print('Potential duplicate volume: {}'.format(name))
+                result = matcher.match(line)
+                if result.status:
+                    volume_validator.validate(matcher, result)
 
-                    volume_ids.add(volume_id)
-
-                    if volume_id > 0:
-                        if curr_volume_id != 0 and curr_volume_id + 1 != volume_id:  # missing detection
-                            print('Potential missing volume: {}'.format(
-                                curr_volume_id + 1))
-
-                            curr_volume_id = volume_id
+                    curr_dir = os.path.join(out_dir, matcher.filename(result))
+                    if not os.path.isdir(curr_dir):
+                        os.mkdir(curr_dir)
 
                     # Discard chapter ids between volumes
                     if discard_chapters:
-                        chapter_ids.clear()
-                        curr_chapter_id = 0
+                        chapter_validator.clear()
 
-                    volume_name = name
-                    curr_dir = os.path.join(out_dir, name)
-                    os.mkdir(curr_dir)
+                    chapter_validator.curr_volume = matcher.format(result)
+
                     if chapter is not None:
-                        chapter.close() # Close current chapter
+                        chapter.close()  # Close current chapter
                         chapter = None
+
                     matched = True
                     break
 
-            if matched:  # Early exit
+            if matched:  # Volume matched, go to next line
                 continue
 
             # Then check chapter name
             for matcher in chapter_matchers:
-                status, name, chapter_id = matcher.match(line)
-                if status:
-                    if chapter_id in chapter_ids:  # duplicate detection
-                        print('Potential duplicate chapter in volume {}: {}'.format(
-                            volume_name, name))
-
-                    chapter_ids.add(chapter_id)
-
-                    if chapter_id > 0:
-                        if curr_chapter_id != 0 and curr_chapter_id + 1 != chapter_id:  # missing detection
-                            print('Potential missing chapter in volume {}: {}'.format(
-                                volume_name, curr_chapter_id + 1))
-
-                        curr_chapter_id = chapter_id
+                result = matcher.match(line)
+                if result.status:
+                    chapter_validator.validate(matcher, result)
 
                     # Close previous chapter file
                     if chapter is not None:
@@ -109,15 +95,15 @@ def split(filename: str, out_dir: str, discard_chapters: bool) -> None:
                         os.mkdir(curr_dir)
 
                     chapter = open(os.path.join(
-                        curr_dir, name + '.md'), 'w', encoding='utf8')
-                    chapter.write('# ' + line + '\n')
+                        curr_dir, matcher.filename(result) + '.md'), 'w', encoding='utf8')
+                    chapter.write('# ' + matcher.format(result) + '\n')
                     matched = True
                     break
 
             # Regular line
             if chapter is not None and not matched:
                 chapter.write(line)
-                if line != '\n' and line != '\r\n':
+                if line != '':
                     chapter.write('\n')
 
         chapter.close()
