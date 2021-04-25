@@ -105,7 +105,8 @@ def split(filename: str, out_dir: str, discard_chapters: bool, correct: bool) ->
                 if line != '':
                     chapter.write('\n')
 
-        chapter.close()
+        if chapter is not None:
+            chapter.close()
 
 
 if (__name__ == '__main__'):
