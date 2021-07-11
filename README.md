@@ -35,10 +35,10 @@ First, use `split.py` to break up the volumes and chapters within the txt file. 
 Here is its usage:
 
 ```shell
-python3 split.py -f FILENAME [-o OUT_DIR] [-d] [-c] [-h]
+python3 split.py -f FILENAME [-o OUT_DIR] [-d] [-c] [-l] [-h]
 ```
 
-`-f` is the name of the book file and is required. The others are optional parameters. `-o` specifies the output directory and defaults to the book's directory; `-d` controls the title detection module whether to discard chapter ids between novels. Some novels will number their chapters continuously, while some would restart at Chapter 1 at the beginning of every volume. `-c` controls whether you want to automatically correct duplicate/missing indices.
+`-f` is the name of the book file and is required. The others are optional parameters. `-d` controls the title detection module whether to discard chapter ids between novels. Some novels will number their chapters continuously, while some would restart at Chapter 1 at the beginning of every volume. `-c` controls whether you want to automatically correct duplicate/missing indices. `-l` is a flag that, when enabled, will only list the volume and chapter titles, but not actually split the text file. This is particularly useful if you want to verify the index structure and make necessary changes before splitting. Finally, `-o` specifies the output directory for splitting (i.e., `-l` is not enabled), and will default to the book's directory if not specified. If ` -l` is enabled (i.e., listing the chapters), it will specify the output file for logging, and will print to the terminal if not specified.
 
 `split.py` identifies volume and chapter names through different **Matchers**. During splitting, each line is passed into all the defined matchers, which will try to extract two parts: "index" and "title".
 
@@ -47,7 +47,7 @@ python3 split.py -f FILENAME [-o OUT_DIR] [-d] [-c] [-h]
 Matchers also define two additional methods:
 
 - `format()` takes a match result (index and title), and reformats the chapter/volume name. This is particularly useful for auto correction, where one needs to adjust the index due to duplicate/missing indices.
-- `filename()` takes a match result (index and title), and outputs a valid filename. A bare-bones implementation would be to remove all illegal character names in the string returned by `format()`.
+- `filename()` takes a match result (index and title), and outputs a valid filename. A bare-bones implementation would be to remove all illegal characters in the string returned by `format()`.
 
 There are three default Matcher implementations right now, though you are welcome to add more for your own needs. When `split.py` runs, it will fetch `Matcher`s and their arguments from `default_matchers.json` from the working directory. If you need a to customize your matchers for a specific novel, you can copy the file to the novel's directory, rename it to `matchers.json` and then modify it. The script will automatically find this file and create the corresponding `Matcher`s.
 
