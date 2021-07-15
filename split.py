@@ -123,7 +123,7 @@ def list_chapters(filename: str, out_filename: str, discard_chapters: bool, corr
 
     in_dir = os.path.dirname(filename)
     volume_matchers, chapter_matchers = generate_matchers(in_dir)
-    out_file = sys.stdout if out_filename == '' else open(out_filename, 'wt')
+    out_file = sys.stdout if out_filename is None else open(out_filename, 'wt')
 
     with open(filename, 'rt', encoding='utf8') as file:
         volume = None  # Default volume name
