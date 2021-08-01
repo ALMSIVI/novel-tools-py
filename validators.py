@@ -16,10 +16,7 @@ class ValidateResult:
         self.title = title
 
 class Validator(ABC):
-    indices = set()
-    curr_index = 0
-
-    def clear(self):
+    def __init__(self):
         self.indices = set()
         self.curr_index = 0
 

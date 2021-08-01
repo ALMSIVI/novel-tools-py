@@ -63,7 +63,7 @@ def split(filename: str, out_dir: str, discard_chapters: bool, correct: bool) ->
 
                     # Discard chapter ids between volumes
                     if discard_chapters:
-                        chapter_validator.clear()
+                        chapter_validator = ChapterValidator()
 
                     chapter_validator.curr_volume = matcher.format(result)
 
@@ -144,7 +144,7 @@ def list_chapters(filename: str, out_filename: str, discard_chapters: bool, corr
 
                     # Discard chapter ids between volumes
                     if discard_chapters:
-                        chapter_validator.clear()
+                        chapter_validator = ChapterValidator()
 
                     chapter_validator.curr_volume = volume
                     matched = True
