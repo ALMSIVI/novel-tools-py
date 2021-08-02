@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from matchers import Matcher, MatchResult
+from split.matchers import *
 
 class ValidateResult:
     '''
@@ -10,10 +10,11 @@ class ValidateResult:
         - For special titles, the ids should be negative.
     '''
 
-    def __init__(self, status: str, index: int, title: str):
-        self.status = status
+    def __init__(self, error: str, index: int, title: str):
+        self.error = error
         self.index = index
         self.title = title
+
 
 class Validator(ABC):
     def __init__(self):
@@ -59,21 +60,3 @@ class Validator(ABC):
     @abstractmethod
     def missing_message(self, matcher: Matcher, result: MatchResult) -> str:
         pass
-
-
-class VolumeValidator(Validator):
-    def duplicate_message(self, matcher: Matcher, result: MatchResult) -> str:
-        return f'Potential duplicate volume: {matcher.format(result)}'
-
-    def missing_message(self, matcher: Matcher, result: MatchResult) -> str:
-        return f'Potential missing volume: {self.curr_index + 1}'
-
-
-class ChapterValidator(Validator):
-    curr_volume = '正文'
-
-    def duplicate_message(self, matcher: Matcher, result: MatchResult) -> str:
-        return f'Potential duplicate chapter in volume {self.curr_volume}: {matcher.format(result)}'
-
-    def missing_message(self, matcher: Matcher, result: MatchResult) -> str:
-        return f'Potential missing chapter in volume {self.curr_volume}: {self.curr_index + 1} (original chapter: {matcher.format(result)})'
