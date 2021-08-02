@@ -1,6 +1,6 @@
 import argparse
 from split import *
-from importlib import import_module
+from utils import import_class
 
 if (__name__ == '__main__'):
     parser = argparse.ArgumentParser(
@@ -20,7 +20,5 @@ if (__name__ == '__main__'):
 
     args = parser.parse_args()
     
-    tool_name = args.tool.replace('_', ' ').title().replace(' ', '')
-    tool = getattr(import_module(f'split.{args.tool}'), tool_name)
-
+    tool = import_class(args.tool, 'split')
     tool(args.filename, args.out_dir, args.discard_chapters, args.correct, args.debug).split()

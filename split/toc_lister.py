@@ -25,7 +25,7 @@ class TocLister(SplitBase):
 
     def volume_match(self, line: str, line_num: int, matcher: Matcher, match_result: MatchResult, val_result: ValidateResult):
         self.volume = matcher.format(val_result)
-        self.out_file.write(self.volume)
+        self.out_file.write(f'{self.volume}\t{line_num}')
         if self.debug and val_result.error is not None:
             self.out_file.write('\t' + val_result.error)
         self.out_file.write('\n')
@@ -34,7 +34,7 @@ class TocLister(SplitBase):
     def chapter_match(self, line: str, line_num: int, matcher: Matcher, match_result: MatchResult, val_result: ValidateResult):
         if self.volume is not None:
             self.out_file.write('\t')
-        self.out_file.write(matcher.format(val_result))
+        self.out_file.write(f'{matcher.format(val_result)}\t{line_num}')
         if self.debug and val_result.error is not None:
             self.out_file.write('\t' + val_result.error)
         self.out_file.write('\n')
