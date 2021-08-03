@@ -1,5 +1,5 @@
 import json, os
-from volumes.volume_base import VolumeBase
+from .volume_base import VolumeBase
 
 class JsonVolume(VolumeBase):
     def filename(self):

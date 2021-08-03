@@ -1,6 +1,4 @@
-import os
-import json
-import argparse
+import os, json, argparse
 
 
 def add(directory: str) -> None:

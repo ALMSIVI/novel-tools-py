@@ -1,7 +1,7 @@
 import os, sys
-from split.matchers import *
-from split.validators import *
-from split.split_base import SplitBase
+from .matchers import *
+from .validators import *
+from .split_base import SplitBase
 
 class TocLister(SplitBase):
     '''

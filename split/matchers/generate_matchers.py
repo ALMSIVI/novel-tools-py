@@ -1,45 +1,19 @@
-import csv, json, os
-from split.matchers import Matcher
-from utils import snake_to_pascal, import_class
+import json, os
+from .matcher import Matcher
+from utils import ClassFactory
+from volumes import read_volumes
 
-class MatcherFactory:
-    def __init__(self):
-        module_names = [filename[:-3] for filename in os.listdir('./split/matchers') if filename.endswith('_matcher.py')]
-        
-        self.matchers: dict[str, Matcher] = {}
-        for module in module_names:
-            matcher_name = snake_to_pascal(module)
-            self.matchers[matcher_name] = import_class(module, 'split.matchers')
-
-    def get(self, name, args):
-        return self.matchers[name](args)
-
-
-def check_volume_matchers(in_dir: str, factory: MatcherFactory):
+def check_volume_matchers(in_dir: str, factory: ClassFactory):
     # Check csv first.
-    csv_volumes = os.path.join(in_dir, 'volumes.csv')
-    json_volumes = os.path.join(in_dir, 'volumes.json')
-    volumes = None
-
-    if os.path.isfile(csv_volumes):
-        volumes = []
-        with open(csv_volumes, 'rt') as f:
-            reader = csv.DictReader(f, fieldnames=['name, volume'])
-            for row in reader:
-                volumes.append(row)
-        
-    elif os.path.isfile(json_volumes):
-        with open(json_volumes, 'rt') as f:
-            volumes = json.load(f)
-    
+    volumes = read_volumes(in_dir)
     if volumes is None:
         return None
     else:
         return [factory.get('VolumeMatcher', {'volumes': volumes})]
 
     
-def generate_matchers(in_dir: str):
-    factory = MatcherFactory()
+def generate_matchers(in_dir: str) -> tuple[list[Matcher], list[Matcher]]:
+    factory = ClassFactory('split.matchers', '_matcher')
 
     matcher_filename = os.path.join(in_dir, 'matchers.json')
     if not os.path.isfile(matcher_filename):

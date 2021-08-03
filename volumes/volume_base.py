@@ -6,7 +6,7 @@ class VolumeBase(ABC):
         self.dir = dir
 
     def exists(self):
-        return os.path.isfile(self.filename)
+        return os.path.isfile(self.filename())
 
     @abstractmethod
     def filename(self):

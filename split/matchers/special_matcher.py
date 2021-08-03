@@ -1,6 +1,6 @@
 import re
-from split.matchers import *
-from split.matchers.utils import purify_name
+from . import *
+from .utils import purify_name
 
 class SpecialMatcher(Matcher):
     '''Matches a special chapter, whose prefix is in the given dict.'''

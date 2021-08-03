@@ -1,4 +1,4 @@
-from split.matchers import *
+from . import *
 
 class VolumeMatcher(Matcher):
     '''

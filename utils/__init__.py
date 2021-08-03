@@ -1,1 +1,1 @@
-from utils.utils import snake_to_pascal, import_class, import_function
+from .utils import snake_to_pascal, import_class, import_function, ClassFactory

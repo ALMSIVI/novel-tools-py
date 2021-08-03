@@ -1,6 +1,6 @@
 import re
-from split.matchers import *
-from split.matchers.utils import to_num, purify_name
+from . import *
+from .utils import to_num, purify_name
 
 class NumberedMatcher(Matcher):
     '''Matches a regular chapter/volume, with an index and/or a title.'''

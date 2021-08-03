@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
-from split.matchers import *
-from split.validators import *
+from .matchers import *
+from .validators import *
 
 class SplitBase(ABC):
     def __init__(self, filename, out_dir, discard_chapters, correct, debug):

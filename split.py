@@ -1,5 +1,4 @@
 import argparse
-from split import *
 from utils import import_class
 
 if (__name__ == '__main__'):

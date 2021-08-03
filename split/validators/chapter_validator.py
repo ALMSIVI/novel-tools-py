@@ -1,5 +1,5 @@
-from split.validators.validator import Validator
-from split.matchers import *
+from .validator import Validator
+from ..matchers import *
 
 class ChapterValidator(Validator):
     curr_volume = '正文'
