@@ -1,49 +1,67 @@
-from abc import ABC, abstractmethod
-from .validate_result import ValidateResult
-from ..matchers import *
+from abc import abstractmethod
+from framework import Processor
+from common import NovelData
 
+class Validator(Processor):
+    def __init__(self, args):
+        '''
+        Arguments:
+        - discard_chapters (bool): If set to True, restart indexing at the beginning of each new volume.
+        - correct (bool): If set to True, automatically correct the indices.
+        - verbose (optional, bool): If set to True, will keep a copy of the uncorrected index in the others field. Default is False.
+        '''
+        self.discard_chapters = args['discard_chapters']
+        self.correct = args['correct']
+        self.verbose = args.get('verbose', False)
 
-class Validator(ABC):
-    def __init__(self):
+    def before(self):
         self.indices = set()
         self.curr_index = 0
 
-    def validate(self, matcher: Matcher, match_result: MatchResult, correct: bool) -> ValidateResult:
+    def process(self, data: NovelData) -> NovelData:
         '''
         Validates the index, and tries to fix any errors if the correct flag is set to true.
         Returns a copy of the original result if correct is false, or a fixed result if true.
         '''
-        val_result = ValidateResult(None, match_result.index, match_result.title)
+        new_data = data.copy()
+        if self.verbose and not data.has('original_index'):
+            new_data.set(original_index=data.index)
 
-        # Do not validate special titles (those with negative index values)
-        if match_result.index < 0:
-            self.indices.add(val_result.index)
-            return val_result
+        if not self.precheck(data):
+            return new_data
 
         # Duplicate detection
-        if match_result.index in self.indices:
+        if data.index in self.indices:
             # Auto fix by trying attempting to increase the index (positive only)
-            if correct:
-                while val_result.index in self.indices:
-                    val_result.index += 1
+            if self.correct:
+                while new_data.index in self.indices:
+                    new_data.index += 1
 
-            val_result.status = self.duplicate_message(matcher, match_result)
+            new_data.error = self.duplicate_message(data)
 
         # Missing detection
-        if self.curr_index != 0 and self.curr_index + 1 != val_result.index:
-            if correct:
-                val_result.index = self.curr_index + 1
+        if self.curr_index != 0 and self.curr_index + 1 != new_data.index:
+            if self.correct:
+                new_data.index = self.curr_index + 1
 
-            val_result.status = self.missing_message(matcher, match_result)
+            new_data.error = self.missing_message(data)
 
-        self.indices.add(val_result.index)
-        self.curr_index = val_result.index
-        return val_result
+        self.indices.add(new_data.index)
+        self.curr_index = new_data.index
+        return new_data
+
+    def format(self, result: NovelData) -> str:
+        return f'index = {result.content[0]}, title = {result.content[1]}'
 
     @abstractmethod
-    def duplicate_message(self, matcher: Matcher, result: MatchResult) -> str:
+    def precheck(self, data: NovelData) -> bool:
+        '''Performs a check as of whether to validate the object. If it returns false, skip validation and move on.'''
         pass
 
     @abstractmethod
-    def missing_message(self, matcher: Matcher, result: MatchResult) -> str:
+    def duplicate_message(self, data: NovelData) -> str:
+        pass
+
+    @abstractmethod
+    def missing_message(self, data: NovelData) -> str:
         pass

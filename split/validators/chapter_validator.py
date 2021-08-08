@@ -1,11 +1,27 @@
+from common import NovelData, Type
 from .validator import Validator
-from ..matchers import *
 
 class ChapterValidator(Validator):
     curr_volume = '正文'
 
-    def duplicate_message(self, matcher: Matcher, result: MatchResult) -> str:
-        return f'Potential duplicate chapter in volume {self.curr_volume}: {matcher.format(result)}'
+    def precheck(self, data: NovelData) -> bool:
+        if data.type == Type.VOLUME_TITLE:
+            self.curr_volume = data.content[1]
+            if self.discard_chapters:
+                self.indices.clear()
+            return False
+        if data.type == Type.CHAPTER_TITLE:
+            # Do not validate special titles (those with negative index values)
+            if data.index < 0:
+                self.indices.add(data.index)
+                return False
 
-    def missing_message(self, matcher: Matcher, result: MatchResult) -> str:
-        return f'Potential missing chapter in volume {self.curr_volume}: {self.curr_index + 1} (original chapter: {matcher.format(result)})'
+            return True
+
+        return False
+
+    def duplicate_message(self, data: NovelData) -> str:
+        return f'Potential duplicate chapter in volume {self.curr_volume}: {self.format(data)}'
+
+    def missing_message(self, data: NovelData) -> str:
+        return f'Potential missing chapter in volume {self.curr_volume}: {self.curr_index + 1} (current chapter: {self.format(data)})'

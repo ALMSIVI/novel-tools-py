@@ -1,0 +1,107 @@
+{
+  "readers": [
+    {
+      "package_base": "common",
+      "ending": "reader",
+      "list": [
+        {
+          "class": "TextReader",
+          "encoding": "utf-8",
+          "verbose": true
+        }
+      ]
+    }
+  ],
+  "matchers": [
+    {
+      "package_base": "split.matchers",
+      "ending": "matcher",
+      "list": [
+        {
+          "class": "NumberedMatcher",
+          "type": "volume_title",
+          "regex": "^第(.+)卷(.*)$"
+        },
+        {
+          "class": "SpecialMatcher",
+          "type": "volume_title",
+          "prefixes": ["前传", "最终卷", "后记", "番外篇"],
+          "regex": "^{prefixes}(.*)$"
+        },
+        {
+          "class": "NumberedMatcher",
+          "type": "chapter_title",
+          "regex": "^第(.+)章(.*)$"
+        },
+        {
+          "class": "SpecialMatcher",
+          "type": "chapter_title",
+          "prefixes": ["序章", "楔子", "终章", "番外"],
+          "regex": "^{prefixes}(.*)$"
+        }
+      ]
+    }
+  ],
+  "validators": [
+    {
+      "package_base": "split.validators",
+      "ending": "validator",
+      "list": [
+        {
+          "class": "VolumeValidator",
+          "discard_chapters": false,
+          "correct": true,
+          "verbose": true
+        },
+        {
+          "class": "ChapterValidator",
+          "discard_chapters": false,
+          "correct": true,
+          "verbose": true
+        }
+      ]
+    }
+  ],
+  "writers": [
+    {
+      "package_base": "split.writers",
+      "ending": "writer",
+      "list": [
+        {
+          "class": "CsvWriter",
+          "formats": {
+            "volume_title": {
+              "column": "volume",
+              "format": "第{index}卷 {title}"
+            },
+            "chapter_title": {
+              "column": "chapter",
+              "format": "第{index}章 {title}"
+            }
+          },
+          "correct": true,
+          "debug": true,
+          "verbose": true
+        },
+        {
+          "class": "TocWriter",
+          "formats": {
+            "volume_title": "第{index}卷 {title}",
+            "chapter_title": "第{index}卷 {title}"
+          },
+          "debug": true
+        },
+        {
+          "class": "FileWriter",
+          "formats": {
+            "volume_title": "第{index}卷 {title}",
+            "chapter_title": "第{index}卷 {title}"
+          },
+          "correct": true,
+          "debug": true,
+          "default_volume": "正文"
+        }
+      ]
+    }
+  ]
+}

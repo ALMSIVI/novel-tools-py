@@ -3,24 +3,27 @@ from .processor import Processor
 from .writer import Writer
 
 class Worker:
-    def __init__(self, reader: Reader, processors: list[Processor], writer: Writer):
+    def __init__(self, reader: Reader, processors: list[Processor], writers: list[Writer]):
         self.reader = reader
         self.processors = processors
-        self.writer = writer
+        self.writers = writers
 
     def work(self):
         self.reader.before()
         for processor in self.processors:
             processor.before()
-        self.writer.before()
+        for writer in self.writers:
+            writer.before()
 
         while obj := self.reader.read():
             for processor in self.processors:
                 obj = processor.process(obj)
 
-            self.writer.write(obj)
+            for writer in self.writers:
+                writer.write(obj)
 
         self.reader.after()
         for processor in self.processors:
             processor.after()
-        self.writer.after()
+        for writer in self.writers:
+            writer.after()

@@ -1,9 +1,21 @@
-from ..matchers import *
+from common import NovelData, Type
 from .validator import Validator
 
 class VolumeValidator(Validator):
-    def duplicate_message(self, matcher: Matcher, result: MatchResult) -> str:
-        return f'Potential duplicate volume: {matcher.format(result)}'
+    def precheck(self, data: NovelData) -> bool:
+        if data.type == Type.VOLUME_TITLE:
+            # Do not validate special titles (those with negative index values)
+            if data.index < 0:
+                self.indices.add(data.index)
+                return False
+                
+            return True
 
-    def missing_message(self, matcher: Matcher, result: MatchResult) -> str:
-        return f'Potential missing volume: {self.curr_index + 1}'
+        return False
+        
+
+    def duplicate_message(self, data: NovelData) -> str:
+        return f'Potential duplicate volume: {self.format(data)}'
+
+    def missing_message(self, data: NovelData) -> str:
+        return f'Potential missing volume: {self.curr_index + 1} (current volume: {self.format(data)})'

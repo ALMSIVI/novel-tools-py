@@ -1,33 +1,29 @@
 import re
-from . import *
-from .utils import purify_name
+from framework import Processor
+from common import NovelData, Type
 
-class SpecialMatcher(Matcher):
-    '''Matches a special chapter, whose prefix is in the given dict.'''
+class SpecialMatcher(Processor):
+    '''Accepts a line in a book and matches a special chapter, whose prefix is in the given dict.'''
 
     def __init__(self, args):
         '''
         Arguments:
-        - prefixes: list of special names to match for.
+        - type (str): Specifies the type for this matcher.
+        - prefixes (list[str]): List of special names to match for.
+        - regex (str): The regex to match for. It will contain a "prefex" format, that will be replaced with the list of prefixes.
         '''
+        self.type = Type[args['type'].upper()]
         self.prefixes = args['prefixes']
-        self.regex = re.compile(args['regex'].format(
-            prefixes=f'({"|".join(self.prefixes)})'))
-        self.format_str = args['format']
+        prefix_str = '|'.join(self.prefixes)
+        self.regex = re.compile(args['regex'].format(prefixes=f'({prefix_str})'))
 
-    def match(self, line: str) -> MatchResult:
-        m = self.regex.match(line)
+    def process(self, data: NovelData) -> NovelData:
+        m = self.regex.match(data.content)
         if m:
             for i in range(len(self.prefixes)):
                 if m[0] == self.prefixes[i]:
                     title = m[2].strip()
                     # Use negative number to avoid colliding with numbered titles
-                    return MatchResult(True, -i - 1, title)
+                    return NovelData(self.type, title, -i - 1, data.error, data.order, **data.others)
 
-        return MatchResult(False, None, None)
-
-    def format(self, result: MatchResult) -> str:
-        return self.format_str.format(prefix=self.prefixes[-result.index - 1], title=result.title)
-
-    def filename(self, result: MatchResult) -> str:
-        return purify_name(self.format(result))
+        return data.copy()

@@ -1,33 +1,28 @@
 import re
-from . import *
-from .utils import to_num, purify_name
+from framework import Processor
+from common import NovelData, Type
+from utils import to_num
 
-class NumberedMatcher(Matcher):
-    '''Matches a regular chapter/volume, with an index and/or a title.'''
+class NumberedMatcher(Processor):
+    '''Accepts a line in a book and matches a regular chapter/volume, with an index and/or a title.'''
 
     def __init__(self, args):
         '''
         Arguments:
-        - regex: The regex to match for. It will contain two groups: the first group is the index, the second (optional) is the title.
-        - format: The format for the chapter/volume.
+        - type (str): Specifies the type for this matcher.
+        - regex (str): The regex to match for. It will contain two groups: the first group is the index, the second (optional) is the title.
         '''
+        self.type = Type[args['type'].upper()]
         self.regex = re.compile(args['regex'])
-        self.format_str = args['format']
 
-    def match(self, line: str) -> MatchResult:
-        m = self.regex.match(line)
+    def process(self, data: NovelData) -> NovelData:
+        m = self.regex.match(data.content)
         if m:
             try:
                 index = to_num(m[1])
                 title = m[2].strip()
-                return MatchResult(True, index, title)
+                return NovelData(self.type, title, index, data.error, data.order, **data.others)
             except:  # Not a valid number
-                return MatchResult(False, None, None)
+                return data.copy()
 
-        return MatchResult(False, None, None)
-
-    def format(self, result: MatchResult) -> str:
-        return self.format_str.format(index=result.index, title=result.title)
-
-    def filename(self, result: MatchResult) -> str:
-        return purify_name(self.format(result))
+        return data.copy()
