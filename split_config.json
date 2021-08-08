@@ -5,23 +5,23 @@
       "name": "default",
       "list": [
         {
-          "base": "common",
+          "base": "readers",
           "ending": "reader"
         },
         {
-          "base": "split.matchers",
+          "base": "processors.matchers",
           "ending": "matcher"
         },
         {
-          "base": "split.validators",
+          "base": "processors.validators",
           "ending": "validator"
         },
         {
-          "base": "split.transformers",
+          "base": "processors.transformers",
           "ending": "transformer"
         },
         {
-          "base": "split.writers",
+          "base": "writers",
           "ending": "writer"
         }
       ]

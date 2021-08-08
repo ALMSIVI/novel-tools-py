@@ -1,14 +1,19 @@
-import os, json
+import json
+import os
 from importlib import import_module
+
 
 def snake_to_pascal(s: str):
     return s.replace('_', ' ').title().replace(' ', '')
 
+
 def import_class(filename: str, base_package: str):
     return getattr(import_module(f'{base_package}.{filename}'), snake_to_pascal(filename))
 
+
 def import_function(filename: str, base_package: str, func_name: str):
     return getattr(import_module(f'{base_package}.{filename}'), func_name)
+
 
 class ClassFactory:
     def __init__(self, packages):
@@ -31,8 +36,10 @@ class ClassFactory:
         return self.classes[name](args)
 
 
-def generate_objects(in_dir: str, config_filename: str, default_config_filename: str, additional_args: dict = {}):
-    '''Generates corresponding objects from the config file.'''
+def generate_objects(in_dir: str, config_filename: str, default_config_filename: str, additional_args=None):
+    """Generates corresponding objects from the config file."""
+    if additional_args is None:
+        additional_args = {}
     filename = os.path.join(in_dir, config_filename)
     if not os.path.isfile(filename):
         filename = os.path.join(os.curdir, default_config_filename)
@@ -66,13 +73,13 @@ num_dict = {"零": 0, "〇": 0, "一": 1, "二": 2, "两": 2, "三": 3, "四": 4
 
 
 def to_num(num: str) -> int:
-    '''
+    """
     Converts a chinese string to a number.
-    '''
+    """
     num = num.strip()
     try:
         value = int(num)
-    except:
+    except ValueError:
         value = 0
         digit = 1
 
@@ -89,7 +96,7 @@ def to_num(num: str) -> int:
     return value
 
 
-valid_filenames = dict((ord(char), None) for char in '\/*?:"<>|\n')
+valid_filenames = dict((ord(char), None) for char in '\\/*?:"<>|\n')
 
 
 def purify_name(filename: str) -> str:

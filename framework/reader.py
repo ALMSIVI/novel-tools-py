@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 
-class Reader(ABC):
-    def __init__(self, args):
-        pass
 
+class Reader(ABC):
     def before(self):
         pass
 

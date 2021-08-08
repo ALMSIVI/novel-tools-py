@@ -1,5 +1,6 @@
 from enum import Enum, auto
 
+
 class Type(Enum):
     BOOK_TITLE = auto()
     BOOK_INTRO = auto()

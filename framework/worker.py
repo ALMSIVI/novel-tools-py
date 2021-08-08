@@ -2,6 +2,7 @@ from .reader import Reader
 from .processor import Processor
 from .writer import Writer
 
+
 class Worker:
     def __init__(self, reader: Reader, processors: list[Processor], writers: list[Writer]):
         self.reader = reader

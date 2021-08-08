@@ -2,16 +2,18 @@ import re
 from framework import Processor
 from common import NovelData, Type
 
+
 class SpecialMatcher(Processor):
-    '''Accepts a line in a book and matches a special title, whose prefixes are in the given list.'''
+    """Accepts a line in a book and matches a special title, whose prefixes are in the given list."""
 
     def __init__(self, args):
-        '''
+        """
         Arguments:
         - type (str): Specifies the type for this matcher.
         - prefixes (list[str]): List of special names to match for.
-        - regex (str): The regex to match for. It will contain a "prefex" format, that will be replaced with the list of prefixes.
-        '''
+        - regex (str): The regex to match for. It will contain a "prefix" format, that will be replaced with the list of
+          prefixes.
+        """
         self.type = Type[args['type'].upper()]
         self.prefixes = args['prefixes']
         prefix_str = '|'.join(self.prefixes)

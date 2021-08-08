@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 
-class Processor(ABC):
-    def __init__(self, args):
-        pass
 
+class Processor(ABC):
     def before(self):
         pass
 

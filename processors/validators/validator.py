@@ -2,32 +2,32 @@ from abc import abstractmethod
 from framework import Processor
 from common import NovelData
 
+
 class Validator(Processor):
     def __init__(self, args):
-        '''
+        """
         Arguments:
         - discard_chapters (bool): If set to True, restart indexing at the beginning of each new volume.
         - correct (bool): If set to True, automatically correct the indices.
-        - verbose (optional, bool): If set to True, will keep a copy of the uncorrected index in the others field. Default is False.
-        '''
+        - verbose (optional, bool): If set to True, will keep a copy of the uncorrected index in the others field.
+          Default is False.
+        """
         self.discard_chapters = args['discard_chapters']
         self.correct = args['correct']
         self.verbose = args.get('verbose', False)
-
-    def before(self):
         self.indices = set()
         self.curr_index = 0
 
     def process(self, data: NovelData) -> NovelData:
-        '''
+        """
         Validates the index, and tries to fix any errors if the correct flag is set to true.
         Returns a copy of the original result if correct is false, or a fixed result if true.
-        '''
+        """
         new_data = data.copy()
         if self.verbose and not data.has('original_index'):
             new_data.set(original_index=data.index)
 
-        if not self.precheck(data):
+        if not self.check(data):
             return new_data
 
         # Duplicate detection
@@ -50,12 +50,13 @@ class Validator(Processor):
         self.curr_index = new_data.index
         return new_data
 
-    def format(self, result: NovelData) -> str:
-        return result.format('index = {index}, title = {content}')
+    @staticmethod
+    def format(result: NovelData) -> str:
+        return result.format('index = {index}, content = {content}')
 
     @abstractmethod
-    def precheck(self, data: NovelData) -> bool:
-        '''Performs a check as of whether to validate the object. If it returns false, skip validation and move on.'''
+    def check(self, data: NovelData) -> bool:
+        """Performs a check as of whether to validate the object. If it returns false, skip validation and move on."""
         pass
 
     @abstractmethod
