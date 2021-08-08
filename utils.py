@@ -11,36 +11,52 @@ def import_function(filename: str, base_package: str, func_name: str):
     return getattr(import_module(f'{base_package}.{filename}'), func_name)
 
 class ClassFactory:
-    def __init__(self, package_base: str, ending: str):
-        module_dir = os.path.join('.', *package_base.split('.'))
-        module_names = [filename[:-3] for filename in os.listdir(module_dir) if filename.endswith(f'{ending}.py')]
-        
+    def __init__(self, packages):
         self.classes = {}
+
+        if type(packages) is dict:
+            packages = [packages]
+
+        for package in packages:
+            self.add_package(package['base'], package['ending'])
+
+    def add_package(self, base: str, ending: str):
+        module_dir = os.path.join('.', *base.split('.'))
+        module_names = [filename[:-3] for filename in os.listdir(module_dir) if filename.endswith(f'{ending}.py')]
         for module in module_names:
             name = snake_to_pascal(module)
-            self.classes[name] = import_class(module, package_base)
+            self.classes[name] = import_class(module, base)
 
     def get(self, name, args):
         return self.classes[name](args)
 
 
 def generate_objects(in_dir: str, config_filename: str, default_config_filename: str, additional_args: dict = {}):
-    '''Generates corresponding objects from config files.'''
+    '''Generates corresponding objects from the config file.'''
     filename = os.path.join(in_dir, config_filename)
     if not os.path.isfile(filename):
         filename = os.path.join(os.curdir, default_config_filename)
 
     with open(filename, 'rt') as f:
-        config_map = json.load(f)
+        config = json.load(f)
+
+    factories = {}
+    for factory_config in config['packages']:
+        factories[factory_config['name']] = ClassFactory(factory_config['list'])
 
     objects = {}
-    for key, configs in config_map.items():
-        object_list = []
-        for config in configs:
-            factory = ClassFactory(config['package_base'], config['ending'])
-            object_list += [factory.get(args['class'], args | additional_args) for args in config['list']]
+    for key, object_configs in config['objects'].items():
+        if type(object_configs) is dict:
+            object_config = object_configs
+            factory_name = object_config.get('name', config['default_package'])
+            objects[key] = factories[factory_name].get(object_config['class'], object_config | additional_args)
+        else:
+            object_list = []
+            for object_config in object_configs:
+                factory_name = object_config.get('name', config['default_package'])
+                object_list.append(factories[factory_name].get(object_config['class'], object_config | additional_args))
 
-        objects[key] = object_list
+            objects[key] = object_list
 
     return objects
 

@@ -11,7 +11,7 @@ class FileWriter(Writer):
         '''
         Arguments:
         - formats (dict[str, dict[str, str]] | dict[str, str]): Key is Type representations, and the value can either consist of the following two fields:
-            - title: Format string that contains {index} and {title} to be formatted. Will be written to the top of the file.
+            - title: Format string that can use any NovelData field. Will be written to the top of the file.
             - filename: Same as above, except that it will be used as a filename (after purification).
         Or it can simply be one format string, in which case both the title and filename will use it.
         - correct (bool): If set to False and the original_index field exists, will use the original index.
@@ -26,23 +26,37 @@ class FileWriter(Writer):
         self.default_volume = args['default_volume']
 
     def before(self):
-        self.chapter = None
+        self.file = None
         self.curr_dir = os.path.join(self.out_dir, self.default_volume)
 
     def after(self):
-        if self.chapter:
-            self.chapter.close()
+        if self.file:
+            self.file.close()
 
     def write(self, data: NovelData):
         if data.type not in self.formats: # Normally, should only contain volume and chapter titles
-            if self.chapter:
-                self.chapter.write(data.content)
-                if data.content != '':
-                    self.chapter.write('\n')
+            if data.type == Type.BLANK:
+                return
+            elif data.type == Type.BOOK_TITLE or data.type == Type.BOOK_INTRO:
+                # Write to _intro.txt in the book directory
+                if self.file:
+                    self.file.close()
+                self.file = open(os.path.join(self.out_dir, '_intro.txt'), 'wt')
+
+            elif data.type == Type.VOLUME_INTRO:
+                # Write to _intro.txt in the volume directory
+                if self.file:
+                    self.file.close()
+                self.file = open(os.path.join(self.curr_dir, '_intro.txt'), 'wt')
+            elif data.type != Type.CHAPTER_CONTENT:
+                print(f'Unrecognized data type: {data.type}')
+                return
+
+            self.file.write(data.content + '\n')
         else:
-            index = data.get('original_index') if self.correct and data.has('original_index') else data.index
-            filename = purify_name(self.formats[data.type]['filename'].format(index=index, title=data.content))
-            title = self.formats[data.type]['title'].format(index=data.index, title=data.content)
+            index = data.get('original_index') if not self.correct and data.has('original_index') else data.index
+            filename = purify_name(data.format(self.formats[data.type]['filename'], index=index))
+            title = data.format(self.formats[data.type]['title'], index=index)
 
             # If there is a validation error, print on the terminal
             if self.debug and data.error:
@@ -51,20 +65,22 @@ class FileWriter(Writer):
                     print(f'\t- Adjusted to {title}')
 
             if data.type == Type.VOLUME_TITLE:
+                # For volumes, create the volume directory
                 self.curr_dir = os.path.join(self.out_dir, filename)
                 if not os.path.isdir(self.curr_dir):
                     os.mkdir(self.curr_dir)
 
-                if self.chapter:
-                    self.chapter.close()  # Close current chapter
-                    self.chapter = None
+                if self.file:
+                    self.file.close()  # Close current chapter
+                    self.file = None
             elif data.type == Type.CHAPTER_TITLE:
+                # For chapters, create the chapter file
                 # Close previous chapter file
-                if self.chapter:
-                    self.chapter.close()
+                if self.file:
+                    self.file.close()
 
                 if not os.path.isdir(self.curr_dir):
                     os.mkdir(self.curr_dir)
 
-                self.chapter = open(os.path.join(self.curr_dir, filename + '.txt'), 'wt')
-                self.chapter.write(title + '\n') 
+                self.file = open(os.path.join(self.curr_dir, filename + '.txt'), 'wt')
+                self.file.write(title + '\n') 

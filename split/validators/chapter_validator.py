@@ -2,7 +2,7 @@ from common import NovelData, Type
 from .validator import Validator
 
 class ChapterValidator(Validator):
-    curr_volume = '正文'
+    curr_volume = None
 
     def precheck(self, data: NovelData) -> bool:
         if data.type == Type.VOLUME_TITLE:
@@ -21,7 +21,11 @@ class ChapterValidator(Validator):
         return False
 
     def duplicate_message(self, data: NovelData) -> str:
-        return f'Potential duplicate chapter in volume {self.curr_volume}: {self.format(data)}'
+        if self.curr_volume:
+            return f'Potential duplicate chapter in volume {self.curr_volume}: {self.format(data)}'
+        return f'Potential duplicate chapter: {self.format(data)}'
 
     def missing_message(self, data: NovelData) -> str:
-        return f'Potential missing chapter in volume {self.curr_volume}: {self.curr_index + 1} (current chapter: {self.format(data)})'
+        if self.curr_volume:
+            return f'Potential missing chapter in volume {self.curr_volume}: {self.curr_index + 1} (current chapter: {self.format(data)})'
+        return f'Potential missing chapter: {self.curr_index + 1} (current chapter: {self.format(data)})'

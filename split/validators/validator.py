@@ -51,7 +51,7 @@ class Validator(Processor):
         return new_data
 
     def format(self, result: NovelData) -> str:
-        return f'index = {result.content[0]}, title = {result.content[1]}'
+        return result.format('index = {index}, title = {content}')
 
     @abstractmethod
     def precheck(self, data: NovelData) -> bool:

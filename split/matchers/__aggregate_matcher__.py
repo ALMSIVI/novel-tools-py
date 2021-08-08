@@ -6,7 +6,7 @@ class __AggregateMatcher__(Processor):
     *** INTERNAL CLASS ***
     Accepts a line and matches against the given list of regular Matchers.
     If one Matcher returns a non-UNRECOGNIZED result, that will be returned.
-    If all Matchers return UNRECOGNIZED, then the line will be treated as CHAPTER_CONTENT.
+    If all Matchers return UNRECOGNIZED, then the original data is returned.
     '''
 
     def __init__(self, args: list[Processor]):
@@ -26,6 +26,4 @@ class __AggregateMatcher__(Processor):
             if new_data.type != Type.UNRECOGNIZED:
                 return new_data
 
-        new_data = data.copy()
-        new_data.type = Type.CHAPTER_CONTENT
-        return new_data
+        return data

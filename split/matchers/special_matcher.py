@@ -3,7 +3,7 @@ from framework import Processor
 from common import NovelData, Type
 
 class SpecialMatcher(Processor):
-    '''Accepts a line in a book and matches a special chapter, whose prefix is in the given dict.'''
+    '''Accepts a line in a book and matches a special title, whose prefixes are in the given list.'''
 
     def __init__(self, args):
         '''
@@ -24,6 +24,6 @@ class SpecialMatcher(Processor):
                 if m[0] == self.prefixes[i]:
                     title = m[2].strip()
                     # Use negative number to avoid colliding with numbered titles
-                    return NovelData(self.type, title, -i - 1, data.error, data.order, **data.others)
+                    return NovelData(self.type, title, -i - 1, data.error, **data.others)
 
-        return data.copy()
+        return data

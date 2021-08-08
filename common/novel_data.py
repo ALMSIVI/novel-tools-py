@@ -10,16 +10,14 @@ class NovelData:
         - For regular titles, the id should be positive and self-increasing. This is required for duplicate/missing index detection.
         - For special titles, the id should be negative.
     - error: If there is an error during processing, this field will be populated with the error message.
-    - order: Internal order of the split result.
     - others: Contains additional data needed for processers/writers here.
     '''
 
-    def __init__(self, type: Type, content: str, index: int = None, error: str = None, order: int = None, **kwargs):
+    def __init__(self, type: Type, content: str, index: int = None, error: str = None, **kwargs):
         self.type = type
         self.content = content
         self.index = index
         self.error = error
-        self.order = order
         self.others = kwargs
 
     def has(self, key: str) -> bool:
@@ -30,6 +28,18 @@ class NovelData:
 
     def set(self, **kwargs):
         self.others |= kwargs
+
+    def format(self, format_str: str, **kw):
+        '''Formats the novel data by a given format string. Use kw to overwrite existing fields if necessary.'''
+        args = {
+            'type': self.type,
+            'content': self.content,
+            'index': self.index,
+            'error': self.error
+        }
+        args |= self.others
+        args |= kw
+        return format_str.format(**args)
 
     def copy(self):
         return deepcopy(self)

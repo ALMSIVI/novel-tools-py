@@ -16,8 +16,7 @@ def split(filename: str, out_dir: str):
     objects = generate_objects(in_dir, 'split_config.json', 'split_config.json', additional_args)
 
     matcher = __AggregateMatcher__(objects['matchers'])
-    validators = objects['validators']
-    processors = [matcher] + validators
+    processors = [matcher] + objects['validators'] + objects['transformers']
 
-    worker = Worker(objects['readers'][0], processors, objects['writers']) # There is only one reader
+    worker = Worker(objects['readers'], processors, objects['writers']) # There is only one reader
     worker.work()

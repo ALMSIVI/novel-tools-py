@@ -21,8 +21,8 @@ class NumberedMatcher(Processor):
             try:
                 index = to_num(m[1])
                 title = m[2].strip()
-                return NovelData(self.type, title, index, data.error, data.order, **data.others)
+                return NovelData(self.type, title, index, data.error, **data.others)
             except:  # Not a valid number
-                return data.copy()
+                return data
 
-        return data.copy()
+        return data
