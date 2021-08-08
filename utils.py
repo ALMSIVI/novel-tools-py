@@ -36,12 +36,12 @@ class ClassFactory:
         return self.classes[name](args)
 
 
-def generate_objects(in_dir: str, config_filename: str, default_config_filename: str, additional_args=None):
+def generate_objects(config_filename: str, default_config_filename: str, in_dir: str, additional_args=None):
     """Generates corresponding objects from the config file."""
     if additional_args is None:
         additional_args = {}
     filename = os.path.join(in_dir, config_filename)
-    if not os.path.isfile(filename):
+    if not os.path.exists(filename):
         filename = os.path.join(os.curdir, default_config_filename)
 
     with open(filename, 'rt') as f:

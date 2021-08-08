@@ -5,7 +5,8 @@ from processors.matchers.__aggregate_matcher__ import AggregateMatcher
 from utils import generate_objects
 
 
-def split(filename: str, out_dir: str):
+def analyze(filename: str, out_dir: str):
+    """Analyzes the volume/chapter structure of the novel."""
     in_dir = os.path.dirname(filename)
 
     additional_args = {
@@ -15,7 +16,7 @@ def split(filename: str, out_dir: str):
     if out_dir:
         additional_args['out_dir'] = out_dir
 
-    objects = generate_objects(in_dir, 'split_config.json', 'split_config.json', additional_args)
+    objects = generate_objects('analyze_config.json', 'analyze_config.json', in_dir, additional_args)
 
     matcher = AggregateMatcher(objects['matchers'])
     processors = [matcher] + objects['validators'] + objects['transformers']
@@ -25,11 +26,9 @@ def split(filename: str, out_dir: str):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Split ebook file into individual chapters.')
-    parser.add_argument('-t', '--tool', default='list_generator',
-                        help='Select which tool you want to use. Default is to generate a csv file.')
+    parser = argparse.ArgumentParser(description='Analyzes the volume/chapter structure of the novel.')
     parser.add_argument('-f', '--filename', help='Filename of the book file.')
-    parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output files.')
+    parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output file(s).')
 
     args = parser.parse_args()
-    split(args.filename, args.out_dir)
+    analyze(args.filename, args.out_dir)

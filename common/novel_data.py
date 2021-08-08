@@ -24,7 +24,7 @@ class NovelData:
         self.others = kwargs
 
     def has(self, key: str) -> bool:
-        return key in self.others
+        return self.others and key in self.others
 
     def get(self, key: str):
         return self.others.get(key)

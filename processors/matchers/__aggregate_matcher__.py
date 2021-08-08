@@ -13,13 +13,9 @@ class AggregateMatcher(Processor):
     def __init__(self, args: list[Processor]):
         self.matchers = args
 
-    def before(self):
+    def cleanup(self):
         for matcher in self.matchers:
-            matcher.before()
-
-    def after(self):
-        for matcher in self.matchers:
-            matcher.after()
+            matcher.cleanup()
 
     def process(self, data: NovelData) -> NovelData:
         for matcher in self.matchers:

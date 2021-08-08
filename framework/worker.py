@@ -10,12 +10,6 @@ class Worker:
         self.writers = writers
 
     def work(self):
-        self.reader.before()
-        for processor in self.processors:
-            processor.before()
-        for writer in self.writers:
-            writer.before()
-
         while obj := self.reader.read():
             for processor in self.processors:
                 obj = processor.process(obj)
@@ -23,8 +17,8 @@ class Worker:
             for writer in self.writers:
                 writer.write(obj)
 
-        self.reader.after()
+        self.reader.cleanup()
         for processor in self.processors:
-            processor.after()
+            processor.cleanup()
         for writer in self.writers:
-            writer.after()
+            writer.cleanup()

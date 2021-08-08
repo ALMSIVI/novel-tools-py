@@ -17,11 +17,11 @@ class TextReader(Reader):
 
         self.encoding = args.get('encoding', 'utf-8')
         self.verbose = args.get('verbose', False)
-        self.file = None
+        self.file = open(self.filename, 'rt', encoding=self.encoding)
         self.line_num = 0
 
-    def before(self):
-        self.file = open(self.filename, 'rt', encoding=self.encoding)
+    def cleanup(self):
+        self.file.close()
 
     def read(self) -> Optional[NovelData]:
         self.line_num += 1
@@ -32,6 +32,3 @@ class TextReader(Reader):
         content = content.strip()
         args = {'line_num': self.line_num, 'raw': content} if self.verbose else {}
         return NovelData(Type.UNRECOGNIZED, content.strip(), **args)
-
-    def after(self):
-        self.file.close()
