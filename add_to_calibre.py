@@ -1,4 +1,6 @@
-import os, json, argparse
+import argparse
+import json
+import os
 
 
 def add(directory: str) -> None:
@@ -15,10 +17,8 @@ def add(directory: str) -> None:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Add a book file to Calibre database.')
-    parser.add_argument(
-        '-d', '--dir', help='Directory for book and metadata files.')
+    parser = argparse.ArgumentParser(description='Add a book file to Calibre database.')
+    parser.add_argument('-d', '--dir', help='Directory for book and metadata files.')
     args = parser.parse_args()
 
     add(args.dir)
