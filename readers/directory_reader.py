@@ -5,7 +5,10 @@ from framework import Reader
 
 
 class DirectoryReader(Reader):
-    """Reads from a directory structure."""
+    """
+    Reads from a directory structure. This directory should be generated from FileWriter, as it will follow certain
+    conventions, such as the first line of the chapter file being the title.
+    """
 
     def __init__(self, args):
         """
@@ -38,16 +41,16 @@ class DirectoryReader(Reader):
             with open(os.path.join(self.in_dir, '_intro.txt'), 'rt') as f:
                 return NovelData(Type.BOOK_INTRO, f.read())
 
+        # Read chapter contents
         if self.chapter_file:
-            # Read chapter contents
             contents = self.chapter_file.read()
             self.chapter_file.close()
             self.chapter_file = None
             return NovelData(Type.CHAPTER_CONTENT, contents)
 
         self.curr_chapter += 1
+        # Proceed to next volume
         if self.curr_volume == -1 or self.curr_chapter == len(self.chapters):
-            # Proceed to next volume
             self.curr_volume += 1
             if self.curr_volume == len(self.volumes):
                 # End of novel

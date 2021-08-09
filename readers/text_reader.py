@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 from framework import Reader
 from common import NovelData, Type
@@ -13,7 +14,9 @@ class TextReader(Reader):
         - verbose (optional, bool): If set to True, additional information, including line number and raw line info,
           will be added to the data object. Default is False.
         """
-        self.filename = args['filename']  # This will be supplied by the program, not the config
+        # Both will be supplied by the program, not the config
+        self.filename = args['filename'] if os.path.isfile(args['filename']) else os.path.join(args['in_dir'],
+                                                                                               args['filename'])
 
         self.encoding = args.get('encoding', 'utf-8')
         self.verbose = args.get('verbose', False)

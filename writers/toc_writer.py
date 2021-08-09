@@ -18,15 +18,16 @@ class TocWriter(Writer):
         - debug (bool): If set to True, will write error information to the table of contents.
         """
         out_dir = args.get('out_dir', args['in_dir'])  # Both will be supplied by the program, not the config
-        self.filename = os.path.join(out_dir, args.get('out_filename', 'toc.txt')) if os.path.isdir(
-            out_dir) else out_dir
+        self.filename = os.path.join(out_dir, args.get('out_filename', 'toc.txt')) if os.path.isdir(out_dir) \
+            else out_dir
 
         self.formats = {Type[key.upper()]: value for key, value in args['formats'].items()}
         self.debug = args['debug']
+
         self.file = open(self.filename, 'wt')
         self.has_volume = False  # Whether we need to indent chapter titles
 
-    def after(self):
+    def cleanup(self):
         self.file.close()
 
     def write(self, data: NovelData):

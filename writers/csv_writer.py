@@ -30,22 +30,18 @@ class CsvWriter(Writer):
         self.debug = args['debug']
         self.additional_fields = args.get('additional_fields', [])
 
-        self.field_names = ['type', 'index', 'title', 'formatted']
+        self.field_names = ['type', 'index', 'content', 'formatted']
         if self.correct:
             self.field_names += ['o_index', 'o_formatted']
         if self.debug:
             self.field_names += ['error']
 
         self.field_names += self.additional_fields
-        self.file = None
-        self.writer = None
-
-    def before(self):
         self.file = open(self.filename, 'wt')
         self.writer = csv.DictWriter(self.file, fieldnames=self.field_names)
         self.writer.writeheader()
 
-    def after(self):
+    def cleanup(self):
         self.file.close()
 
     def write(self, data: NovelData):
@@ -55,7 +51,7 @@ class CsvWriter(Writer):
         csv_data = {
             'type': self.formats[data.data_type]['column'],
             'index': data.index,
-            'title': data.content,
+            'content': data.content,
             'formatted': data.format(self.formats[data.data_type]['format'])
         }
 

@@ -108,7 +108,8 @@
         },
         "correct": true,
         "debug": true,
-        "default_volume": "正文"
+        "default_volume": "正文",
+        "write_blank": true
       }
     ]
   }

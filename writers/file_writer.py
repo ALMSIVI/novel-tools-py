@@ -19,7 +19,10 @@ class FileWriter(Writer):
           Or it can simply be one format string, in which case both the title and filename will use it.
         - correct (bool): If set to False and the original_index field exists, will use the original index.
         - debug (bool): If set to True, will print the error message to the terminal.
-        - default_volume: If the volume doesn't have volumes, specify the directory name to place the chapter files.
+        - default_volume (optional, str): If the volume doesn't have volumes, specify the directory name to place the
+          chapter files.
+        - write_blank (optional, bool): If set to True, will write blank lines to the files. Sometimes blank lines serve
+          as separators in novels, and we want to keep them. Default is True.
         """
         self.out_dir = args.get('out_dir', args['in_dir'])  # Both will be supplied by the program, not the config
 
@@ -27,17 +30,19 @@ class FileWriter(Writer):
                         key, value in args['formats'].items()}
         self.correct = args['correct']
         self.debug = args['debug']
-        self.default_volume = args['default_volume']
+        self.default_volume = args.get('default_volume', 'default')
+        self.write_blank = args.get('write_blank', True)
+
         self.file = None
         self.curr_dir = os.path.join(self.out_dir, self.default_volume)
 
-    def after(self):
+    def cleanup(self):
         if self.file:
             self.file.close()
 
     def write(self, data: NovelData):
         if data.data_type not in self.formats:  # Normally, should only contain volume and chapter titles
-            if data.data_type == Type.BLANK:
+            if data.data_type == Type.BLANK and not self.write_blank:
                 return
             elif data.data_type == Type.BOOK_TITLE or data.data_type == Type.BOOK_INTRO:
                 # Write to _intro.txt in the book directory
@@ -50,11 +55,12 @@ class FileWriter(Writer):
                 if self.file:
                     self.file.close()
                 self.file = open(os.path.join(self.curr_dir, '_intro.txt'), 'wt')
-            elif data.data_type != Type.CHAPTER_CONTENT:
+            elif data.data_type != Type.BLANK and data.data_type != Type.CHAPTER_CONTENT:
                 print(f'Unrecognized data type: {data.data_type}')
                 return
 
-            self.file.write(data.content + '\n')
+            if self.file:
+                self.file.write(data.content + '\n')
         else:
             index = data.get('original_index') if not self.correct and data.has('original_index') else data.index
             filename = purify_name(data.format(self.formats[data.data_type]['filename'], index=index))
@@ -69,7 +75,7 @@ class FileWriter(Writer):
             if data.data_type == Type.VOLUME_TITLE:
                 # For volumes, create the volume directory
                 self.curr_dir = os.path.join(self.out_dir, filename)
-                if not os.path.isdir(self.curr_dir):
+                if not os.path.exists(self.curr_dir):
                     os.mkdir(self.curr_dir)
 
                 if self.file:
@@ -81,7 +87,7 @@ class FileWriter(Writer):
                 if self.file:
                     self.file.close()
 
-                if not os.path.isdir(self.curr_dir):
+                if not os.path.exists(self.curr_dir):
                     os.mkdir(self.curr_dir)
 
                 self.file = open(os.path.join(self.curr_dir, filename + '.txt'), 'wt')

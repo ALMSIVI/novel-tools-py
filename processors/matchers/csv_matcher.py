@@ -26,14 +26,17 @@ class CsvMatcher(Processor):
     def __init__(self, args):
         """
         Arguments:
-        - csv_filename (str): Filename of the csv list file.
+        - csv_filename (optional, str): Filename of the csv list file. Default is list.csv.
+          This does not have to be the list file generated from a CsvWriter; one might copy and paste the list from a
+          website without the type. Therefore, the following two fields are needed to determine the type of each list
+          element.
         - type (optional, str): If present, specifies the type of all the matches.
         - regex (optional, dict[str, str]): If present, specifies the regexes for each type.
         """
         # in_dir will be plugged in by the splitter
-        with open(os.path.join(args['in_dir'], args['csv_filename']), 'rt') as f:
+        with open(os.path.join(args['in_dir'], args.get('csv_filename', 'list.csv')), 'rt') as f:
             self.list = []
-            reader = csv.DictReader(f, ['type', 'raw', 'formatted'])
+            reader = csv.DictReader(f)
             for row in reader:
                 self.list.append(row)
 

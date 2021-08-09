@@ -9,18 +9,6 @@
           "ending": "reader"
         },
         {
-          "base": "processors.matchers",
-          "ending": "matcher"
-        },
-        {
-          "base": "processors.validators",
-          "ending": "validator"
-        },
-        {
-          "base": "processors.transformers",
-          "ending": "transformer"
-        },
-        {
           "base": "writers",
           "ending": "writer"
         }

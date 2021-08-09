@@ -1,0 +1,42 @@
+{
+  "default_package": "default",
+  "packages": [
+    {
+      "name": "default",
+      "list": [
+        {
+          "base": "readers",
+          "ending": "reader"
+        },
+        {
+          "base": "writers",
+          "ending": "writer"
+        }
+      ]
+    }
+  ],
+  "objects": {
+    "readers": {
+      "class": "CompositeTextReader",
+      "structure": "csv",
+      "structure_filename": "list.csv",
+      "metadata": "metadata.json",
+      "encoding": "utf-8",
+      "types": {
+        "volume": "volume_title",
+        "chapter": "chapter_title"
+      }
+    },
+    "writers": [
+      {
+        "class": "MarkdownWriter",
+        "levels": {
+          "book_title": 1,
+          "volume_title": 2,
+          "chapter_title": 3
+        },
+        "write_blank": true
+      }
+    ]
+  }
+}
