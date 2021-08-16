@@ -34,20 +34,20 @@ class Validator(Processor):
         if data.index in self.indices:
             # Auto fix by trying attempting to increase the index (positive only)
             if self.correct:
-                while new_data.index in self.indices:
-                    new_data.index += 1
+                while new_data.list_index in self.indices:
+                    new_data.list_index += 1
 
             new_data.error = self.duplicate_message(data)
 
         # Missing detection
-        if self.curr_index != 0 and self.curr_index + 1 != new_data.index:
+        if self.curr_index != 0 and self.curr_index + 1 != new_data.list_index:
             if self.correct:
-                new_data.index = self.curr_index + 1
+                new_data.list_index = self.curr_index + 1
 
             new_data.error = self.missing_message(data)
 
-        self.indices.add(new_data.index)
-        self.curr_index = new_data.index
+        self.indices.add(new_data.list_index)
+        self.curr_index = new_data.list_index
         return new_data
 
     @staticmethod

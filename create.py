@@ -1,10 +1,12 @@
 import argparse
 import os
+from typing import Optional
+
 from framework import Worker
 from utils import generate_objects
 
 
-def create(filename: str, in_dir: str, out_dir: str):
+def create(filename: Optional[str], in_dir: str, out_dir: str):
     """
     Recreates the novel from the cleaned up data.
     """

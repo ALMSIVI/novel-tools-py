@@ -78,8 +78,6 @@ def to_num(num: str) -> int:
     """
     num = num.strip()
     try:
-        value = int(num)
-    except ValueError:
         value = 0
         digit = 1
 
@@ -92,6 +90,8 @@ def to_num(num: str) -> int:
                 value += v
             else:
                 digit = v
+    except KeyError:
+        value = int(num)
 
     return value
 
