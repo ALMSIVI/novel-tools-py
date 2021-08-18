@@ -7,28 +7,31 @@ class TypeTransformer(Processor):
 
     # noinspection PyUnusedLocal
     def __init__(self, args):
-        self.first_line = False
+        self.first_line = True
         self.in_volume = False
         self.in_chapter = False
 
     def process(self, data: NovelData) -> NovelData:
-        # At this stage, only title types are assigned now.
+        # Theoretically BLANK can fit anywhere, but they are omitted for concision.
         if data.data_type == Type.VOLUME_TITLE:
+            # After this, should either be volume intro or chapter title.
             self.in_volume = True
             self.in_chapter = False
         elif data.data_type == Type.CHAPTER_TITLE:
+            # After this, should only be chapter content.
             self.in_chapter = True
-        elif not data.content:  # Empty string, treat as BLANK
+        elif not data.content:
+            # Empty content that is not a title, treat as BLANK.
             data.data_type = Type.BLANK
-        elif not self.in_volume:  # book metadata or intro
-            if self.first_line:  # Treat first line as book title
-                data.data_type = Type.BOOK_TITLE
-            else:
-                data.data_type = Type.BOOK_INTRO
-        elif not self.in_chapter:  # volume intro
+        elif not self.in_volume:
+            # Outside of volume, should be book metadata or intro. Treat first line as book title.
+            data.data_type = Type.BOOK_TITLE if self.first_line else Type.BOOK_INTRO
+        elif not self.in_chapter:
+            # Outside of chapter, should be volume intro.
             data.data_type = Type.VOLUME_INTRO
-        else:  # chapter content
+        else:
+            # Inside chapter, should be chapter content.
             data.data_type = Type.CHAPTER_CONTENT
 
-        self.first_line = True
+        self.first_line = False
         return data

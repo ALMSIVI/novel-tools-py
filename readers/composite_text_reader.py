@@ -74,7 +74,7 @@ class CompositeTextReader(Reader):
             self.title_read = True
             if self.metadata:
                 return self.metadata.read()
-            return NovelData(Type.BOOK_TITLE, self.title)
+            return NovelData(self.title, Type.BOOK_TITLE)
 
         if not self.curr_title:
             self.curr_title = self.structure.read()

@@ -1,7 +1,11 @@
+from textwrap import dedent
 from pytest_mock import MockerFixture
-from common import Type
+from common import NovelData, Type
 from processors.matchers.csv_matcher import CsvMatcher
-from tests.utils import data, format_csv
+
+
+def format_csv(csv):
+    return dedent(csv).strip()
 
 
 def create(args) -> CsvMatcher:
@@ -17,16 +21,16 @@ def test_self_type(mocker: MockerFixture):
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
     matcher = create({'type': 'chapter_title'})
 
-    before = data('Chapter 1 Lorem')
+    before = NovelData('Chapter 1 Lorem')
     after = matcher.process(before)
     assert after.data_type == Type.CHAPTER_TITLE
     assert after.content == 'Chapter 1 Lorem'
 
-    before = data('Chapter 3 dolor')
+    before = NovelData('Chapter 3 dolor')
     after = matcher.process(before)
     assert after.data_type == Type.UNRECOGNIZED
 
-    before = data('Chapter 2 Ipsum')
+    before = NovelData('Chapter 2 Ipsum')
     after = matcher.process(before)
     assert after.data_type == Type.CHAPTER_TITLE
     assert after.content == 'Chapter 2 Ipsum'
@@ -39,14 +43,14 @@ def test_self_regex(mocker: MockerFixture):
             Chapter 1 Ipsum
         ''')
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
-    matcher = create({'regex': {'volume_title': 'Volume \d+ .+', 'chapter_title': 'Chapter \d+ .+'}})
+    matcher = create({'regex': {'volume_title': 'Volume \\d+ .+', 'chapter_title': 'Chapter \\d+ .+'}})
 
-    before = data('Volume 1 Lorem')
+    before = NovelData('Volume 1 Lorem')
     after = matcher.process(before)
     assert after.data_type == Type.VOLUME_TITLE
     assert after.content == 'Volume 1 Lorem'
 
-    before = data('Chapter 1 Ipsum')
+    before = NovelData('Chapter 1 Ipsum')
     after = matcher.process(before)
     assert after.data_type == Type.CHAPTER_TITLE
     assert after.content == 'Chapter 1 Ipsum'
@@ -61,12 +65,12 @@ def test_list_type(mocker: MockerFixture):
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
     matcher = create({})
 
-    before = data('Volume 1 Lorem')
+    before = NovelData('Volume 1 Lorem')
     after = matcher.process(before)
     assert after.data_type == Type.VOLUME_TITLE
     assert after.content == 'Volume 1 Lorem'
 
-    before = data('Chapter 1 Ipsum')
+    before = NovelData('Chapter 1 Ipsum')
     after = matcher.process(before)
     assert after.data_type == Type.CHAPTER_TITLE
     assert after.content == 'Chapter 1 Ipsum'
@@ -80,6 +84,6 @@ def test_format(mocker: MockerFixture):
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
     matcher = create({'type': 'chapter_title'})
 
-    before = data('Chapter One Lorem')
+    before = NovelData('Chapter One Lorem')
     after = matcher.process(before)
     assert after.content == 'Chapter 1 Lorem'

@@ -1,7 +1,6 @@
 from pytest import fixture
-from common import Type
+from common import NovelData, Type
 from processors.matchers.special_matcher import SpecialMatcher
-from tests.utils import data
 
 
 @fixture
@@ -29,32 +28,32 @@ def group_index_matcher():
     return SpecialMatcher({
         'type': 'chapter_title',
         'affixes': ['Introduction'],
-        'regex': '^{affixes} (.+)\. (.+)$',
+        'regex': '^{affixes} (.+)\\. (.+)$',
         'index_group': 1,
         'content_group': 2
     })
 
 
 def test_process(simple_matcher: SpecialMatcher):
-    before = data('Introduction Test')
+    before = NovelData('Introduction Test')
     after = simple_matcher.process(before)
     assert after.data_type == Type.CHAPTER_TITLE
     assert after.index == -1
     assert after.content == 'Test'
 
-    before = data('Prelude Test')
+    before = NovelData('Prelude Test')
     after = simple_matcher.process(before)
     assert after.index == -2
 
 
 def test_process_fail(simple_matcher: SpecialMatcher):
-    before = data('Foreword Test')
+    before = NovelData('Foreword Test')
     after = simple_matcher.process(before)
     assert after.data_type == Type.UNRECOGNIZED
 
 
 def test_group(group_matcher: SpecialMatcher):
-    before = data('Test of Introduction')
+    before = NovelData('Test of Introduction')
     after = group_matcher.process(before)
     assert after.data_type == Type.CHAPTER_TITLE
     assert after.index == -1
@@ -62,7 +61,7 @@ def test_group(group_matcher: SpecialMatcher):
 
 
 def test_group_index(group_index_matcher: SpecialMatcher):
-    before = data('Introduction 1. Test')
+    before = NovelData('Introduction 1. Test')
     after = group_index_matcher.process(before)
     assert after.data_type == Type.CHAPTER_TITLE
     assert after.index == -1

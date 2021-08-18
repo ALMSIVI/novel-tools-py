@@ -32,4 +32,4 @@ class MetadataJsonReader(Reader):
         self.consumed = True
         title = self.metadata['title']
         self.metadata.pop('title')
-        return NovelData(Type.BOOK_TITLE, title, **self.metadata)
+        return NovelData(title, Type.BOOK_TITLE, **self.metadata)

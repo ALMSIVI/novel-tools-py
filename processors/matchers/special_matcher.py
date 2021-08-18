@@ -43,11 +43,11 @@ class SpecialMatcher(Processor):
                 if m[self.affix_group] == self.affixes[i]:
                     title = m[self.content_group].strip()
                     if self.index_group == 0:
-                        return NovelData(self.type, title, -i - 1, data.error, **data.others)
+                        return NovelData(title, self.type, -i - 1, data.error, **data.others)
                     else:
                         try:
                             index = to_num(m[self.index_group])
-                            return NovelData(self.type, title, -i - 1, data.error, **data.others, special_index=index)
+                            return NovelData(title, self.type, -i - 1, data.error, **data.others, special_index=index)
                         except ValueError:
                             return data
 

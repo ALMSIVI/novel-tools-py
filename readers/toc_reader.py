@@ -38,7 +38,7 @@ class TocReader(Reader):
             if len(elements) > 2:
                 line_num = int(elements[1])
 
-        data = NovelData(data_type, content)
+        data = NovelData(content, data_type)
         if line_num:
             data.set(line_num=line_num)
 

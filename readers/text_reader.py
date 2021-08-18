@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 from framework import Reader
-from common import NovelData, Type
+from common import NovelData
 
 
 class TextReader(Reader):
@@ -34,4 +34,4 @@ class TextReader(Reader):
 
         content = content.strip()
         args = {'line_num': self.line_num, 'raw': content} if self.verbose else {}
-        return NovelData(Type.UNRECOGNIZED, content.strip(), **args)
+        return NovelData(content.strip(), **args)

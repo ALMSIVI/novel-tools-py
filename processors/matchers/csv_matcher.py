@@ -69,16 +69,19 @@ class CsvMatcher(Processor):
             self.list_index += 1
             title = to_match.get('formatted', to_match['raw'])
             title_type = self.get_type(to_match, data) or Type.UNRECOGNIZED
-            return NovelData(title_type, title, self.list_index, data.error, **data.others)
+            return NovelData(title, title_type, self.list_index, data.error, **data.others)
 
         return data
 
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def get_type_list(self, to_match, data):
         return Type[to_match['type'].upper()]
 
+    # noinspection PyUnusedLocal
     def get_type_type(self, to_match, data):
         return self.type
 
+    # noinspection PyUnusedLocal
     def get_type_regex(self, to_match, data):
         for data_type, regex in self.regex.items():
             if regex.match(data.content):

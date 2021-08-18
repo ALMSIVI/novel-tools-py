@@ -1,7 +1,6 @@
 from pytest import fixture
-from common import Type
+from common import NovelData, Type
 from processors.matchers.numbered_matcher import NumberedMatcher
-from tests.utils import data
 
 
 @fixture
@@ -23,7 +22,7 @@ def group_matcher():
 
 
 def test_process(simple_matcher: NumberedMatcher):
-    before = data('Volume 1 Test')
+    before = NovelData('Volume 1 Test')
     after = simple_matcher.process(before)
     assert after.data_type == Type.VOLUME_TITLE
     assert after.index == 1
@@ -31,7 +30,7 @@ def test_process(simple_matcher: NumberedMatcher):
 
 
 def test_process_fail(simple_matcher: NumberedMatcher):
-    before = data('Volume abc Test')
+    before = NovelData('Volume abc Test')
     after = simple_matcher.process(before)
     assert after.data_type == Type.UNRECOGNIZED
     assert after.index is None
@@ -39,7 +38,7 @@ def test_process_fail(simple_matcher: NumberedMatcher):
 
 
 def test_process_chinese(simple_matcher: NumberedMatcher):
-    before = data('Volume 十一 测试')
+    before = NovelData('Volume 十一 测试')
     after = simple_matcher.process(before)
     assert after.data_type == Type.VOLUME_TITLE
     assert after.index == 11
@@ -47,7 +46,7 @@ def test_process_chinese(simple_matcher: NumberedMatcher):
 
 
 def test_process_chinese_fail(simple_matcher: NumberedMatcher):
-    before = data('Volume 十人 测试')
+    before = NovelData('Volume 十人 测试')
     after = simple_matcher.process(before)
     assert after.data_type == Type.UNRECOGNIZED
     assert after.index is None
@@ -55,7 +54,7 @@ def test_process_chinese_fail(simple_matcher: NumberedMatcher):
 
 
 def test_process_group(group_matcher: NumberedMatcher):
-    before = data('Test of Volume 1')
+    before = NovelData('Test of Volume 1')
     after = group_matcher.process(before)
     assert after.data_type == Type.VOLUME_TITLE
     assert after.index == 1

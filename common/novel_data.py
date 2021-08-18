@@ -16,9 +16,10 @@ class NovelData:
     - others: Contains additional data needed for processors/writers here.
     """
 
-    def __init__(self, data_type: Type, content: str, index: int = None, error: str = None, **kwargs):
-        self.data_type = data_type
+    def __init__(self, content: str, data_type: Type = Type.UNRECOGNIZED, index: int = None, error: str = None,
+                 **kwargs):
         self.content = content
+        self.data_type = data_type
         self.index = index
         self.error = error
         self.others = kwargs

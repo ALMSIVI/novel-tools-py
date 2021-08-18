@@ -1,9 +1,8 @@
 from pytest import fixture
-from common import Type
+from common import NovelData, Type
 from processors.matchers.numbered_matcher import NumberedMatcher
 from processors.matchers.special_matcher import SpecialMatcher
 from processors.matchers.__aggregate_matcher__ import AggregateMatcher
-from tests.utils import data
 
 
 @fixture
@@ -15,7 +14,7 @@ def aggregate_matcher():
 
 
 def test_numbered(aggregate_matcher: AggregateMatcher):
-    before = data('Volume 1 Test')
+    before = NovelData('Volume 1 Test')
     after = aggregate_matcher.process(before)
     assert after.data_type == Type.VOLUME_TITLE
     assert after.index == 1
@@ -23,7 +22,7 @@ def test_numbered(aggregate_matcher: AggregateMatcher):
 
 
 def test_special(aggregate_matcher: AggregateMatcher):
-    before = data('Introduction Test')
+    before = NovelData('Introduction Test')
     after = aggregate_matcher.process(before)
     assert after.data_type == Type.CHAPTER_TITLE
     assert after.index == -1

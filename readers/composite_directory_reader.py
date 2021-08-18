@@ -75,20 +75,20 @@ class CompositeDirectoryReader(Reader):
             self.title_read = True
             if self.metadata:
                 return self.metadata.read()
-            return NovelData(Type.BOOK_TITLE, self.title)
+            return NovelData(self.title, Type.BOOK_TITLE)
 
         # Then read the intro
         if self.read_intro:
             self.read_intro = False
             with open(os.path.join(self.in_dir, '_intro.txt'), 'rt') as f:
-                return NovelData(Type.BOOK_INTRO, f.read())
+                return NovelData(f.read(), Type.BOOK_INTRO)
 
         # Read chapter contents
         if self.chapter_file:
             contents = self.chapter_file.read()
             self.chapter_file.close()
             self.chapter_file = None
-            return NovelData(self.curr_type, contents)
+            return NovelData(contents, self.curr_type)
 
         if not self.curr_title:
             self.curr_title = self.structure.read()

@@ -1,4 +1,6 @@
 import os
+from typing import Optional
+
 from natsort import natsorted
 from common import NovelData, Type
 from framework import Reader
@@ -34,19 +36,19 @@ class DirectoryReader(Reader):
         if self.chapter_file and not self.chapter_file.closed:
             self.chapter_file.close()
 
-    def read(self) -> NovelData:
+    def read(self) -> Optional[NovelData]:
         if self.read_intro:
             # Read intro
             self.read_intro = False
             with open(os.path.join(self.in_dir, '_intro.txt'), 'rt') as f:
-                return NovelData(Type.BOOK_INTRO, f.read())
+                return NovelData(f.read(), Type.BOOK_INTRO)
 
         # Read chapter contents
         if self.chapter_file:
             contents = self.chapter_file.read()
             self.chapter_file.close()
             self.chapter_file = None
-            return NovelData(Type.CHAPTER_CONTENT, contents)
+            return NovelData(contents, Type.CHAPTER_CONTENT)
 
         self.curr_chapter += 1
         # Proceed to next volume
@@ -62,7 +64,7 @@ class DirectoryReader(Reader):
                              os.path.isfile(os.path.join(volume_dir, filename))]
             self.curr_chapter = -1
             if volume_name != self.default_volume:
-                return NovelData(Type.VOLUME_TITLE, volume_name, self.curr_volume + 1, filename=volume_name)
+                return NovelData(volume_name, Type.VOLUME_TITLE, self.curr_volume + 1, filename=volume_name)
 
         # Read the next chapter
         filename = self.chapters[self.curr_chapter]
@@ -70,7 +72,7 @@ class DirectoryReader(Reader):
         if filename == '_intro.txt' and self.read_contents:
             # Volume intro
             with open(full_filename, 'rt') as f:
-                return NovelData(Type.VOLUME_INTRO, f.read())
+                return NovelData(f.read(), Type.VOLUME_INTRO)
 
         # Read chapter title
         self.chapter_file = open(full_filename, 'rt')
@@ -78,4 +80,4 @@ class DirectoryReader(Reader):
         if not self.read_contents:
             self.chapter_file.close()
             self.chapter_file = None
-        return NovelData(Type.CHAPTER_TITLE, title.strip(), self.curr_chapter, filename=filename)
+        return NovelData(title.strip(), Type.CHAPTER_TITLE, self.curr_chapter, filename=filename)

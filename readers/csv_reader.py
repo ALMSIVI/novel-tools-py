@@ -45,4 +45,4 @@ class CsvReader(Reader):
             error = None
 
         self.index += 1
-        return NovelData(data_type, content, index, error, **data)
+        return NovelData(content, data_type, index, error, **data)
