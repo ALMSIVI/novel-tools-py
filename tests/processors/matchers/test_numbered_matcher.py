@@ -1,6 +1,7 @@
 from pytest import fixture
-from common import NovelData, Type
+from common import Type
 from processors.matchers.numbered_matcher import NumberedMatcher
+from tests.utils import data
 
 
 @fixture
@@ -19,10 +20,6 @@ def group_matcher():
         'index_group': 1,
         'content_group': 0
     })
-
-
-def data(content):
-    return NovelData(Type.UNRECOGNIZED, content)
 
 
 def test_process(simple_matcher: NumberedMatcher):
