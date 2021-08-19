@@ -14,8 +14,9 @@ class MetadataJsonReader(Reader):
     def __init__(self, args):
         """
         Arguments:
-        - metadata_filename (optional, str): Filename of the metadata json file. Default is metadata.json.
-          The metadata MUST contain a "title" field.
+
+        - metadata_filename (str, optional, default='metadata.json'): Filename of the metadata json file. The metadata
+          MUST contain a "title" field.
         """
         with open(os.path.join(args['in_dir'], args.get('metadata_filename', 'metadata.json')), 'rt') as f:
             self.metadata = json.load(f)

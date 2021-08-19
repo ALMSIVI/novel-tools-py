@@ -28,9 +28,10 @@ class CsvMatcher(Processor):
     def __init__(self, args):
         """
         Arguments:
-        - csv_filename (optional, str): Filename of the csv list file. Default is list.csv.
-        - type (optional, str): If present, specifies the type of all the matches.
-        - regex (optional, dict[str, str]): If present, specifies the regexes for each type.
+
+        - csv_filename (str, optional, default='list.csv'): Filename of the csv list file.
+        - type (str, optional): If present, specifies the type of all the matches.
+        - regex (dict[str, str], optional): If present, specifies the regexes for each type.
         """
         # in_dir will be plugged in by the program
         filename = args.get('csv_filename', 'list.csv')
@@ -69,7 +70,7 @@ class CsvMatcher(Processor):
             self.list_index += 1
             title = to_match.get('formatted', to_match['raw'])
             title_type = self.get_type(to_match, data) or Type.UNRECOGNIZED
-            return NovelData(title, title_type, self.list_index, data.error, **data.others)
+            return NovelData(title, title_type, self.list_index, **data.others)
 
         return data
 

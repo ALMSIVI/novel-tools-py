@@ -12,6 +12,7 @@ class FileWriter(Writer):
     def __init__(self, args):
         """
         Arguments:
+
         - formats (dict[str, dict[str, str]] | dict[str, str]): Key is Type representations, and the value can either
           consist of the following two fields:
             - title: Format string that can use any NovelData field. Will be written to the top of the file.
@@ -19,10 +20,10 @@ class FileWriter(Writer):
           Or it can simply be one format string, in which case both the title and filename will use it.
         - correct (bool): If set to False and the original_index field exists, will use the original index.
         - debug (bool): If set to True, will print the error message to the terminal.
-        - default_volume (optional, str): If the volume doesn't have volumes, specify the directory name to place the
+        - default_volume (str, optional): If the volume doesn't have volumes, specify the directory name to place the
           chapter files.
-        - write_blank (optional, bool): If set to True, will write blank lines to the files. Sometimes blank lines serve
-          as separators in novels, and we want to keep them. Default is True.
+        - write_blank (bool, optional, default=True): If set to True, will write blank lines to the files. Sometimes
+          blank lines serve as separators in novels, and we want to keep them.
         """
         self.out_dir = args.get('out_dir', args['in_dir'])  # Both will be supplied by the program, not the config
 
@@ -67,8 +68,8 @@ class FileWriter(Writer):
             title = data.format(self.formats[data.data_type]['title'], index=index)
 
             # If there is a validation error, print on the terminal
-            if self.debug and data.error:
-                print(data.error)
+            if self.debug and data.has('error'):
+                print(data.get('error'))
                 if self.correct:
                     print(f'\t- Adjusted to {title}')
 

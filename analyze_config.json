@@ -60,15 +60,12 @@
     "validators": [
       {
         "class": "VolumeValidator",
-        "discard_chapters": false,
-        "correct": true,
-        "verbose": true
+        "overwrite": true
       },
       {
         "class": "ChapterValidator",
         "discard_chapters": false,
-        "correct": true,
-        "verbose": true
+        "overwrite": true
       }
     ],
     "transformers": [

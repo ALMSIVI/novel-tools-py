@@ -10,9 +10,10 @@ class TextReader(Reader):
     def __init__(self, args):
         """
         Arguments:
-        - encoding (optional, str): The encoding of the file. Default is utf-8.
-        - verbose (optional, bool): If set to True, additional information, including line number and raw line info,
-          will be added to the data object. Default is False.
+
+        - encoding (str, optional, default='utf-8'): The encoding of the file.
+        - verbose (bool, optional, default=False): If set to True, additional information, including line number and
+          raw line info, will be added to the data object.
         """
         # Both will be supplied by the program, not the config
         self.filename = args['filename'] if os.path.isfile(args['filename']) else os.path.join(args['in_dir'],

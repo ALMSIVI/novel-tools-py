@@ -13,14 +13,15 @@ class CsvWriter(Writer):
     def __init__(self, args):
         """
         Arguments:
-        - out_filename (optional, str): Filename of the output csv file. Default is list.csv.
+
+        - out_filename (str, optional, default='list.csv'): Filename of the output csv file.
         - formats (dict[str, dict[str, str]]): Key is Type representations, and the value consists of two fields:
             - column: Name of the type that will appear on the csv column.
             - format: Format string that can use any NovelData field.
         - correct (bool): If set to True, will write the original index and the corresponding formatted title to the
           csv.
         - debug (bool): If set to True, will write the error message to the csv.
-        - additional_fields (optional, list[str]): Specifies additional fields to be included to the csv file.
+        - additional_fields (list[str], optional): Specifies additional fields to be included to the csv file.
         """
         out_dir = args.get('out_dir', args['in_dir'])  # Both will be supplied by the program, not the config
         self.filename = os.path.join(out_dir, args.get('out_filename', 'list.csv'))
@@ -60,7 +61,7 @@ class CsvWriter(Writer):
             csv_data['o_index'] = o_index
             csv_data['o_formatted'] = data.format(self.formats[data.data_type]['format'], index=o_index)
         if self.debug:
-            csv_data['error'] = data.error
+            csv_data['error'] = data.get('error', '')
 
         for field in self.additional_fields:
             csv_data[field] = data.get(field)

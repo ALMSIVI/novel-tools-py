@@ -13,8 +13,9 @@ class CsvReader(Reader):
     def __init__(self, args):
         """
         Arguments:
-        - csv_filename (optional, str): Filename of the csv list file. This file should be generated from CsvMatcher.
-          Default is list.csv.
+
+        - csv_filename (str, default='list.csv'): Filename of the csv list file. This file should be generated from
+          CsvMatcher.
         - types (dict[str, str]): Correspondence between csv types and novel types.
         """
         self.types = {key: Type[value.upper()] for key, value in args['types'].items()}
@@ -38,11 +39,6 @@ class CsvReader(Reader):
         data.pop('content')
         index = data['index']
         data.pop('index')
-        if 'error' in data:
-            error = data['error']
-            data.pop('error')
-        else:
-            error = None
 
         self.index += 1
-        return NovelData(content, data_type, index, error, **data)
+        return NovelData(content, data_type, index, **data)

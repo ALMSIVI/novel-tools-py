@@ -11,9 +11,10 @@ class MarkdownWriter(Writer):
     def __init__(self, args):
         """
         Arguments:
+
         - levels (dict[str, int]): Specifies what level the header should be for each type.
-        - write_blank (optional, bool): If set to True, will write blank lines to the files. Sometimes blank lines serve
-          as separators in novels, and we want to keep them. Default is True.
+        - write_blank (bool, optional, default=True): If set to True, will write blank lines to the files. Sometimes
+          blank lines serve as separators in novels, and we want to keep them.
         """
         self.out_dir = args.get('out_dir', args['in_dir'])  # Both will be supplied by the program, not the config
         self.levels = {Type[key.upper()]: '#' * value + ' ' for key, value in args['levels'].items()}

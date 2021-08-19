@@ -18,15 +18,18 @@ class CompositeTextReader(Reader):
     def __init__(self, args):
         """
         Arguments:
+
         - structure (string): Structure provider. Should be either csv or toc.
-        - structure_filename (optional, string): Filename of the structure file that is needed for the provider. If not
+        - structure_filename (string, optional): Filename of the structure file that is needed for the provider. If not
           specified, will use the respective reader's default filename (specified in the reader).
-        - metadata (optional, string | bool): If it is False, then no metadata will be read. If it is True, then the
+        - metadata (string | bool, optional): If it is False, then no metadata will be read. If it is True, then the
           reader will use the default filename (specified in the reader). If it is a string, then the filename will be
           provided to the reader.
+
         The rest of the arguments are from TextReader:
-        - encoding (optional, str): The encoding of the file. Default is utf-8.
-        - types (optional, dict[str, str]): Correspondence between csv types and novel types. Required if the structure
+
+        - encoding (str, optional, default='utf-8'): The encoding of the file.
+        - types (dict[str, str], optional): Correspondence between csv types and novel types. Required if the structure
           is csv.
         """
         reader_args = {'in_dir': args['in_dir']}  # This will be provided by the program, not the config

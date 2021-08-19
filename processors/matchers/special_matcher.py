@@ -19,14 +19,15 @@ class SpecialMatcher(Processor):
     def __init__(self, args):
         """
         Arguments:
+
         - type (str): Specifies the type for this matcher.
         - affixes (list[str]): List of special names to match for.
         - regex (str): The regex to match for. It will contain a "affixes" format, that will be replaced with the list
           of affixes. Example: ^{affixes}$ will match lines with any of the affixes.
-        - affix_group (optional, int): The group index for the title's affix (starting from 0). Default is 0.
-        - index_group (optional, int): The group index for the title's order/index, if such exists. (starting from 0).
-          Default is -1 (representing Do Not Find).
-        - content_group (optional, int): The group index for the title's content (starting from 0). Default is 1.
+        - affix_group (int, optional, default=0): The group index for the title's affix (starting from 0).
+        - index_group (int, optional, default=-1): The group index for the title's order/index (starting from 0), if
+          such exists. -1 represents Do Not Find.
+        - content_group (int, optional, default=1): The group index for the title's content (starting from 0).
         """
         self.type = Type[args['type'].upper()]
         self.affixes = args['affixes']
@@ -43,11 +44,11 @@ class SpecialMatcher(Processor):
                 if m[self.affix_group] == self.affixes[i]:
                     title = m[self.content_group].strip()
                     if self.index_group == 0:
-                        return NovelData(title, self.type, -i - 1, data.error, **data.others)
+                        return NovelData(title, self.type, -i - 1, **data.others)
                     else:
                         try:
                             index = to_num(m[self.index_group])
-                            return NovelData(title, self.type, -i - 1, data.error, **data.others, special_index=index)
+                            return NovelData(title, self.type, -i - 1, **data.others, special_index=index)
                         except ValueError:
                             return data
 

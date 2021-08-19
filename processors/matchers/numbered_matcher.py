@@ -10,11 +10,12 @@ class NumberedMatcher(Processor):
     def __init__(self, args):
         """
         Arguments:
+
         - type (str): Specifies the type for this matcher.
         - regex (str): The regex to match for. It will contain two groups: the first group is the index, the second
           (optional) is the title.
-        - index_group (optional, int): The group index for the title's order/index (starting from 0). Default is 0.
-        - content_group (optional, int): The group index for the title's content (starting from 0). Default is 1.
+        - index_group (int, optional, default=0): The group index for the title's order/index (starting from 0).
+        - content_group (int, optional, default=1): The group index for the title's content (starting from 0).
         """
         self.type = Type[args['type'].upper()]
         self.regex = re.compile(args['regex'])
@@ -27,7 +28,7 @@ class NumberedMatcher(Processor):
             try:
                 index = to_num(m[self.index_group])
                 title = m[self.content_group].strip()
-                return NovelData(title, self.type, index, data.error, **data.others)
+                return NovelData(title, self.type, index, **data.others)
             except ValueError:  # Not a valid number
                 return data
 

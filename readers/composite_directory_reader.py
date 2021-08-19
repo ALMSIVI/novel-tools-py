@@ -19,14 +19,17 @@ class CompositeDirectoryReader(Reader):
     def __init__(self, args):
         """
         Arguments:
+
         - structure (string): Structure provider. Should be either csv or toc.
-        - structure_filename (optional, string): Filename of the structure file that is needed for the provider. If not
+        - structure_filename (string, optional): Filename of the structure file that is needed for the provider. If not
           specified, will use the respective reader's default filename (specified in the reader).
-        - metadata (optional, string | bool): If it is False, then no metadata will be read. If it is True, then the
+        - metadata (string | bool, optional): If it is False, then no metadata will be read. If it is True, then the
           reader will use the default filename (specified in the reader). If it is a string, then the filename will be
           provided to the reader.
+
         The rest of the arguments are from TextReader:
-        - default_volume (optional, str): If the novel doesn't have volumes but all chapters are stored in a directory,
+
+        - default_volume (str, optional): If the novel doesn't have volumes but all chapters are stored in a directory,
           then the variable would store the directory name.
         """
         reader_args = {'in_dir': args['in_dir']}  # This will be provided by the program, not the config
@@ -95,7 +98,7 @@ class CompositeDirectoryReader(Reader):
             if not self.curr_title:
                 return None
 
-        content = self.curr_title.get('raw') if self.curr_title.has('raw') else self.curr_title.content
+        content = self.curr_title.get('raw', self.curr_title.content)
         if self.curr_title.data_type == Type.VOLUME_TITLE:
             self.curr_volume = content
             # Look for volume intro

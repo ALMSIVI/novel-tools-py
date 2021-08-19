@@ -10,8 +10,9 @@ class TocReader(Reader):
     def __init__(self, args):
         """
         Arguments:
-        - toc_filename (optional, str): Filename of the toc file. This file should be generated from TocWriter. Default
-          is toc.txt.
+
+        - toc_filename (str, optional, default='toc.txt'): Filename of the toc file. This file should be generated from
+          TocWriter.
         """
         self.file = open(os.path.join(args['in_dir'], args.get('toc_filename', 'toc.txt')), 'rt')
 

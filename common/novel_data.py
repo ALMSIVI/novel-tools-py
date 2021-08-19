@@ -16,19 +16,17 @@ class NovelData:
     - others: Contains additional data needed for processors/writers here.
     """
 
-    def __init__(self, content: str, data_type: Type = Type.UNRECOGNIZED, index: int = None, error: str = None,
-                 **kwargs):
+    def __init__(self, content: str, data_type: Type = Type.UNRECOGNIZED, index: int = None, **kwargs):
         self.content = content
         self.data_type = data_type
         self.index = index
-        self.error = error
         self.others = kwargs
 
     def has(self, key: str) -> bool:
         return self.others and key in self.others
 
-    def get(self, key: str):
-        return self.others.get(key)
+    def get(self, key: str, default=None):
+        return self.others.get(key, default)
 
     def set(self, **kwargs):
         self.others |= kwargs
@@ -39,7 +37,6 @@ class NovelData:
             'type': self.data_type,
             'content': self.content,
             'index': self.index,
-            'error': self.error
         }
         args |= self.others
         args |= kw

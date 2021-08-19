@@ -12,7 +12,8 @@ class TocWriter(Writer):
     def __init__(self, args):
         """
         Arguments:
-        - out_filename (optional, str): Filename of the output toc. Default is toc.txt.
+
+        - out_filename (str, optional, default='toc.txt'): Filename of the output toc.
         - formats (dict[str, str]): Key is Type representations, and the value is the format string that can use any
           NovelData field.
         - debug (bool): If set to True, will write error information to the table of contents.
@@ -45,7 +46,7 @@ class TocWriter(Writer):
         if data.has('line_num'):
             self.file.write('\t' + str(data.get('line_num')))
 
-        if self.debug and data.error is not None:
-            self.file.write('\t' + data.error)
+        if self.debug and data.has('error'):
+            self.file.write('\t' + data.get('error'))
 
         self.file.write('\n')

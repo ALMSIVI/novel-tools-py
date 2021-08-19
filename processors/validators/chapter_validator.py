@@ -3,7 +3,15 @@ from .validator import Validator
 
 
 class ChapterValidator(Validator):
-    curr_volume = None
+    def __init__(self, args):
+        """
+         Arguments (apart from those inherited from Validator):
+
+        - discard_chapters (bool): If set to True, restart indexing at the beginning of each new volume.
+        """
+        super().__init__(args)
+        self.discard_chapters = args['discard_chapters']
+        self.curr_volume = None
 
     def check(self, data: NovelData) -> bool:
         if data.data_type == Type.VOLUME_TITLE:
@@ -11,23 +19,16 @@ class ChapterValidator(Validator):
             if self.discard_chapters:
                 self.indices.clear()
             return False
-        if data.data_type == Type.CHAPTER_TITLE:
-            # Do not validate special titles (those with negative index values)
-            if data.index < 0:
-                self.indices.add(data.index)
-                return False
 
-            return True
+        return data.data_type == Type.CHAPTER_TITLE and ((self.special_field is None and data.index >= 0) or (
+                self.special_field is not None and data.index < 0))
 
-        return False
+    def duplicate_message(self, data: NovelData, corrected_index: int) -> str:
+        return f'Duplicate chapter{self.volume_message} - expected: {corrected_index}, actual: {self.format(data)}'
 
-    def duplicate_message(self, data: NovelData) -> str:
-        if self.curr_volume:
-            return f'Potential duplicate chapter in volume {self.curr_volume}: {self.format(data)}'
-        return f'Potential duplicate chapter: {self.format(data)}'
+    def missing_message(self, data: NovelData, corrected_index: int) -> str:
+        return f'Missing chapter{self.volume_message} - expected: {corrected_index}, actual: {self.format(data)}'
 
-    def missing_message(self, data: NovelData) -> str:
-        if self.curr_volume:
-            return f'Potential missing chapter in volume {self.curr_volume}: {self.curr_index + 1} \
-                (current chapter: {self.format(data)}) '
-        return f'Potential missing chapter: {self.curr_index + 1} (current chapter: {self.format(data)})'
+    @property
+    def volume_message(self):
+        return f' in volume {self.curr_volume}' if self.curr_volume else ''

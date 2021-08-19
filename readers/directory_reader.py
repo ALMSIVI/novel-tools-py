@@ -15,8 +15,9 @@ class DirectoryReader(Reader):
     def __init__(self, args):
         """
         Arguments:
+
         - read_contents (bool): If set to true, will open the files to read the contents.
-        - default_volume (optional, str): If the novel doesn't have volumes but all chapters are stored in a directory,
+        - default_volume (str, optional): If the novel doesn't have volumes but all chapters are stored in a directory,
           then the variable would store the directory name.
         """
         self.in_dir = args['in_dir']  # Will be supplied by the program, not the config
