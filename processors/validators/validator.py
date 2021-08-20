@@ -27,13 +27,12 @@ class Validator(Processor):
           validate both regular titles and special titles, please use two validators, one for each type of title.
         """
         self.overwrite = args.get('overwrite', True)
-        if 'special_field' not in args or args['special_field'] == False:
+        if 'special_field' not in args or args['special_field'] is False:
             self.special_field = None
-        elif type(args['special_field']) is str:
-            self.special_field = args['special_field']
-        else:
-            # value is True
+        elif args['special_field'] is True:
             self.special_field = 'special_index'
+        else:
+            self.special_field = args['special_field']
 
         self.indices = set()
         self.curr_index = 0
