@@ -13,27 +13,30 @@ class TocWriter(Writer):
         """
         Arguments:
 
-        - out_filename (str, optional, default='toc.txt'): Filename of the output toc.
+        - toc_filename (str, optional, default='toc.txt'): Filename of the output toc file.
+        - out_dir (str): The directory to write the toc file to.
         - formats (dict[str, str]): Key is Type representations, and the value is the format string that can use any
           NovelData field.
         - debug (bool): If set to True, will write error information to the table of contents.
         """
-        out_dir = args.get('out_dir', args['in_dir'])  # Both will be supplied by the program, not the config
-        self.filename = os.path.join(out_dir, args.get('out_filename', 'toc.txt')) if os.path.isdir(out_dir) \
-            else out_dir
+        self.filename = os.path.join(args.get('out_dir', args['in_dir']), args.get('out_filename', 'toc.txt'))
 
         self.formats = {Type[key.upper()]: value for key, value in args['formats'].items()}
         self.debug = args['debug']
 
-        self.file = open(self.filename, 'wt')
+        self.file = None
         self.has_volume = False  # Whether we need to indent chapter titles
 
     def cleanup(self):
-        self.file.close()
+        if self.file:
+            self.file.close()
 
     def write(self, data: NovelData):
         if data.data_type not in self.formats:  # Normally, should only contain volume and chapter titles
             return
+
+        if not self.file:
+            self.file = open(self.filename, 'wt')
 
         if data.data_type == Type.CHAPTER_TITLE and self.has_volume:
             self.file.write('\t')

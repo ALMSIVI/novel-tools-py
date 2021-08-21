@@ -5,7 +5,9 @@ from processors.transformers.type_transformer import TypeTransformer
 
 @fixture
 def type_transformer():
-    return TypeTransformer({})
+    transformer = TypeTransformer({})
+    yield transformer
+    transformer.cleanup()
 
 
 def test_process(type_transformer: TypeTransformer):

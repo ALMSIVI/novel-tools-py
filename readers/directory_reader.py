@@ -16,16 +16,19 @@ class DirectoryReader(Reader):
         """
         Arguments:
 
+        - in_dir (str): The working directory.
         - read_contents (bool): If set to true, will open the files to read the contents.
         - default_volume (str, optional): If the novel doesn't have volumes but all chapters are stored in a directory,
           then the variable would store the directory name.
+        - intro_filename (str, optional, default='_intro.txt'): The filename of the book/volume introduction file(s).
         """
-        self.in_dir = args['in_dir']  # Will be supplied by the program, not the config
+        self.in_dir = args['in_dir']
         self.read_contents = args['read_contents']
         self.default_volume = args.get('default_volume', None)
 
         # Create the list of volumes/directories to look for
-        self.read_intro = self.read_contents and os.path.exists(os.path.join(self.in_dir, '_intro.txt'))
+        self.intro_filename = args.get('intro_filename', '_intro.txt')
+        self.read_intro = self.read_contents and os.path.exists(os.path.join(self.in_dir, self.intro_filename))
         self.volumes = [dir_name for dir_name in natsorted(os.listdir(self.in_dir)) if
                         os.path.isdir(os.path.join(self.in_dir, dir_name))]
         self.chapters = []
@@ -41,7 +44,7 @@ class DirectoryReader(Reader):
         if self.read_intro:
             # Read intro
             self.read_intro = False
-            with open(os.path.join(self.in_dir, '_intro.txt'), 'rt') as f:
+            with open(os.path.join(self.in_dir, self.intro_filename), 'rt') as f:
                 return NovelData(f.read(), Type.BOOK_INTRO)
 
         # Read chapter contents
@@ -70,7 +73,7 @@ class DirectoryReader(Reader):
         # Read the next chapter
         filename = self.chapters[self.curr_chapter]
         full_filename = os.path.join(self.in_dir, self.volumes[self.curr_volume], filename)
-        if filename == '_intro.txt' and self.read_contents:
+        if filename == self.intro_filename and self.read_contents:
             # Volume intro
             with open(full_filename, 'rt') as f:
                 return NovelData(f.read(), Type.VOLUME_INTRO)

@@ -17,8 +17,12 @@ class MetadataJsonReader(Reader):
 
         - metadata_filename (str, optional, default='metadata.json'): Filename of the metadata json file. The metadata
           MUST contain a "title" field.
+        - in_dir (str, optional): The directory to read the metadata file from. Required if the filename does not
+          contain the path.
         """
-        with open(os.path.join(args['in_dir'], args.get('metadata_filename', 'metadata.json')), 'rt') as f:
+        filename = args.get('metadata_filename', 'metadata.json')
+        filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
+        with open(filename, 'rt') as f:
             self.metadata = json.load(f)
 
         if 'title' not in self.metadata:

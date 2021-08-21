@@ -30,13 +30,15 @@ class CsvMatcher(Processor):
         Arguments:
 
         - csv_filename (str, optional, default='list.csv'): Filename of the csv list file.
+        - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the
+          path.
+        - encoding (str, optional, default='utf-8'): Encoding of the csv list file.
         - type (str, optional): If present, specifies the type of all the matches.
         - regex (dict[str, str], optional): If present, specifies the regexes for each type.
         """
-        # in_dir will be plugged in by the program
         filename = args.get('csv_filename', 'list.csv')
         filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
-        with open(filename, 'rt') as f:
+        with open(filename, 'rt', encoding=args.get('encoding', 'utf-8')) as f:
             self.list = []
             reader = csv.DictReader(f)
             for row in reader:
@@ -58,7 +60,7 @@ class CsvMatcher(Processor):
         # Therefore, we will keep track of the number of objects that have already been matched.
         # If it exceeds the length of the list we stop matching.
         self.list_index = 0
-        self.index = {}
+        self.indices = {}
 
     def process(self, data: NovelData) -> NovelData:
         # When the list is exhausted, stop matching
@@ -70,7 +72,10 @@ class CsvMatcher(Processor):
             self.list_index += 1
             title = to_match.get('formatted', to_match['raw'])
             title_type = self.get_type(to_match, data) or Type.UNRECOGNIZED
-            return NovelData(title, title_type, self.list_index, **data.others)
+            if title_type not in self.indices:
+                self.indices[title_type] = 0
+            self.indices[title_type] += 1
+            return NovelData(title, title_type, self.indices[title_type], list_index=self.list_index, **data.others)
 
         return data
 

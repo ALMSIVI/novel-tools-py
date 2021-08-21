@@ -1,7 +1,6 @@
-import os
 from typing import Optional
 from framework import Reader
-from common import NovelData, Type
+from common import NovelData
 from .text_reader import TextReader
 from .csv_reader import CsvReader
 from .toc_reader import TocReader
@@ -19,10 +18,13 @@ class CompositeTextReader(Reader):
         """
         Arguments:
 
-        - structure (string): Structure provider. Should be either csv or toc.
-        - structure_filename (string, optional): Filename of the structure file that is needed for the provider. If not
+        - in_dir (str, optional): The directory to read the text file, structure file and metadata file (if it exists)
+          from. Required if any of these filenames does not contain the path.
+        - text_filename (str, optional, default='text.txt'): Filename of the text file.
+        - structure (str): Structure provider. Should be either csv or toc.
+        - structure_filename (str, optional): Filename of the structure file that is needed for the provider. If not
           specified, will use the respective reader's default filename (specified in the reader).
-        - metadata (string | bool, optional): If it is False, then no metadata will be read. If it is True, then the
+        - metadata (str | bool, optional): If it is False, then no metadata will be read. If it is True, then the
           reader will use the default filename (specified in the reader). If it is a string, then the filename will be
           provided to the reader.
 
@@ -32,7 +34,7 @@ class CompositeTextReader(Reader):
         - types (dict[str, str], optional): Correspondence between csv types and novel types. Required if the structure
           is csv.
         """
-        reader_args = {'in_dir': args['in_dir']}  # This will be provided by the program, not the config
+        reader_args = {'in_dir': args['in_dir']} if 'in_dir' in args else {}
 
         if args['structure'] == 'csv':
             if 'structure_filename' in args:
@@ -48,36 +50,27 @@ class CompositeTextReader(Reader):
 
         if not args.get('metadata', False):
             self.metadata = None
-        elif type(args['metadata']) is str:
-            reader_args['metadata_filename'] = args['metadata']
-            self.metadata = MetadataJsonReader(reader_args)
         else:
-            self.metadata = MetadataJsonReader({})
+            if type(args['metadata']) is str:
+                reader_args['metadata_filename'] = args['metadata_filename']
+            metadata_reader = MetadataJsonReader(reader_args)
+            self.metadata = metadata_reader.read()
+            metadata_reader.cleanup()
 
         args['verbose'] = True  # Enforce verbose to get the line_num and raw
         self.reader = TextReader(args)
 
         self.curr_title = None
 
-        # If there is no metadata, use the filename as title
-        path, extension = os.path.splitext(args['filename'])
-        self.title = path.split('/')[-1]
-
-        self.title_read = False
-
     def cleanup(self):
         self.reader.cleanup()
         self.structure.cleanup()
-        if self.metadata:
-            self.metadata.cleanup()
 
     def read(self) -> Optional[NovelData]:
-        # The first data must be BOOK_TITLE
-        if not self.title_read:
-            self.title_read = True
-            if self.metadata:
-                return self.metadata.read()
-            return NovelData(self.title, Type.BOOK_TITLE)
+        if self.metadata:
+            metadata = self.metadata
+            self.metadata = None
+            return metadata
 
         if not self.curr_title:
             self.curr_title = self.structure.read()

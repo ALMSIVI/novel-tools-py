@@ -5,12 +5,16 @@ from processors.validators.volume_validator import VolumeValidator
 
 @fixture
 def volume_validator():
-    return VolumeValidator({})
+    validator = VolumeValidator({})
+    yield validator
+    validator.cleanup()
 
 
 @fixture
 def special_validator():
-    return VolumeValidator({'special_field': True})
+    validator = VolumeValidator({'special_field': True})
+    yield validator
+    validator.cleanup()
 
 
 def test_non_title(volume_validator: VolumeValidator, special_validator: VolumeValidator):

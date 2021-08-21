@@ -20,6 +20,8 @@ class CompositeDirectoryReader(Reader):
         """
         Arguments:
 
+        - in_dir (str): The working directory. Should also include the structure file and the metadata file, if
+          specified.
         - structure (string): Structure provider. Should be either csv or toc.
         - structure_filename (string, optional): Filename of the structure file that is needed for the provider. If not
           specified, will use the respective reader's default filename (specified in the reader).
@@ -31,8 +33,9 @@ class CompositeDirectoryReader(Reader):
 
         - default_volume (str, optional): If the novel doesn't have volumes but all chapters are stored in a directory,
           then the variable would store the directory name.
+        - intro_filename (str, optional, default='_intro.txt'): The name if the book/volume introduction file.
         """
-        reader_args = {'in_dir': args['in_dir']}  # This will be provided by the program, not the config
+        reader_args = {'in_dir': args['in_dir']}
 
         if args['structure'] == 'csv':
             if 'structure_filename' in args:
@@ -47,43 +50,37 @@ class CompositeDirectoryReader(Reader):
 
         if not args.get('metadata', False):
             self.metadata = None
-        elif type(args['metadata']) is str:
-            reader_args['metadata_filename'] = args['metadata_filename']
-            self.metadata = MetadataJsonReader(reader_args)
         else:
-            self.metadata = MetadataJsonReader({})
+            if type(args['metadata']) is str:
+                reader_args['metadata_filename'] = args['metadata_filename']
+            metadata_reader = MetadataJsonReader(reader_args)
+            self.metadata = metadata_reader.read()
+            metadata_reader.cleanup()
 
-        self.in_dir = args['in_dir']  # Will be supplied by the program, not the config
+        self.in_dir = args['in_dir']
         self.curr_volume = args.get('default_volume', '')
-        self.read_intro = os.path.exists(os.path.join(self.in_dir, '_intro.txt'))
+        self.intro_filename = args.get('intro_filename', '_intro.txt')
+        self.read_intro = os.path.exists(os.path.join(self.in_dir, self.intro_filename))
 
         self.chapter_file = None
         self.curr_title = None
         self.curr_type = Type.UNRECOGNIZED
 
-        # If there is no metadata, use the filename as title
-        self.title = os.path.basename(args['in_dir'])
-        self.title_read = False
-
     def cleanup(self):
         if self.chapter_file and not self.chapter_file.closed:
             self.chapter_file.close()
         self.structure.cleanup()
-        if self.metadata:
-            self.metadata.cleanup()
 
     def read(self) -> Optional[NovelData]:
-        # The first data must be BOOK_TITLE
-        if not self.title_read:
-            self.title_read = True
-            if self.metadata:
-                return self.metadata.read()
-            return NovelData(self.title, Type.BOOK_TITLE)
+        if self.metadata:
+            metadata = self.metadata
+            self.metadata = None
+            return metadata
 
         # Then read the intro
         if self.read_intro:
             self.read_intro = False
-            with open(os.path.join(self.in_dir, '_intro.txt'), 'rt') as f:
+            with open(os.path.join(self.in_dir, self.intro_filename), 'rt') as f:
                 return NovelData(f.read(), Type.BOOK_INTRO)
 
         # Read chapter contents
@@ -102,8 +99,8 @@ class CompositeDirectoryReader(Reader):
         if self.curr_title.data_type == Type.VOLUME_TITLE:
             self.curr_volume = content
             # Look for volume intro
-            if '_intro.txt' in os.listdir(os.path.join(self.in_dir, self.curr_volume)):
-                self.chapter_file = open(os.path.join(self.in_dir, self.curr_volume, '_intro.txt'), 'rt')
+            if self.intro_filename in os.listdir(os.path.join(self.in_dir, self.curr_volume)):
+                self.chapter_file = open(os.path.join(self.in_dir, self.curr_volume, self.intro_filename), 'rt')
                 self.curr_type = Type.VOLUME_INTRO
         elif self.curr_title.data_type == Type.CHAPTER_TITLE:
             self.chapter_file = open(os.path.join(self.in_dir, self.curr_volume, content), 'rt')

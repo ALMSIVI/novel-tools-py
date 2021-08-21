@@ -12,11 +12,16 @@ class MarkdownWriter(Writer):
         """
         Arguments:
 
+        - use_title (bool): If set to True, will use the book title (if specified) as the Markdown filename.
+        - md_filename (str, optional, default='text.md'): Filename of the output Markdown file, if use_title is False.
+        - out_dir (str): The directory to write the markdown file to.
         - levels (dict[str, int]): Specifies what level the header should be for each type.
         - write_blank (bool, optional, default=True): If set to True, will write blank lines to the files. Sometimes
           blank lines serve as separators in novels, and we want to keep them.
         """
-        self.out_dir = args.get('out_dir', args['in_dir'])  # Both will be supplied by the program, not the config
+        self.use_title = args['use_title']
+        self.filename = args.get('csv_filename', 'text.md')
+        self.out_dir = args['out_dir']
         self.levels = {Type[key.upper()]: '#' * value + ' ' for key, value in args['levels'].items()}
         self.write_blank = args.get('write_blank', True)
 
@@ -27,15 +32,12 @@ class MarkdownWriter(Writer):
             self.file.close()
 
     def write(self, data: NovelData):
-        # The first data should be of type BOOK_TITLE. If this is not the case, the name will be extracted from the
-        # directory name.
-        if not self.file:
-            filename = data.content if data.data_type == Type.BOOK_TITLE else os.path.basename(os.getcwd())
-            self.file = open(os.path.join(self.out_dir, filename + '.md'), 'wt')
-            return
-
         if data.data_type == Type.BLANK and not self.write_blank:
             return
+
+        if not self.file:
+            filename = data.content + '.md' if self.use_title and data.data_type == Type.BOOK_TITLE else self.filename
+            self.file = open(os.path.join(self.out_dir, filename), 'wt')
 
         self.file.write(self.levels.get(data.data_type, ''))
         self.file.write(data.content + '\n')
