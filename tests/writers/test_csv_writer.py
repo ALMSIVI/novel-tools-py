@@ -5,10 +5,6 @@ from common import NovelData, Type
 from writers.csv_writer import CsvWriter
 
 
-def ends(x: str) -> str:
-    return x + ('\r\n' if platform.system() == 'Windows' else '\n')
-
-
 @fixture
 def csv_writer(request: FixtureRequest):
     args = request.node.get_closest_marker('args').args[0]
@@ -34,12 +30,12 @@ def test_write(csv_writer: CsvWriter, mocker: MockerFixture):
 
     data = NovelData('Lorem', Type.VOLUME_TITLE, 1)
     csv_writer.write(data)
-    handle.write.assert_any_call(ends('type,index,content,formatted'))
-    handle.write.assert_called_with(ends('VOLUME_TITLE,1,Lorem,Volume 1. Lorem'))
+    handle.write.assert_any_call('type,index,content,formatted\r\n')
+    handle.write.assert_called_with('VOLUME_TITLE,1,Lorem,Volume 1. Lorem\r\n')
 
     data = NovelData('Ipsum', Type.CHAPTER_TITLE, 2)
     csv_writer.write(data)
-    handle.write.assert_called_with(ends('CHAPTER_TITLE,2,Ipsum,Chapter 2. Ipsum'))
+    handle.write.assert_called_with('CHAPTER_TITLE,2,Ipsum,Chapter 2. Ipsum\r\n')
 
 
 @mark.args({'correct': True})
@@ -49,8 +45,8 @@ def test_correct(csv_writer: CsvWriter, mocker: MockerFixture):
 
     data = NovelData('Lorem', Type.VOLUME_TITLE, 1, original_index=2)
     csv_writer.write(data)
-    handle.write.assert_any_call(ends('type,index,content,formatted,original_index,original_formatted'))
-    handle.write.assert_called_with(ends('VOLUME_TITLE,1,Lorem,Volume 1. Lorem,2,Volume 2. Lorem'))
+    handle.write.assert_any_call('type,index,content,formatted,original_index,original_formatted\r\n')
+    handle.write.assert_called_with('VOLUME_TITLE,1,Lorem,Volume 1. Lorem,2,Volume 2. Lorem\r\n')
 
 
 @mark.args({'correct': False, 'debug': True})
@@ -60,8 +56,8 @@ def test_debug(csv_writer: CsvWriter, mocker: MockerFixture):
 
     data = NovelData('Lorem', Type.VOLUME_TITLE, 1, error='Error')
     csv_writer.write(data)
-    handle.write.assert_any_call(ends('type,index,content,formatted,error'))
-    handle.write.assert_called_with(ends('VOLUME_TITLE,1,Lorem,Volume 1. Lorem,Error'))
+    handle.write.assert_any_call('type,index,content,formatted,error\r\n')
+    handle.write.assert_called_with('VOLUME_TITLE,1,Lorem,Volume 1. Lorem,Error\r\n')
 
 
 @mark.args({'correct': False, 'additional_fields': ['raw']})
@@ -71,8 +67,8 @@ def test_additional_fields(csv_writer: CsvWriter, mocker: MockerFixture):
 
     data = NovelData('Lorem', Type.VOLUME_TITLE, 1, raw='Volume One Lorem')
     csv_writer.write(data)
-    handle.write.assert_any_call(ends('type,index,content,formatted,raw'))
-    handle.write.assert_called_with(ends('VOLUME_TITLE,1,Lorem,Volume 1. Lorem,Volume One Lorem'))
+    handle.write.assert_any_call('type,index,content,formatted,raw\r\n')
+    handle.write.assert_called_with('VOLUME_TITLE,1,Lorem,Volume 1. Lorem,Volume One Lorem\r\n')
 
 
 @mark.args({'correct': True, 'debug': True, 'additional_fields': ['raw']})
@@ -82,6 +78,5 @@ def test_everything(csv_writer: CsvWriter, mocker: MockerFixture):
 
     data = NovelData('Lorem', Type.VOLUME_TITLE, 1, original_index=2, error='Error', raw='Volume One Lorem')
     csv_writer.write(data)
-    handle.write.assert_any_call(ends('type,index,content,formatted,original_index,original_formatted,error,raw'))
-    handle.write.assert_called_with(
-        ends('VOLUME_TITLE,1,Lorem,Volume 1. Lorem,2,Volume 2. Lorem,Error,Volume One Lorem'))
+    handle.write.assert_any_call('type,index,content,formatted,original_index,original_formatted,error,raw\r\n')
+    handle.write.assert_called_with('VOLUME_TITLE,1,Lorem,Volume 1. Lorem,2,Volume 2. Lorem,Error,Volume One Lorem\r\n')
