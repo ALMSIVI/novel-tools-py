@@ -17,12 +17,14 @@ class TocReader(Reader):
           path.
         - encoding (str, optional, default='utf-8'): Encoding of the toc file.
         - has_volume(bool): Specifies whether the toc contains volumes.
+        - discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
         """
         self.has_volume = args['has_volume']
+        self.discard_chapters = args['discard_chapters']
         filename = args.get('toc_filename', 'toc.txt')
         filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
         self.file = open(filename, 'rt', encoding=args.get('encoding', 'utf-8'))
-        self.indices = {}
+        self.indices = {Type.VOLUME_TITLE: 0, Type.CHAPTER_TITLE: 0}
 
     def cleanup(self):
         self.file.close()
@@ -47,8 +49,9 @@ class TocReader(Reader):
             if len(elements) > 1:
                 line_num = int(elements[1])
 
-        if data_type not in self.indices:
-            self.indices[data_type] = 0
+            if data_type == Type.VOLUME_TITLE and self.discard_chapters:
+                self.indices[Type.CHAPTER_TITLE] = 0
+
         self.indices[data_type] += 1
         data = NovelData(content.strip(), data_type, self.indices[data_type])
         if line_num is not None:

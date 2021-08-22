@@ -1,16 +1,20 @@
 from textwrap import dedent
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import Type
+from common import NovelData, Type
 from readers.toc_reader import TocReader
+
+
+def assert_data(data: NovelData, content: str, data_type: Type, index, **kwargs):
+    assert data.content == content
+    assert data.data_type == data_type
+    assert data.index == index
+    for key, value in kwargs.items():
+        assert data.get(key) == value
 
 
 def format_toc(toc: str):
     return dedent(toc).strip()
-
-
-def create(args):
-    return TocReader(args | {'in_dir': ''})
 
 
 @fixture
@@ -18,7 +22,7 @@ def toc_reader(mocker: MockerFixture, request: FixtureRequest):
     toc, args = request.node.get_closest_marker('data').args
     toc = format_toc(toc)
     mocker.patch('builtins.open', mocker.mock_open(read_data=toc))
-    reader = create(args)
+    reader = TocReader(args | {'in_dir': ''})
     yield reader
     reader.cleanup()
 
@@ -29,90 +33,75 @@ def toc_reader(mocker: MockerFixture, request: FixtureRequest):
     \tChapter 2
     Volume 2
     \tChapter 3
-''', {'has_volume': True})
+''', {'has_volume': True, 'discard_chapters': False})
 def test_read(toc_reader: TocReader):
     data = toc_reader.read()
-    assert data.content == 'Volume 1'
-    assert data.data_type == Type.VOLUME_TITLE
-    assert data.index == 1
+    assert_data(data, 'Volume 1', Type.VOLUME_TITLE, 1)
 
     data = toc_reader.read()
-    assert data.content == 'Chapter 1'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 1
+    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1)
 
     data = toc_reader.read()
-    assert data.content == 'Chapter 2'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 2
+    assert_data(data, 'Chapter 2', Type.CHAPTER_TITLE, 2)
 
     data = toc_reader.read()
-    assert data.content == 'Volume 2'
-    assert data.data_type == Type.VOLUME_TITLE
-    assert data.index == 2
+    assert_data(data, 'Volume 2', Type.VOLUME_TITLE, 2)
 
     data = toc_reader.read()
-    assert data.content == 'Chapter 3'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 3
+    assert_data(data, 'Chapter 3', Type.CHAPTER_TITLE, 3)
 
 
 @mark.data('''
     Volume 1\t1
     \tChapter 1\t2
-    \tChapter 2\t10
     Volume 2\t25
-    \tChapter 3\t27
-''', {'has_volume': True})
+    \tChapter 2\t27
+''', {'has_volume': True, 'discard_chapters': False})
 def test_read_line_num(toc_reader: TocReader):
     data = toc_reader.read()
-    assert data.content == 'Volume 1'
-    assert data.data_type == Type.VOLUME_TITLE
-    assert data.index == 1
-    assert data.get('line_num') == 1
+    assert_data(data, 'Volume 1', Type.VOLUME_TITLE, 1, line_num=1)
 
     data = toc_reader.read()
-    assert data.content == 'Chapter 1'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 1
-    assert data.get('line_num') == 2
+    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1, line_num=2)
 
     data = toc_reader.read()
-    assert data.content == 'Chapter 2'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 2
-    assert data.get('line_num') == 10
+    assert_data(data, 'Volume 2', Type.VOLUME_TITLE, 2, line_num=25)
 
     data = toc_reader.read()
-    assert data.content == 'Volume 2'
-    assert data.data_type == Type.VOLUME_TITLE
-    assert data.index == 2
-    assert data.get('line_num') == 25
-
-    data = toc_reader.read()
-    assert data.content == 'Chapter 3'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 3
-    assert data.get('line_num') == 27
+    assert_data(data, 'Chapter 2', Type.CHAPTER_TITLE, 2, line_num=27)
 
 
 @mark.data('''
     Chapter 1
     Chapter 2
     Chapter 3
-''', {'has_volume': False})
+''', {'has_volume': False, 'discard_chapters': False})
 def test_read_no_volume(toc_reader: TocReader):
     data = toc_reader.read()
-    assert data.content == 'Chapter 1'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 1
+    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1)
 
     data = toc_reader.read()
-    assert data.content == 'Chapter 2'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 2
+    assert_data(data, 'Chapter 2', Type.CHAPTER_TITLE, 2)
 
     data = toc_reader.read()
-    assert data.content == 'Chapter 3'
-    assert data.data_type == Type.CHAPTER_TITLE
-    assert data.index == 3
+    assert_data(data, 'Chapter 3', Type.CHAPTER_TITLE, 3)
+
+
+@mark.data('''
+    Volume 1
+    \tChapter 1
+    Volume 2
+    \tChapter 1
+''', {'has_volume': True, 'discard_chapters': True})
+def test_read_discard(toc_reader: TocReader):
+    data = toc_reader.read()
+    assert_data(data, 'Volume 1', Type.VOLUME_TITLE, 1)
+
+    data = toc_reader.read()
+    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1)
+
+    data = toc_reader.read()
+    assert_data(data, 'Volume 2', Type.VOLUME_TITLE, 2)
+
+    data = toc_reader.read()
+    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1)

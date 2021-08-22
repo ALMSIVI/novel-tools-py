@@ -18,16 +18,12 @@ def format_csv(csv: str):
     return dedent(csv).strip()
 
 
-def create(args):
-    return CsvMatcher(args | {'in_dir': ''})
-
-
 @fixture
 def csv_matcher(mocker: MockerFixture, request: FixtureRequest):
     csv, args = request.node.get_closest_marker('data').args
     csv = format_csv(csv)
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
-    matcher = create(args)
+    matcher = CsvMatcher(args | {'in_dir': ''})
     yield matcher
     matcher.cleanup()
 
@@ -99,4 +95,4 @@ def test_invalid(mocker: MockerFixture):
         ''')
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
     with raises(ValueError, match='Type of title is not specified in file or arguments.'):
-        create({})
+        CsvMatcher({'in_dir': ''})

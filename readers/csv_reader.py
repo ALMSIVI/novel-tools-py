@@ -15,13 +15,11 @@ class CsvReader(Reader):
         Arguments:
 
         - csv_filename (str, default='list.csv'): Filename of the csv list file. This file should be generated from
-          CsvMatcher.
+          CsvWriter, i.e., it must contain at least type, index and content.
         - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the
           path.
-        - types (dict[str, str]): Correspondence between csv types and novel types.
+        - encoding (str, optional, default='utf-8'): Encoding of the csv file.
         """
-        self.types = {key: Type[value.upper()] for key, value in args['types'].items()}
-
         filename = args.get('csv_filename', 'list.csv')
         filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
         with open(filename, 'rt', encoding=args.get('encoding', 'utf-8')) as f:
@@ -32,16 +30,20 @@ class CsvReader(Reader):
 
             self.index = 0
 
+        first = self.list[0]
+        if 'content' not in first or 'type' not in first or 'index' not in first:
+            raise ValueError('csv does not contain valid columns.')
+
     def read(self) -> Optional[NovelData]:
         if self.index >= len(self.list):
             return None
 
         data = self.list[self.index]
-        data_type = self.types[data['type']]
+        data_type = Type[data['type'].upper()]
         data.pop('type')
         content = data['content']
         data.pop('content')
-        index = data['index']
+        index = int(data['index'])
         data.pop('index')
 
         self.index += 1
