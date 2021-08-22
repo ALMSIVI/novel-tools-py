@@ -26,7 +26,7 @@ class ClassFactory:
             self.add_package(package['base'], package['ending'])
 
     def add_package(self, base: str, ending: str):
-        module_dir = os.path.join('.', *base.split('.'))
+        module_dir = os.path.join('..', *base.split('.'))
         module_names = [filename[:-3] for filename in os.listdir(module_dir) if filename.endswith(f'{ending}.py')]
         for module in module_names:
             name = snake_to_pascal(module)
@@ -66,38 +66,3 @@ def generate_objects(config_filename: str, default_config_filename: str, in_dir:
             objects[key] = object_list
 
     return objects
-
-
-num_dict = {"零": 0, "〇": 0, "一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9,
-            "十": 10, "廿": 20, "卅": 30, "卌": 40, "百": 100, "千": 1000}
-
-
-def to_num(num: str) -> int:
-    """
-    Converts a chinese string to a number.
-    """
-    num = num.strip()
-    try:
-        value = 0
-        digit = 1
-
-        for i in range(len(num)):
-            v = num_dict[num[i]]
-            if v >= 10:
-                digit *= v
-                value += digit
-            elif i == len(num) - 1:
-                value += v
-            else:
-                digit = v
-    except KeyError:
-        value = int(num)
-
-    return value
-
-
-valid_filenames = dict((ord(char), None) for char in '\\/*?:"<>|\n')
-
-
-def purify_name(filename: str) -> str:
-    return filename.translate(valid_filenames).strip()

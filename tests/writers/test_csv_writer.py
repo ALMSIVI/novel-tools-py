@@ -1,4 +1,3 @@
-import platform
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
 from common import NovelData, Type

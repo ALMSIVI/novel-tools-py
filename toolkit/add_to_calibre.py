@@ -1,4 +1,3 @@
-import argparse
 import json
 import os
 
@@ -15,11 +14,3 @@ def add(directory: str) -> None:
             metadata['title'],
             os.path.join(directory, metadata['title'] + '.md'))
         os.system(command)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Add a book file to Calibre database.')
-    parser.add_argument('-d', '--dir', help='Directory for book and metadata files.')
-    args = parser.parse_args()
-
-    add(args.dir)

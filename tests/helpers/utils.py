@@ -1,5 +1,4 @@
 from typing import Optional
-import platform
 from textwrap import dedent
 from common import NovelData, Type
 

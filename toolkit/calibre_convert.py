@@ -1,4 +1,3 @@
-import argparse
 import json
 import os
 
@@ -16,13 +15,6 @@ def convert(directory: str) -> None:
             ','.join(metadata['languages']),
             metadata['publisher'],
             ','.join(metadata['tags']),
-            metadata['title'], )
+            metadata['title'],
+        )
         os.system(command)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Convert a file to epub using calibre\'s built-in tool.')
-    parser.add_argument('-d', '--dir', help='Directory for book and metadata files.')
-    args = parser.parse_args()
-
-    convert(args.dir)
