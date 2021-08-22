@@ -1,26 +1,14 @@
-from textwrap import dedent
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import NovelData, Type
+from common import Type
 from readers.toc_reader import TocReader
-
-
-def assert_data(data: NovelData, content: str, data_type: Type, index, **kwargs):
-    assert data.content == content
-    assert data.data_type == data_type
-    assert data.index == index
-    for key, value in kwargs.items():
-        assert data.get(key) == value
-
-
-def format_toc(toc: str):
-    return dedent(toc).strip()
+from tests.helpers.utils import assert_data, format_structure
 
 
 @fixture
 def toc_reader(mocker: MockerFixture, request: FixtureRequest):
     toc, args = request.node.get_closest_marker('data').args
-    toc = format_toc(toc)
+    toc = format_structure(toc)
     mocker.patch('builtins.open', mocker.mock_open(read_data=toc))
     reader = TocReader(args | {'in_dir': ''})
     yield reader

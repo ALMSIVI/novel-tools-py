@@ -1,6 +1,7 @@
 import os
 from framework import Writer
 from common import NovelData, Type
+from utils import purify_name
 
 
 class TocWriter(Writer):
@@ -17,12 +18,12 @@ class TocWriter(Writer):
         - out_dir (str): The directory to write the toc file to.
         - formats (dict[str, str]): Key is Type representations, and the value is the format string that can use any
           NovelData field.
-        - debug (bool): If set to True, will write error information to the table of contents.
+        - debug (bool, optional, default=False): If set to True, will write error information to the table of contents.
         """
-        self.filename = os.path.join(args.get('out_dir', args['in_dir']), args.get('out_filename', 'toc.txt'))
+        self.filename = os.path.join(args['out_dir'], purify_name(args.get('out_filename', 'toc.txt')))
 
         self.formats = {Type[key.upper()]: value for key, value in args['formats'].items()}
-        self.debug = args['debug']
+        self.debug = args.get('debug', False)
 
         self.file = None
         self.has_volume = False  # Whether we need to indent chapter titles
@@ -38,18 +39,18 @@ class TocWriter(Writer):
         if not self.file:
             self.file = open(self.filename, 'wt')
 
+        line = ''
         if data.data_type == Type.CHAPTER_TITLE and self.has_volume:
-            self.file.write('\t')
+            line += '\t'
         elif data.data_type == Type.VOLUME_TITLE:
             self.has_volume = True
 
-        title = data.format(self.formats[data.data_type])
-        self.file.write(title)
+        line += data.format(self.formats[data.data_type])
 
         if data.has('line_num'):
-            self.file.write('\t' + str(data.get('line_num')))
+            line += '\t' + str(data.get('line_num'))
 
         if self.debug and data.has('error'):
-            self.file.write('\t' + data.get('error'))
+            line += '\t' + data.get('error')
 
-        self.file.write('\n')
+        self.file.write(line + '\n')

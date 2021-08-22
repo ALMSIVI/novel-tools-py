@@ -1,13 +1,7 @@
-from typing import Optional
 from pytest import fixture
 from common import NovelData, Type
 from processors.matchers.numbered_matcher import NumberedMatcher
-
-
-def assert_data(data: NovelData, content: str, data_type: Type, index: Optional[int]):
-    assert data.content == content
-    assert data.data_type == data_type
-    assert data.index == index
+from tests.helpers.utils import assert_data
 
 
 @fixture

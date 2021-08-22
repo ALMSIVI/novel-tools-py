@@ -1,21 +1,8 @@
-from textwrap import dedent
-from typing import Optional
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import NovelData, Type
+from common import Type
 from readers.composite_directory_reader import CompositeDirectoryReader
-
-
-def assert_data(data: NovelData, content: str, data_type: Type, index: Optional[int], **kwargs):
-    assert data.content == content
-    assert data.data_type == data_type
-    assert data.index == index
-    for key, value in kwargs.items():
-        assert data.get(key) == value
-
-
-def format_structure(structure: str):
-    return dedent(structure).strip()
+from tests.helpers.utils import assert_data, format_structure
 
 
 @fixture

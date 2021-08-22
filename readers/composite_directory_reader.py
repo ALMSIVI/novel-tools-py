@@ -120,7 +120,7 @@ class CompositeDirectoryReader(Reader):
             filename = [name for name in self.chapters if name.startswith(title)][0]
             self.file = open(os.path.join(self.in_dir, self.curr_volume, filename), 'rt',
                              encoding=self.encoding)
-            self.file.readline() # Skip title
+            self.file.readline()  # Skip title
             self.curr_type = Type.CHAPTER_CONTENT
 
         return data

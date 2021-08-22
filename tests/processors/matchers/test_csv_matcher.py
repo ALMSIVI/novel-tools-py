@@ -1,27 +1,14 @@
-from textwrap import dedent
-from typing import Optional
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from common import NovelData, Type
 from processors.matchers.csv_matcher import CsvMatcher
-
-
-def assert_data(data: NovelData, content: str, data_type: Type, index: Optional[int], **kwargs):
-    assert data.content == content
-    assert data.data_type == data_type
-    assert data.index == index
-    for key, value in kwargs.items():
-        assert data.get(key) == value
-
-
-def format_csv(csv: str):
-    return dedent(csv).strip()
+from tests.helpers.utils import assert_data, format_structure
 
 
 @fixture
 def csv_matcher(mocker: MockerFixture, request: FixtureRequest):
     csv, args = request.node.get_closest_marker('data').args
-    csv = format_csv(csv)
+    csv = format_structure(csv)
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
     matcher = CsvMatcher(args | {'in_dir': ''})
     yield matcher
@@ -88,7 +75,7 @@ def test_format(csv_matcher: CsvMatcher):
 
 
 def test_invalid(mocker: MockerFixture):
-    csv = format_csv('''
+    csv = format_structure('''
             raw
             Chapter 1 Lorem
             Chapter 2 Ipsum

@@ -10,3 +10,6 @@ class Type(Enum):
     CHAPTER_CONTENT = auto()
     UNRECOGNIZED = auto()
     BLANK = auto()
+
+    def __str__(self):
+        return self.name

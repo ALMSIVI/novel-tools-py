@@ -1,13 +1,13 @@
 import csv
 import os
-
 from common import NovelData, Type
 from framework import Writer
+from utils import purify_name
 
 
 class CsvWriter(Writer):
     """
-    Generates a volume/chapter list as a csv file, without splitting the chapters into their respective text files.
+    Generates a volume/chapter list as a csv file.
     """
 
     def __init__(self, args):
@@ -16,24 +16,23 @@ class CsvWriter(Writer):
 
         - csv_filename (str, optional, default='list.csv'): Filename of the output csv file.
         - out_dir (str): The directory to write the csv file to.
-        - formats (dict[str, dict[str, str]]): Key is Type representations, and the value consists of two fields:
-            - column: Name of the type that will appear on the csv column.
-            - format: Format string that can use any NovelData field.
+        - formats (dict[str, str]): Key is Type representations, and the value is the format string that can use any
+          NovelData field.
         - correct (bool): If set to True, will write the original index and the corresponding formatted title to the
           csv.
-        - debug (bool): If set to True, will write the error message to the csv.
+        - debug (bool, optional, default=False): If set to True, will write the error message to the csv.
         - additional_fields (list[str], optional): Specifies additional fields to be included to the csv file.
         """
-        self.filename = os.path.join(args['out_dir'], args.get('csv_filename', 'list.csv'))
+        self.filename = os.path.join(args['out_dir'], purify_name(args.get('csv_filename', 'list.csv')))
 
         self.formats = {Type[key.upper()]: value for key, value in args['formats'].items()}
         self.correct = args['correct']
-        self.debug = args['debug']
+        self.debug = args.get('debug', False)
         self.additional_fields = args.get('additional_fields', [])
 
         self.field_names = ['type', 'index', 'content', 'formatted']
         if self.correct:
-            self.field_names += ['o_index', 'o_formatted']
+            self.field_names += ['original_index', 'original_formatted']
         if self.debug:
             self.field_names += ['error']
 
@@ -55,16 +54,16 @@ class CsvWriter(Writer):
             self.writer.writeheader()
 
         csv_data = {
-            'type': self.formats[data.data_type]['column'],
+            'type': data.data_type,
             'index': data.index,
             'content': data.content,
-            'formatted': data.format(self.formats[data.data_type]['format'])
+            'formatted': data.format(self.formats[data.data_type])
         }
 
         if self.correct:
-            o_index = data.get('original_index')
-            csv_data['o_index'] = o_index
-            csv_data['o_formatted'] = data.format(self.formats[data.data_type]['format'], index=o_index)
+            original_index = data.get('original_index')
+            csv_data['original_index'] = original_index
+            csv_data['original_formatted'] = data.format(self.formats[data.data_type], index=original_index)
         if self.debug:
             csv_data['error'] = data.get('error', '')
 

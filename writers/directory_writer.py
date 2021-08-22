@@ -18,9 +18,9 @@ class DirectoryWriter(Writer):
           consist of the following two fields:
             - title: Format string that can use any NovelData field. Will be written to the top of the file.
             - filename: Same as above, except that it will be used as a filename (after purification).
-          Or it can simply be one format string, in which case both the title and filename will use it.
+          Or it can simply be one format string, in which case will be used by both the title and filename.
         - correct (bool): If set to False and the original_index field exists, will use the original index.
-        - debug (bool): If set to True, will print the error message to the terminal.
+        - debug (bool, optional, default=False): If set to True, will print the error message to the terminal.
         - default_volume (str, optional, default='default'): If the volume doesn't have volumes, specify the directory
           name to place the chapter files.
         - intro_filename (str, optional, default='_intro.txt'): The filename of the book/volume introduction file(s).
@@ -32,11 +32,12 @@ class DirectoryWriter(Writer):
         self.formats = {Type[key.upper()]: {'title': value, 'filename': value} if type(value) is str else value for
                         key, value in args['formats'].items()}
         self.correct = args['correct']
-        self.debug = args['debug']
+        self.debug = args.get('debug', False)
         self.default_volume = args.get('default_volume', 'default')
         self.intro_filename = args.get('intro_filename', '_intro.txt')
         self.write_blank = args.get('write_blank', True)
 
+        self.curr_type = Type.UNRECOGNIZED  # Used to indicate what file is currently being written
         self.file = None
         self.curr_dir = os.path.join(self.out_dir, self.default_volume)
 
@@ -49,16 +50,19 @@ class DirectoryWriter(Writer):
             if data.data_type == Type.BLANK and not self.write_blank:
                 return
             elif data.data_type == Type.BOOK_TITLE or data.data_type == Type.BOOK_INTRO:
-                # Write to _intro.txt in the book directory
-                if self.file:
-                    self.file.close()
-                self.file = open(os.path.join(self.out_dir, self.intro_filename), 'wt')
-
+                # Write to book intro file
+                if self.curr_type != Type.BOOK_INTRO:
+                    if self.file:
+                        self.file.close()
+                    self.file = open(os.path.join(self.out_dir, self.intro_filename), 'wt')
+                    self.curr_type = Type.BOOK_INTRO
             elif data.data_type == Type.VOLUME_INTRO:
                 # Write to _intro.txt in the volume directory
-                if self.file:
-                    self.file.close()
-                self.file = open(os.path.join(self.curr_dir, self.intro_filename), 'wt')
+                if self.curr_type != Type.VOLUME_INTRO:
+                    if self.file:
+                        self.file.close()
+                    self.file = open(os.path.join(self.curr_dir, self.intro_filename), 'wt')
+                    self.curr_type = Type.VOLUME_INTRO
             elif data.data_type != Type.BLANK and data.data_type != Type.CHAPTER_CONTENT:
                 print(f'Unrecognized data type: {data.data_type}')
                 return
@@ -70,7 +74,7 @@ class DirectoryWriter(Writer):
             filename = purify_name(data.format(self.formats[data.data_type]['filename'], index=index))
             title = data.format(self.formats[data.data_type]['title'], index=index)
 
-            # If there is a validation error, print on the terminal
+            # If there is an error, print on the terminal
             if self.debug and data.has('error'):
                 print(data.get('error'))
                 if self.correct:
@@ -79,7 +83,7 @@ class DirectoryWriter(Writer):
             if data.data_type == Type.VOLUME_TITLE:
                 # For volumes, create the volume directory
                 self.curr_dir = os.path.join(self.out_dir, filename)
-                if not os.path.exists(self.curr_dir):
+                if not os.path.isdir(self.curr_dir):
                     os.mkdir(self.curr_dir)
 
                 if self.file:
@@ -91,7 +95,7 @@ class DirectoryWriter(Writer):
                 if self.file:
                     self.file.close()
 
-                if not os.path.exists(self.curr_dir):
+                if not os.path.isdir(self.curr_dir):
                     os.mkdir(self.curr_dir)
 
                 self.file = open(os.path.join(self.curr_dir, filename + '.txt'), 'wt')
