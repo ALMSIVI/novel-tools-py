@@ -19,7 +19,7 @@
     "readers": {
       "class": "CompositeTextReader",
       "structure": "csv",
-      "structure_filename": "list.csv",
+      "csv_filename": "list.csv",
       "metadata": "metadata.json",
       "encoding": "utf-8",
       "types": {

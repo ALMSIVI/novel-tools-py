@@ -6,10 +6,7 @@ from tests.helpers.utils import assert_data
 
 @fixture
 def simple_matcher():
-    matcher = NumberedMatcher({
-        'type': 'volume_title',
-        'regex': 'Volume (.+) (.+)'
-    })
+    matcher = NumberedMatcher({'type': 'volume_title', 'regex': 'Volume (.+) (.+)'})
     yield matcher
     matcher.cleanup()
 
@@ -22,6 +19,13 @@ def group_matcher():
         'index_group': 1,
         'content_group': 0
     })
+    yield matcher
+    matcher.cleanup()
+
+
+@fixture
+def tag_matcher():
+    matcher = NumberedMatcher({'type': 'volume_title', 'regex': 'Extra (.+) (.+)', 'tag': 'extras'})
     yield matcher
     matcher.cleanup()
 
@@ -47,8 +51,6 @@ def test_process_chinese(simple_matcher: NumberedMatcher):
 def test_process_chinese_fail(simple_matcher: NumberedMatcher):
     before = NovelData('Volume 十人 测试')
     after = simple_matcher.process(before)
-    assert after.data_type == Type.UNRECOGNIZED
-    assert after.index is None
     assert_data(after, 'Volume 十人 测试', Type.UNRECOGNIZED, None)
 
 
@@ -56,3 +58,9 @@ def test_process_group(group_matcher: NumberedMatcher):
     before = NovelData('Test of Volume 1')
     after = group_matcher.process(before)
     assert_data(after, 'Test', Type.VOLUME_TITLE, 1)
+
+
+def test_matcher(tag_matcher: NumberedMatcher):
+    before = NovelData('Extra 1 Test')
+    after = tag_matcher.process(before)
+    assert_data(after, 'Test', Type.VOLUME_TITLE, 1, tag='extras')

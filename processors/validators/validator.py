@@ -7,33 +7,21 @@ class Validator(Processor):
     """
     Validates whether the title indices are continuous, i.e., whether there exist duplicate of missing chapter indices.
     """
-
     def __init__(self, args):
         """
         Arguments:
 
         - overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one,
           and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored
-          in the 'corrected_index' field.
-
-          In either case, a field called 'error' will be created if a validation error occurs.
-
-        - special_field (bool | str, optional, default=False): Irregular titles usually have negative indices, but some
-          will have a custom field specifying its index within these special titles. If this field is set to False, the
-          validator will use the built-in index. If set to True, will validate the default field 'special_index'. One
-          can also customize the field name by using a string instead of a boolean.
-
-          Notice that, if this field is set, then the validator will NOT validate regular titles. If you want to
-          validate both regular titles and special titles, please use two validators, one for each type of title.
+          in the 'corrected_index' field. In either case, a field called 'error' will be created if a validation error
+          occurs.
+        - tag (str, optional): Only validate on the given tag. Sometimes there may exist several independent sets of
+          indices within the same book; for example, there might be two different Introductions by different authors
+          before the first chapter, or there might be several interludes across the volume. In such case, one can attach
+           a tag to the data, and have a special Validator that only checks for that tag.
         """
         self.overwrite = args.get('overwrite', True)
-        if 'special_field' not in args or args['special_field'] is False:
-            self.special_field = None
-        elif args['special_field'] is True:
-            self.special_field = 'special_index'
-        else:
-            self.special_field = args['special_field']
-
+        self.tag = args.get('tag', None)
         self.indices = set()
         self.curr_index = 0
 
@@ -43,7 +31,7 @@ class Validator(Processor):
         Returns a copy of the original result if correct is false, or a fixed result if true.
         """
         new_data = data.copy()
-        corrected_index = self.get_index(data)
+        corrected_index = data.index
 
         if not self.check(data):
             self.set_index(new_data, corrected_index)
@@ -68,27 +56,17 @@ class Validator(Processor):
         self.set_index(new_data, corrected_index)
         return new_data
 
-    def get_index(self, data: NovelData):
-        return data.index if self.special_field is None else data.get(self.special_field)
-
     def set_index(self, data: NovelData, corrected_index: int):
         if self.overwrite:
-            if self.special_field is None:
-                original_index = data.index
-                data.index = corrected_index
-            else:
-                original_index = data.get(self.special_field)
-                data.set(**{self.special_field: corrected_index})
-
+            original_index = data.index
+            data.index = corrected_index
             data.set(original_index=original_index)
         else:
             data.set(corrected_index=corrected_index)
 
-    def format(self, result: NovelData) -> str:
-        format_str = 'index = {index}, content = {content}' if self.special_field is None else \
-            f'index = {{{self.special_field}}}, content = {{content}}'
-
-        return result.format(format_str)
+    @staticmethod
+    def format(result: NovelData) -> str:
+        return result.format('index = {index}, content = {content}')
 
     @abstractmethod
     def check(self, data: NovelData) -> bool:

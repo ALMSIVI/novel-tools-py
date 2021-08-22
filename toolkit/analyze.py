@@ -6,17 +6,16 @@ from utils import generate_objects
 
 
 def analyze(filename: str, out_dir: Optional[str]):
-    """Analyzes the volume/chapter structure of the novel."""
+    """Analyzes the volume/chapter structure of the novel from a text file."""
     in_dir = os.path.dirname(filename)
 
     additional_args = {
         'text_filename': filename,
-        'in_dir': in_dir
+        'in_dir': in_dir,
+        'out_dir': out_dir if out_dir is not None else in_dir
     }
-    if out_dir:
-        additional_args['out_dir'] = out_dir
 
-    objects = generate_objects('./config/analyze_config.json', 'analyze_config.json', in_dir, additional_args)
+    objects = generate_objects('analyze_config.json', 'config/analyze_config.json', in_dir, additional_args)
 
     matcher = AggregateMatcher(objects['matchers'])
     processors = [matcher] + objects['validators'] + objects['transformers']

@@ -41,7 +41,7 @@ def generate_objects(config_filename: str, default_config_filename: str, in_dir:
     if additional_args is None:
         additional_args = {}
     filename = os.path.join(in_dir, config_filename)
-    if not os.path.exists(filename):
+    if not os.path.isfile(filename):
         filename = os.path.join(os.curdir, default_config_filename)
 
     with open(filename, 'rt') as f:

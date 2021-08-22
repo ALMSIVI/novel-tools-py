@@ -28,19 +28,6 @@ def group_matcher():
     matcher.cleanup()
 
 
-@fixture
-def group_index_matcher():
-    matcher = SpecialMatcher({
-        'type': 'chapter_title',
-        'affixes': ['Introduction'],
-        'regex': '^{affixes} (.+)\\. (.+)$',
-        'index_group': 1,
-        'content_group': 2
-    })
-    yield matcher
-    matcher.cleanup()
-
-
 def test_process(simple_matcher: SpecialMatcher):
     before = NovelData('Introduction Test')
     after = simple_matcher.process(before)
@@ -61,9 +48,3 @@ def test_group(group_matcher: SpecialMatcher):
     before = NovelData('Test of Introduction')
     after = group_matcher.process(before)
     assert_data(after, 'Test', Type.CHAPTER_TITLE, -1)
-
-
-def test_group_index(group_index_matcher: SpecialMatcher):
-    before = NovelData('Introduction 1. Test')
-    after = group_index_matcher.process(before)
-    assert_data(after, 'Test', Type.CHAPTER_TITLE, -1, special_index=1)
