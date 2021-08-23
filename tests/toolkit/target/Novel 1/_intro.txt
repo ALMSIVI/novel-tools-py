@@ -1,0 +1,11 @@
+Test One
+
+This test novel contains volumes and introductions, including special chapters and volumes, but none have independent indices.
+
+It does NOT discard chapter indices.
+
+It contains duplicate and missing chapters, but no such volumes.
+
+For analyze, this novel will use a DirectoryWriter.
+
+

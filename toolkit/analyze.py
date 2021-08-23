@@ -15,7 +15,7 @@ def analyze(filename: str, out_dir: Optional[str], config: str):
         'out_dir': out_dir if out_dir is not None else in_dir
     }
 
-    objects = generate_objects(config, 'config/analyze_config.json', in_dir, additional_args)
+    objects = generate_objects(config, os.path.join('config', 'analyze_config.json'), in_dir, additional_args)
 
     matcher = AggregateMatcher(objects['matchers'])
     processors = [matcher] + objects['validators'] + objects['transformers']

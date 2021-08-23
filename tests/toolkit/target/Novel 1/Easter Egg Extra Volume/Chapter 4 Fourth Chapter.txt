@@ -1,0 +1,5 @@
+Chapter 4 Fourth Chapter
+
+This should be the fourth chapter.
+
+However, the author made a mistake and skipped the index. Hopefully our ChapterValidator can figure this out!

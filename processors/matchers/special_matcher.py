@@ -23,10 +23,8 @@ class SpecialMatcher(Processor):
           of affixes. Example: ^{affixes}$ will match lines with any of the affixes.
         - affix_group (int, optional, default=0): The group index for the title's affix (starting from 0).
         - content_group (int, optional, default=1): The group index for the title's content (starting from 0).
-        - tag (str, optional): The tag to append to matched data. Sometimes there may exist several independent sets of
-          indices within the same book; for example, there might be two different Introductions by different authors
-          before the first chapter, or there might be several interludes across the volume. In such case, one can attach
-          a tag to the data, and have a special Validator that only checks for that tag.
+        - tag (str, optional, default='special'): The tag to append to matched data. This can be used in TitleValidator
+          for different formats.
         """
         self.type = Type[args['type'].upper()]
         self.affixes = args['affixes']
@@ -34,7 +32,7 @@ class SpecialMatcher(Processor):
         self.regex = re.compile(args['regex'].format(affixes=f'({affix_str})'))
         self.affix_group = args.get('affix_group', 0) + 1
         self.content_group = args.get('content_group', 1) + 1
-        self.tag = args.get('tag', None)
+        self.tag = args.get('tag', 'special')
 
     def process(self, data: NovelData) -> NovelData:
         m = self.regex.match(data.content)

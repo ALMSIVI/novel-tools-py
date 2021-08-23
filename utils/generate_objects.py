@@ -30,7 +30,6 @@ default_package = {
 class ClassFactory:
     def __init__(self, packages):
         self.classes = {}
-        self.add_package(default_package)
 
         if type(packages) is dict:
             packages = [packages]
@@ -39,7 +38,7 @@ class ClassFactory:
             self.add_package(package['base'], package['ending'])
 
     def add_package(self, base: str, ending: str):
-        module_dir = os.path.join('..', *base.split('.'))
+        module_dir = os.path.join(os.curdir, *base.split('.'))
         module_names = [filename[:-3] for filename in os.listdir(module_dir) if filename.endswith(f'{ending}.py')]
         for module in module_names:
             name = snake_to_pascal(module)
@@ -61,7 +60,8 @@ def generate_objects(config_filename: str, default_config_filename: str, in_dir:
         config = json.load(f)
 
     factories = {}
-    for factory_config in config['packages']:
+    packages = [default_package] + config.get('packages', [])
+    for factory_config in packages:
         factories[factory_config['name']] = ClassFactory(factory_config['list'])
 
     objects = {}

@@ -1,0 +1,9 @@
+Chapter 3 Third Chapter
+
+This is the third chapter.
+
+Notice that there is no intro for the second volume.
+
+Also notice that the chapter index does not reset after a new volume.
+
+

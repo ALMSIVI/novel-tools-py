@@ -34,7 +34,7 @@ def tag_matcher():
         'type': 'chapter_title',
         'affixes': ['Introduction'],
         'regex': '^{affixes} (.+)$',
-        'tag': 'special'
+        'tag': 'intro'
     })
     yield matcher
     matcher.cleanup()
@@ -43,11 +43,11 @@ def tag_matcher():
 def test_process(simple_matcher: SpecialMatcher):
     before = NovelData('Introduction Test')
     after = simple_matcher.process(before)
-    assert_data(after, 'Test', Type.CHAPTER_TITLE, -1, affix='Introduction')
+    assert_data(after, 'Test', Type.CHAPTER_TITLE, -1, affix='Introduction', tag='special')
 
     before = NovelData('Prelude Test')
     after = simple_matcher.process(before)
-    assert_data(after, 'Test', Type.CHAPTER_TITLE, -2, affix='Prelude')
+    assert_data(after, 'Test', Type.CHAPTER_TITLE, -2, affix='Prelude', tag='special')
 
 
 def test_process_fail(simple_matcher: SpecialMatcher):
@@ -59,10 +59,10 @@ def test_process_fail(simple_matcher: SpecialMatcher):
 def test_group(group_matcher: SpecialMatcher):
     before = NovelData('Test of Introduction')
     after = group_matcher.process(before)
-    assert_data(after, 'Test', Type.CHAPTER_TITLE, -1, affix='Introduction')
+    assert_data(after, 'Test', Type.CHAPTER_TITLE, -1, affix='Introduction', tag='special')
 
 
 def test_tag(tag_matcher: SpecialMatcher):
     before = NovelData('Introduction Test')
     after = tag_matcher.process(before)
-    assert_data(after, 'Test', Type.CHAPTER_TITLE, -1, affix='Introduction', tag='special')
+    assert_data(after, 'Test', Type.CHAPTER_TITLE, -1, affix='Introduction', tag='intro')
