@@ -60,7 +60,7 @@ def test_process_group(group_matcher: NumberedMatcher):
     assert_data(after, 'Test', Type.VOLUME_TITLE, 1)
 
 
-def test_matcher(tag_matcher: NumberedMatcher):
+def test_tag(tag_matcher: NumberedMatcher):
     before = NovelData('Extra 1 Test')
     after = tag_matcher.process(before)
     assert_data(after, 'Test', Type.VOLUME_TITLE, 1, tag='extras')

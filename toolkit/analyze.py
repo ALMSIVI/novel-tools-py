@@ -5,7 +5,7 @@ from processors.matchers.__aggregate_matcher__ import AggregateMatcher
 from utils import generate_objects
 
 
-def analyze(filename: str, out_dir: Optional[str]):
+def analyze(filename: str, out_dir: Optional[str], config: str):
     """Analyzes the volume/chapter structure of the novel from a text file."""
     in_dir = os.path.dirname(filename)
 
@@ -15,7 +15,7 @@ def analyze(filename: str, out_dir: Optional[str]):
         'out_dir': out_dir if out_dir is not None else in_dir
     }
 
-    objects = generate_objects('analyze_config.json', 'config/analyze_config.json', in_dir, additional_args)
+    objects = generate_objects(config, 'config/analyze_config.json', in_dir, additional_args)
 
     matcher = AggregateMatcher(objects['matchers'])
     processors = [matcher] + objects['validators'] + objects['transformers']

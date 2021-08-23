@@ -15,9 +15,22 @@ def import_function(filename: str, base_package: str, func_name: str):
     return getattr(import_module(f'{base_package}.{filename}'), func_name)
 
 
+default_package = {
+    'name': '__default__',
+    'list': [
+        {'base': 'readers', 'ending': 'reader'},
+        {'base': 'processors.matchers', 'ending': 'matcher'},
+        {'base': 'processors.validators', 'ending': 'validator'},
+        {'base': 'processors.transformers', 'ending': 'transformer'},
+        {'base': 'writers', 'ending': 'writer'}
+    ]
+}
+
+
 class ClassFactory:
     def __init__(self, packages):
         self.classes = {}
+        self.add_package(default_package)
 
         if type(packages) is dict:
             packages = [packages]
@@ -55,12 +68,12 @@ def generate_objects(config_filename: str, default_config_filename: str, in_dir:
     for key, object_configs in config['objects'].items():
         if type(object_configs) is dict:
             object_config = object_configs
-            factory_name = object_config.get('name', config['default_package'])
+            factory_name = object_config.get('name', '__default__')
             objects[key] = factories[factory_name].get(object_config['class'], object_config | additional_args)
         else:
             object_list = []
             for object_config in object_configs:
-                factory_name = object_config.get('name', config['default_package'])
+                factory_name = object_config.get('name', '__default__')
                 object_list.append(factories[factory_name].get(object_config['class'], object_config | additional_args))
 
             objects[key] = object_list

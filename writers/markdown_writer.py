@@ -7,6 +7,8 @@ from utils import purify_name
 class MarkdownWriter(Writer):
     """
     Writes the entire novel to a Markdown file.
+    If a title field has been passed from a TitleTransformer and has the 'formatted' field filled, then the field will
+    be prioritized.
     """
 
     def __init__(self, args):
@@ -45,4 +47,4 @@ class MarkdownWriter(Writer):
             filename = data.content + '.md' if self.use_title and data.data_type == Type.BOOK_TITLE else self.filename
             self.file = open(os.path.join(self.out_dir, purify_name(filename)), 'wt')
 
-        self.file.write(self.levels.get(data.data_type, '') + data.content + '\n')
+        self.file.write(self.levels.get(data.data_type, '') + data.get('formatted', data.content) + '\n')

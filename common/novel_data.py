@@ -31,16 +31,16 @@ class NovelData:
     def set(self, **kwargs):
         self.others |= kwargs
 
-    def format(self, format_str: str, **kw):
+    def format(self, format_str: str, **kwargs):
         """Formats the novel data by a given format string. Use kw to overwrite existing fields if necessary."""
-        args = {
-            'type': self.data_type,
-            'content': self.content,
-            'index': self.index,
-        }
-        args |= self.others
-        args |= kw
-        return format_str.format(**args)
+        return format_str.format(**(self.to_dict() | kwargs))
+
+    def to_dict(self):
+        return {
+           'type': self.data_type,
+           'content': self.content,
+           'index': self.index,
+        } | self.others
 
     def copy(self):
         return deepcopy(self)

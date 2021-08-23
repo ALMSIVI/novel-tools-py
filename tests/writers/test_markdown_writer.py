@@ -44,9 +44,9 @@ def test_write(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     markdown_writer.write(data)
     handle.write.assert_called_with('Volume Intro\n')
 
-    data = NovelData('Chapter Title', Type.CHAPTER_TITLE)
+    data = NovelData('Title', Type.CHAPTER_TITLE, formatted='Chapter')
     markdown_writer.write(data)
-    handle.write.assert_called_with('### Chapter Title\n')
+    handle.write.assert_called_with('### Chapter\n')
 
     data = NovelData('Chapter Content', Type.CHAPTER_CONTENT)
     markdown_writer.write(data)
