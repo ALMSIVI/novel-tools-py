@@ -123,6 +123,7 @@ def test_intro(directory_writer: DirectoryWriter, mocker: MockerFixture):
 
 @mark.args({'debug': True})
 def test_debug(directory_writer: DirectoryWriter, mocker: MockerFixture):
+    mocker.patch('os.mkdir')
     mocker.patch('builtins.open', mocker.mock_open())
     mp = mocker.patch('builtins.print')
 
