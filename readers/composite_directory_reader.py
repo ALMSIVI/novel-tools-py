@@ -1,54 +1,61 @@
 import os
 from typing import Optional
 from framework import Reader
-from common import NovelData, Type
+from common import NovelData, Type, ACC, FieldMetadata
 from .csv_reader import CsvReader
 from .toc_reader import TocReader
 from .metadata_json_reader import MetadataJsonReader
 
 
-class CompositeDirectoryReader(Reader):
+class CompositeDirectoryReader(Reader, ACC):
     """
     Reads from a directory, but uses another reader (csv or toc) to provide the structure (volume/chapter titles).
     Additionally, could include a metadata reader for any additional information.
     Since the directory doesn't have an explicit structure, the DirectoryReader needs to read everything first before it
     can be matched against the structure. This might result in an extended initialization time.
-    If csv is used, then it is preferred contain a "raw" column, instead "content".
-    If toc is used, then the titles MUST match the directory/file names.
+    - If csv is used, then it is preferred contain a "raw" column, instead "content".
+    - If toc is used, then the titles MUST match the directory/file names.
+
+    Notice that some arguments from DirectoryReader are not available:
+    - discard_chapters is not available; this will be automatically inferred from the structure provider.
+    - read_contents is not available; please use the structure reader directly if you don't want the contents.
     """
 
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('in_dir', 'str',
+                          description='The working directory. Should also include the structure file and the metadata '
+                                      'file, if specified.'),
+            FieldMetadata('structure', 'str', options=['csv', 'toc'],
+                          description='Structure provider. Currently supported structures are \'csv\' and \'toc\'.'),
+            FieldMetadata('metadata', 'str | bool', default=False,
+                          description='If it is not specified or False, then no metadata will be read. If it is True, '
+                                      'then the reader will use the default filename (specified in the reader). If it '
+                                      'is a string, then the filename will be provided to the reader.'),
+            FieldMetadata('encoding', 'str', default='utf-8',
+                          description='Encoding of the chapter/structure/metadata files.'),
+            # DirectoryReader specific arguments
+            FieldMetadata('intro_filename', 'str', default='_intro.txt',
+                          description='The filename of the book/volume introduction file(s).'),
+            FieldMetadata('default_volume', 'str', default=None,
+                          description='If the novel does not have volumes but all chapters are stored in a directory, '
+                                      'then the variable would store the directory name.'),
+            # CsvReader specific arguments
+            FieldMetadata('csv_filename', 'str', default='list.csv', include_when=lambda a: a['structure'] == 'csv',
+                          description='Filename of the csv list file. This file should be generated from `CsvWriter`, '
+                                      'i.e., it must contain at least type, index and content.'),
+            # TocReader specific arguments
+            FieldMetadata('toc_filename', 'str', default='toc.txt', include_when=lambda a: a['structure'] == 'toc',
+                          description='Filename of the toc file. This file should be generated from `TocWriter`.'),
+            FieldMetadata('has_volume', 'bool', include_when=lambda a: a['structure'] == 'toc',
+                          description='Specifies whether the toc contains volumes.'),
+            FieldMetadata('discard_chapters', 'bool', include_when=lambda a: a['structure'] == 'toc',
+                          description='If set to True, will start from chapter 1 again when entering a new volume.')
+        ]
+
     def __init__(self, args):
-        """
-        Arguments:
-
-        - in_dir (str): The working directory. Should also include the structure file and the metadata file, if
-          specified.
-        - structure (string): Structure provider. Currently supported structures are 'csv' and 'toc'.
-        - metadata (string | bool, optional): If it is not specified or False, then no metadata will be read. If it is
-          True, then the reader will use the default filename (specified in the reader). If it is a string, then the
-          filename will be provided to the reader.
-        - encoding (str, optional, default='utf-8'): Encoding of the chapter/structure/metadata files.
-
-        CsvReader specific arguments (if csv is used):
-
-        - csv_filename (str, default='list.csv'): Filename of the csv list file. This file should be generated from
-          CsvWriter, i.e., it must contain at least type, index and content.
-
-        TocReader specific arguments (if toc is used):
-
-        - toc_filename (str, optional, default='toc.txt'): Filename of the toc file. This file should be generated from
-          TocWriter.
-        - has_volume(bool): Specifies whether the toc contains volumes.
-        - discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
-
-        DirectoryReader specific arguments:
-
-        - intro_filename (str, optional, default='_intro.txt'): The name if the book/volume introduction file.
-        - default_volume (str, optional): If the novel doesn't have volumes but all chapters are stored in a directory,
-          then the variable would store the directory name.
-        - discard_chapters is not available; this will be automatically inferred from the structure provider.
-        - read_contents is not available; please use the structure reader directly if you don't want the contents.
-        """
+        args = self.extract_fields(args)
         if args['structure'] == 'csv':
             self.structure = CsvReader(args)
         elif args['structure'] == 'toc':
@@ -58,16 +65,16 @@ class CompositeDirectoryReader(Reader):
 
         # Initialization of a directory reader
         self.in_dir = args['in_dir']
-        self.encoding = args.get('encoding', 'utf-8')
-        self.intro_filename = args.get('intro_filename', '_intro.txt')
+        self.encoding = args['encoding']
+        self.intro_filename = args['intro_filename']
 
         self.read_intro = os.path.isfile(os.path.join(self.in_dir, self.intro_filename))
         self.chapters = []
-        self.curr_volume = args.get('default_volume', None)
+        self.curr_volume = args['default_volume']
         self.file = None
         self.curr_type = Type.UNRECOGNIZED
 
-        if not args.get('metadata', False):
+        if not args['metadata']:
             self.metadata = None
         else:
             if type(args['metadata']) is str:

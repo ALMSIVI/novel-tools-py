@@ -2,7 +2,7 @@ import os
 from typing import Optional
 from framework import Worker
 from utils import generate_objects
-from .helpers import get_config, default_package
+from .helpers import get_config, default_packages
 
 
 def generate_list(in_dir: str, out_dir: Optional[str], config_filename: str):
@@ -22,6 +22,6 @@ def generate_list(in_dir: str, out_dir: Optional[str], config_filename: str):
         additional_args['out_dir'] = out_dir
 
     config = get_config(in_dir, config_filename, os.path.join('config', 'list_config.json'))
-    objects = generate_objects(config, default_package, additional_args)
+    objects = generate_objects(config, default_packages, additional_args)
     worker = Worker(objects['readers'], [], objects['writers'])
     worker.work()

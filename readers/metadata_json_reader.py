@@ -2,28 +2,33 @@ import json
 import os
 from typing import Optional
 from framework import Reader
-from common import NovelData, Type
+from common import NovelData, Type, ACC, FieldMetadata
 
 
-class MetadataJsonReader(Reader):
+class MetadataJsonReader(Reader, ACC):
     """
     Reads a json that contains the metadata of the book file. Will only generate a BOOK_TITLE, with the others field
     populated with the other metadata.
     """
 
-    def __init__(self, args):
-        """
-        Arguments:
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('metadata_filename', 'str', default='metadata.json',
+                          description='Filename of the metadata json file. The metadata MUST contain a \'title\' '
+                                      'field.'),
+            FieldMetadata('in_dir', 'str', optional=True,
+                          description='The directory to read the metadata file from. Required if the filename does '
+                                      'not contain the path.'),
+            FieldMetadata('encoding', 'str', default='utf-8',
+                          description='Encoding of the json file.')
+        ]
 
-        - metadata_filename (str, optional, default='metadata.json'): Filename of the metadata json file. The metadata
-          MUST contain a "title" field.
-        - in_dir (str, optional): The directory to read the metadata file from. Required if the filename does not
-          contain the path.
-        - encoding (str, optional, default='utf-8'): Encoding of the json file.
-        """
-        filename = args.get('metadata_filename', 'metadata.json')
+    def __init__(self, args):
+        args = self.extract_fields(args)
+        filename = args['metadata_filename']
         filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
-        with open(filename, 'rt', encoding=args.get('encoding', 'utf-8')) as f:
+        with open(filename, 'rt', encoding=args['encoding']) as f:
             self.metadata = json.load(f)
 
         if 'title' not in self.metadata:

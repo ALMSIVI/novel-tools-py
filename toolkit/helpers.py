@@ -2,7 +2,7 @@ import json
 import os
 from typing import Optional
 
-default_package = {
+default_packages = [{
     'name': '__default__',
     'list': [
         {'base': 'readers', 'ending': 'reader'},
@@ -11,7 +11,15 @@ default_package = {
         {'base': 'processors.transformers', 'ending': 'transformer'},
         {'base': 'writers', 'ending': 'writer'}
     ]
-}
+}]
+
+class_packages = [
+    {'name': 'Readers', 'list': [{'base': 'readers', 'ending': 'reader'}]},
+    {'name': 'Matchers', 'list': [{'base': 'processors.matchers', 'ending': 'matcher'}]},
+    {'name': 'Validators', 'list': [{'base': 'processors.validators', 'ending': 'validator'}]},
+    {'name': 'Transformers', 'list': [{'base': 'processors.transformers', 'ending': 'transformer'}]},
+    {'name': 'Writers', 'list': [{'base': 'writers', 'ending': 'writer'}]}
+]
 
 
 def get_config(in_dir: str, config_filename: str, default_config_filename: Optional[str] = None):

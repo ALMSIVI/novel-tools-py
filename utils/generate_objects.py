@@ -1,4 +1,3 @@
-import json
 import os
 from importlib import import_module
 
@@ -42,7 +41,7 @@ def generate_objects(config: dict, default_package=None, additional_args=None):
         additional_args = {}
 
     factories = {}
-    packages = [] if default_package is None else [default_package]
+    packages = [] if default_package is None else default_package
     packages += config.get('packages', [])
     for factory_config in packages:
         factories[factory_config['name']] = ClassFactory(factory_config['list'])
@@ -68,7 +67,7 @@ def generate_classes(config: dict, default_package=None):
     """Generates corresponding classes from the config. Useful for extracting required fields."""
 
     classes = {}
-    packages = [] if default_package is None else [default_package]
+    packages = [] if default_package is None else default_package
     packages += config.get('packages', [])
     for factory_config in packages:
         classes[factory_config['name']] = ClassFactory(factory_config['list']).classes

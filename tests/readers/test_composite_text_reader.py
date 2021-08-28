@@ -19,9 +19,10 @@ def composite_reader(mocker: MockerFixture, request: FixtureRequest):
     mocker.patch('builtins.open', mocker.mock_open(read_data=structure))
 
     # We can only mock one file at a time, so we will mock structure first, and plug the FileReader in later
-    args = (args | {'in_dir': '.'})
+    args = args | {'in_dir': '.'}
     reader = CompositeTextReader(args)
     mocker.patch('builtins.open', mocker.mock_open(read_data=text))
+    args = args | {'verbose': True}
     reader.reader = TextReader(args)
     yield reader
     reader.cleanup()

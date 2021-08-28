@@ -1,18 +1,28 @@
-from common import NovelData, Type
+from common import NovelData, Type, FieldMetadata
 from .validator import Validator
 
 
 class ChapterValidator(Validator):
-    def __init__(self, args):
-        """
-         Arguments (apart from those inherited from Validator):
+    """
+    Validates a chapter, potentially within a volume.
+    """
 
-        - discard_chapters (bool): If set to True, restart indexing at the beginning of each new volume.
-        - volume_special_field (bool | str, optional, default=False): Similar to special_field, but only applies to the
-          volume. The volume is not used for validation, only for outputting error messages. So volume will be processed
-          regardless of whether the volume is a special volume. This field only specifies what field to look for if a
-          special volume is found.
-        """
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        fields = Validator.required_fields()
+        fields += [
+            FieldMetadata('discard_chapters', 'bool',
+                          description='If set to True, restart indexing at the beginning of each new volume.'),
+            FieldMetadata('volume_special_field', 'bool | str', default=False,
+                          description='Similar to special_field, but only applies to the volume. The volume is not '
+                                      'used for validation, only for outputting error messages. So volume will be '
+                                      'processed regardless of whether the volume is a special volume. This field '
+                                      'only specifies what field to look for if a special volume is found.')
+        ]
+        return fields
+
+    def __init__(self, args):
+        args = self.extract_fields(args)
         super().__init__(args)
         self.discard_chapters = args['discard_chapters']
         if 'volume_special_field' not in args or args['volume_special_field'] is False:

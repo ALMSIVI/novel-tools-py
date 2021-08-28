@@ -1,6 +1,6 @@
 from typing import Union, Any
 from framework import Processor
-from common import NovelData, Type
+from common import NovelData, Type, ACC, FieldMetadata
 
 
 class Unit:
@@ -38,7 +38,7 @@ class Unit:
         return data
 
 
-class TitleTransformer(Processor):
+class TitleTransformer(Processor, ACC):
     """
     Formats the title, using the necessary information in the data.
 
@@ -51,15 +51,18 @@ class TitleTransformer(Processor):
     is a title.
     """
 
-    def __init__(self, args):
-        """
-        Arguments:
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('units', 'list[{filter: dict[str, str], format: str | dict[str, str]}]',
+                          description='The list of processing units. The filter is a dictionary with the fields as the '
+                                      'key. The format can be either a string or a dict containing the format strings '
+                                      'for each custom field. Please put the units with the most specific filters '
+                                      'first, and leave the most generic last, to avoid short circuiting.')
+        ]
 
-        - units (list[{filter: dict[str, str], format: str | dict[str, str]}]): The list of processing units. The filter
-          is a dictionary with the fields as the key. The format can be either a string or a dict containing the format
-          strings for each custom field. Please put the units with the most specific filters first, and leave the most
-          generic last, to avoid short circuiting.
-        """
+    def __init__(self, args):
+        args = self.extract_fields(args)
         self.units = [Unit(arg['filter'], arg['format']) for arg in args['units']]
 
     def process(self, data: NovelData) -> NovelData:

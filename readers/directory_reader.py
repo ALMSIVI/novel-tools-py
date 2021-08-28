@@ -1,35 +1,42 @@
 import os
 from typing import Optional
-
 from natsort import natsorted
-from common import NovelData, Type
+from common import NovelData, Type, ACC, FieldMetadata
 from framework import Reader
 
 
-class DirectoryReader(Reader):
+class DirectoryReader(Reader, ACC):
     """
     Reads from a directory structure. This directory should be generated from FileWriter, as it will follow certain
     conventions, such as the first line of the chapter file being the title.
     """
 
-    def __init__(self, args):
-        """
-        Arguments:
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('in_dir', 'str',
+                          description='The working directory.'),
+            FieldMetadata('read_contents', 'bool',
+                          description='If set to True, will open the files to read the contents.'),
+            FieldMetadata('discard_chapters', 'bool',
+                          description='If set to True, will start from chapter 1 again when entering a new volume.'),
+            FieldMetadata('default_volume', 'str', default=None,
+                          description='If the novel does not have volumes but all chapters are stored in a directory, '
+                                      'then the variable would store the directory name.'),
+            FieldMetadata('intro_filename', 'str', default='_intro.txt',
+                          description='The filename of the book/volume introduction file(s).'),
+            FieldMetadata('encoding', 'str', default='utf-8',
+                          description='Encoding of the chapter file(s).')
+        ]
 
-        - in_dir (str): The working directory.
-        - read_contents (bool): If set to True, will open the files to read the contents.
-        - discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
-        - default_volume (str, optional): If the novel doesn't have volumes but all chapters are stored in a directory,
-          then the variable would store the directory name.
-        - intro_filename (str, optional, default='_intro.txt'): The filename of the book/volume introduction file(s).
-        - encoding (str, optional, default='utf-8'): Encoding of the chapter file(s).
-        """
+    def __init__(self, args):
+        args = self.extract_fields(args)
         self.in_dir = args['in_dir']
         self.read_contents = args['read_contents']
         self.discard_chapters = args['discard_chapters']
-        self.default_volume = args.get('default_volume', None)
-        self.encoding = args.get('encoding', 'utf-8')
-        self.intro_filename = args.get('intro_filename', '_intro.txt')
+        self.default_volume = args['default_volume']
+        self.encoding = args['encoding']
+        self.intro_filename = args['intro_filename']
 
         # Create the list of volumes/directories to look for
         self.read_intro = self.read_contents and os.path.isfile(os.path.join(self.in_dir, self.intro_filename))

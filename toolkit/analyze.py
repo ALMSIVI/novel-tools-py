@@ -3,7 +3,7 @@ from typing import Optional
 from framework import Worker
 from processors.matchers.__aggregate_matcher__ import AggregateMatcher
 from utils import generate_objects
-from .helpers import get_config, default_package
+from .helpers import get_config, default_packages
 
 
 def analyze(filename: str, out_dir: Optional[str], config_filename: str):
@@ -24,7 +24,7 @@ def analyze(filename: str, out_dir: Optional[str], config_filename: str):
     }
 
     config_filename = get_config(in_dir, config_filename, os.path.join('config', 'analyze_config.json'))
-    objects = generate_objects(config_filename, default_package, additional_args)
+    objects = generate_objects(config_filename, default_packages, additional_args)
 
     matcher = AggregateMatcher(objects['matchers'])
     processors = [matcher] + objects['validators'] + objects['transformers']

@@ -1,26 +1,31 @@
 import csv
 import os
-from common import NovelData
+from common import NovelData, ACC, FieldMetadata
 from framework import Writer
 from utils import purify_name
 
 
-class CsvWriter(Writer):
+class CsvWriter(Writer, ACC):
     """
     Generates a volume/chapter list as a csv file.
     It is assumed that the title data has been passed from a TitleTransformer and has the 'formatted' field filled.
     """
 
-    def __init__(self, args):
-        """
-        Arguments:
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('csv_filename', 'str', default='list.csv',
+                          description='Filename of the output csv file.'),
+            FieldMetadata('out_dir', 'str',
+                          description='The directory to write the csv file to.'),
+            FieldMetadata('additional_fields', 'list[str]', default=[],
+                          description='Specifies additional fields to be included to the csv file.')
+        ]
 
-        - csv_filename (str, optional, default='list.csv'): Filename of the output csv file.
-        - out_dir (str): The directory to write the csv file to.
-        - additional_fields (list[str], optional): Specifies additional fields to be included to the csv file.
-        """
-        self.filename = os.path.join(args['out_dir'], purify_name(args.get('csv_filename', 'list.csv')))
-        self.field_names = ['type', 'index', 'content', 'formatted'] + args.get('additional_fields', [])
+    def __init__(self, args):
+        args = self.extract_fields(args)
+        self.filename = os.path.join(args['out_dir'], purify_name(args['csv_filename']))
+        self.field_names = ['type', 'index', 'content', 'formatted'] + args['additional_fields']
 
         self.file = None
         self.writer = None

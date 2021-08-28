@@ -1,33 +1,40 @@
 import os
 from framework import Writer
-from common import NovelData, Type
+from common import NovelData, Type, ACC, FieldMetadata
 from utils import purify_name
 
 
-class DirectoryWriter(Writer):
+class DirectoryWriter(Writer, ACC):
     """
     Generates volume directories and chapter files. If there is no volume, a default volume will be created.
     It is assumed that the title data has been passed from a TitleTransformer and has the 'formatted' field filled. One
     can also use the same transformer to attach a 'filename' field, and the writer will prioritize this field.
     """
 
-    def __init__(self, args):
-        """
-        Arguments:
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('out_dir', 'str',
+                          description='The working directory.'),
+            FieldMetadata('debug', 'bool', default=False,
+                          description='If set to True, will print the error message to the terminal.'),
+            FieldMetadata('default_volume', 'str', default='default',
+                          description='If the volume doesn\'t have volumes, specify the directory name to place the '
+                                      'chapter files.'),
+            FieldMetadata('intro_filename', 'str', default='_intro.txt',
+                          description='The filename of the book/volume introduction file(s).'),
+            FieldMetadata('write_blank', 'bool', default=True,
+                          description='If set to True, will write blank lines to the files. Sometimes blank lines '
+                                      'serve as separators in novels, and we want to keep them.')
+        ]
 
-        - out_dir (str): The working directory.
-        - debug (bool, optional, default=False): If set to True, will print the error message to the terminal.
-        - default_volume (str, optional, default='default'): If the volume doesn't have volumes, specify the directory
-          name to place the chapter files.
-        - intro_filename (str, optional, default='_intro.txt'): The filename of the book/volume introduction file(s).
-        - write_blank (bool, optional, default=True): If set to True, will write blank lines to the files. Sometimes
-          blank lines serve as separators in novels, and we want to keep them.
-        """
+    def __init__(self, args):
+        args = self.extract_fields(args)
         self.out_dir = args['out_dir']
-        self.debug = args.get('debug', False)
-        self.default_volume = args.get('default_volume', 'default')
-        self.intro_filename = args.get('intro_filename', '_intro.txt')
-        self.write_blank = args.get('write_blank', True)
+        self.debug = args['debug']
+        self.default_volume = args['default_volume']
+        self.intro_filename = args['intro_filename']
+        self.write_blank = args['write_blank']
 
         self.curr_type = Type.UNRECOGNIZED  # Used to indicate what file is currently being written
         self.file = None

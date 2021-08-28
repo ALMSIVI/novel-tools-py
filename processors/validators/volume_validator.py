@@ -3,6 +3,10 @@ from .validator import Validator
 
 
 class VolumeValidator(Validator):
+    """
+    Validates a volume.
+    """
+
     def check(self, data: NovelData) -> bool:
         return data.type == Type.VOLUME_TITLE and data.index >= 0 and data.get('tag', None) == self.tag
 

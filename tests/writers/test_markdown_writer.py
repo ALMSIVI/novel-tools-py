@@ -8,14 +8,7 @@ from writers.markdown_writer import MarkdownWriter
 @fixture
 def markdown_writer(request: FixtureRequest):
     args = request.node.get_closest_marker('args').args[0]
-    writer = MarkdownWriter(args | {
-        'out_dir': '.',
-        'levels': {
-            'book_title': 1,
-            'volume_title': 2,
-            'chapter_title': 3
-        }
-    })
+    writer = MarkdownWriter(args | {'out_dir': '.'})
     yield writer
     writer.cleanup()
 
@@ -55,6 +48,28 @@ def test_write(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     data = NovelData('', Type.BLANK)
     markdown_writer.write(data)
     handle.write.assert_called_with('\n')
+
+
+@mark.args({
+    'use_title': False,
+    'levels': {'volume_title': 1, 'chapter_title': 2}
+})
+def test_levels(markdown_writer: MarkdownWriter, mocker: MockerFixture):
+    m = mocker.patch('builtins.open', mocker.mock_open())
+    handle = m()
+
+    data = NovelData('Title', Type.BOOK_TITLE)
+    markdown_writer.write(data)
+    m.assert_called_with(os.path.join('.', 'text.md'), 'wt')
+    handle.write.assert_called_with('Title\n')
+
+    data = NovelData('Volume', Type.VOLUME_TITLE)
+    markdown_writer.write(data)
+    handle.write.assert_called_with('# Volume\n')
+
+    data = NovelData('Title', Type.CHAPTER_TITLE, formatted='Chapter')
+    markdown_writer.write(data)
+    handle.write.assert_called_with('## Chapter\n')
 
 
 @mark.args({

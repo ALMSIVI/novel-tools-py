@@ -1,26 +1,31 @@
 import os
 from framework import Writer
-from common import NovelData, Type
+from common import NovelData, Type, ACC, FieldMetadata
 from utils import purify_name
 
 
-class TocWriter(Writer):
+class TocWriter(Writer, ACC):
     """
     Lists the table of contents without actually splitting the file. Useful for debugging.
     If out_dir is empty, the table will be printed to the terminal.
     It is assumed that the title data has been passed from a TitleTransformer and has the 'formatted' field filled.
     """
 
-    def __init__(self, args):
-        """
-        Arguments:
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('toc_filename', 'str', default='toc.txt',
+                          description='Filename of the output toc file.'),
+            FieldMetadata('out_dir', 'str',
+                          description='The directory to write the toc file to.'),
+            FieldMetadata('debug', 'bool', default=False,
+                          description='If set to True, will write error information to the table of contents.'),
+        ]
 
-        - toc_filename (str, optional, default='toc.txt'): Filename of the output toc file.
-        - out_dir (str): The directory to write the toc file to.
-        - debug (bool, optional, default=False): If set to True, will write error information to the table of contents.
-        """
-        self.filename = os.path.join(args['out_dir'], purify_name(args.get('out_filename', 'toc.txt')))
-        self.debug = args.get('debug', False)
+    def __init__(self, args):
+        args = self.extract_fields(args)
+        self.filename = os.path.join(args['out_dir'], purify_name(args['toc_filename']))
+        self.debug = args['debug']
 
         self.file = None
         self.has_volume = False  # Whether we need to indent chapter titles

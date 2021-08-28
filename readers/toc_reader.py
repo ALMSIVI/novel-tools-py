@@ -1,29 +1,35 @@
 import os
 from typing import Optional
 from framework import Reader
-from common import NovelData, Type
+from common import NovelData, Type, ACC, FieldMetadata
 
 
-class TocReader(Reader):
+class TocReader(Reader, ACC):
     """Reads from a table of contents (toc) file."""
 
-    def __init__(self, args):
-        """
-        Arguments:
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('toc_filename', 'str', default='toc.txt',
+                          description='Filename of the toc file. This file should be generated from `TocWriter`.'),
+            FieldMetadata('in_dir', 'str', optional=True,
+                          description='The directory to read the toc file from. Required if the filename does not '
+                                      'contain the path.'),
+            FieldMetadata('encoding', 'str', default='utf-8',
+                          description='Encoding of the toc file.'),
+            FieldMetadata('has_volume', 'bool',
+                          description='Specifies whether the toc contains volumes.'),
+            FieldMetadata('discard_chapters', 'bool',
+                          description='If set to True, will start from chapter 1 again when entering a new volume.')
+        ]
 
-        - toc_filename (str, optional, default='toc.txt'): Filename of the toc file. This file should be generated from
-          TocWriter.
-        - in_dir (str, optional): The directory to read the toc file from. Required if the filename does not contain the
-          path.
-        - encoding (str, optional, default='utf-8'): Encoding of the toc file.
-        - has_volume(bool): Specifies whether the toc contains volumes.
-        - discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
-        """
+    def __init__(self, args):
+        args = self.extract_fields(args)
         self.has_volume = args['has_volume']
         self.discard_chapters = args['discard_chapters']
-        filename = args.get('toc_filename', 'toc.txt')
+        filename = args['toc_filename']
         filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
-        self.file = open(filename, 'rt', encoding=args.get('encoding', 'utf-8'))
+        self.file = open(filename, 'rt', encoding=args['encoding'])
         self.indices = {Type.VOLUME_TITLE: 0, Type.CHAPTER_TITLE: 0}
 
     def cleanup(self):

@@ -1,27 +1,34 @@
 from abc import abstractmethod
 from framework import Processor
-from common import NovelData
+from common import NovelData, ACC, FieldMetadata
 
 
-class Validator(Processor):
+class Validator(Processor, ACC):
     """
     Validates whether the title indices are continuous, i.e., whether there exist duplicate of missing chapter indices.
     """
-    def __init__(self, args):
-        """
-        Arguments:
 
-        - overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one,
-          and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored
-          in the 'corrected_index' field. In either case, a field called 'error' will be created if a validation error
-          occurs.
-        - tag (str, optional): Only validate on the given tag. Sometimes there may exist several independent sets of
-          indices within the same book; for example, there might be two different Introductions by different authors
-          before the first chapter, or there might be several interludes across the volume. In such case, one can attach
-           a tag to the data, and have a special Validator that only checks for that tag.
-        """
-        self.overwrite = args.get('overwrite', True)
-        self.tag = args.get('tag', None)
+    @staticmethod
+    def required_fields() -> list[FieldMetadata]:
+        return [
+            FieldMetadata('overwrite', 'bool', default=True,
+                          description='If set to True, will overwrite the old index with the corrected one, and keep '
+                                      'the original index in the \'original_index\' field. If set to False, '
+                                      'the corrected index will be stored in the \'corrected_index\' field. In either '
+                                      'case, a field called \'error\' will be created if a validation error occurs.'),
+            FieldMetadata('tag', 'str', default=None,
+                          description='Only validate on the given tag. Sometimes there may exist several independent '
+                                      'sets of indices within the same book; for example, there might be two '
+                                      'different Introductions by different authors before the first chapter, '
+                                      'or there might be several interludes across the volume. In such case, '
+                                      'one can attach a tag to the data, and have a special Validator that only '
+                                      'checks for that tag.')
+        ]
+
+    def __init__(self, args):
+        args = self.extract_fields(args)
+        self.overwrite = args['overwrite']
+        self.tag = args['tag']
         self.indices = set()
         self.curr_index = 0
 
