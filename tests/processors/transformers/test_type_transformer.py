@@ -13,30 +13,30 @@ def type_transformer():
 def test_process(type_transformer: TypeTransformer):
     before = NovelData('Title')
     after = type_transformer.process(before)
-    assert after.data_type == Type.BOOK_TITLE
+    assert after.type == Type.BOOK_TITLE
 
     before = NovelData('Intro')
     after = type_transformer.process(before)
-    assert after.data_type == Type.BOOK_INTRO
+    assert after.type == Type.BOOK_INTRO
 
     before = NovelData('')
     after = type_transformer.process(before)
-    assert after.data_type == Type.BLANK
+    assert after.type == Type.BLANK
 
     before = NovelData('Volume 1', Type.VOLUME_TITLE)
     type_transformer.process(before)
 
     before = NovelData('Intro')
     after = type_transformer.process(before)
-    assert after.data_type == Type.VOLUME_INTRO
+    assert after.type == Type.VOLUME_INTRO
 
     before = NovelData('Chapter 1', Type.CHAPTER_TITLE)
     type_transformer.process(before)
 
     before = NovelData('Content')
     after = type_transformer.process(before)
-    assert after.data_type == Type.CHAPTER_CONTENT
+    assert after.type == Type.CHAPTER_CONTENT
 
     before = NovelData('', Type.CHAPTER_TITLE)
     after = type_transformer.process(before)
-    assert after.data_type == Type.CHAPTER_TITLE
+    assert after.type == Type.CHAPTER_TITLE

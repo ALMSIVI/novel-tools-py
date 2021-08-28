@@ -1,9 +1,11 @@
 import os
+from pytest import mark
 from pytest_mock import MockerFixture
 from toolkit.analyze import analyze
 from tests.helpers.integrations import assert_directory
 
 
+@mark.slow
 def test_analyze_1(directories: tuple[str, str, str], mocker: MockerFixture):
     data_dir, target_dir, output_dir = directories
     mp = mocker.patch('builtins.print')

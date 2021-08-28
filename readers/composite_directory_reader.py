@@ -105,7 +105,7 @@ class CompositeDirectoryReader(Reader):
             return None
 
         title = data.get('raw', data.content)
-        if data.data_type == Type.VOLUME_TITLE:
+        if data.type == Type.VOLUME_TITLE:
             self.curr_volume = title
             volume_dir = os.path.join(self.in_dir, self.curr_volume)
             self.chapters = [filename for filename in os.listdir(volume_dir) if
@@ -115,7 +115,7 @@ class CompositeDirectoryReader(Reader):
             if self.intro_filename in self.chapters:
                 self.file = open(os.path.join(volume_dir, self.intro_filename), 'rt', encoding=self.encoding)
                 self.curr_type = Type.VOLUME_INTRO
-        elif data.data_type == Type.CHAPTER_TITLE:
+        elif data.type == Type.CHAPTER_TITLE:
             # Assume that title may not include extension
             filename = [name for name in self.chapters if name.startswith(title)][0]
             self.file = open(os.path.join(self.in_dir, self.curr_volume, filename), 'rt',

@@ -14,9 +14,9 @@ class OrderTransformer(Processor):
         self.orders = {}
 
     def process(self, data: NovelData) -> NovelData:
-        if data.data_type not in self.orders:
-            self.orders[data.data_type] = 0
+        if data.type not in self.orders:
+            self.orders[data.type] = 0
 
-        self.orders[data.data_type] += 1
-        data.set(order=self.orders[data.data_type])
+        self.orders[data.type] += 1
+        data.set(order=self.orders[data.type])
         return data

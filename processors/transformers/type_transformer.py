@@ -13,25 +13,25 @@ class TypeTransformer(Processor):
 
     def process(self, data: NovelData) -> NovelData:
         # Theoretically BLANK can fit anywhere, but they are omitted for concision.
-        if data.data_type == Type.VOLUME_TITLE:
+        if data.type == Type.VOLUME_TITLE:
             # After this, should either be volume intro or chapter title.
             self.in_volume = True
             self.in_chapter = False
-        elif data.data_type == Type.CHAPTER_TITLE:
+        elif data.type == Type.CHAPTER_TITLE:
             # After this, should only be chapter content.
             self.in_chapter = True
         elif not data.content:
             # Empty content that is not a title, treat as BLANK.
-            data.data_type = Type.BLANK
+            data.type = Type.BLANK
         elif not self.in_volume:
             # Outside of volume, should be book metadata or intro. Treat first line as book title.
-            data.data_type = Type.BOOK_TITLE if self.first_line else Type.BOOK_INTRO
+            data.type = Type.BOOK_TITLE if self.first_line else Type.BOOK_INTRO
         elif not self.in_chapter:
             # Outside of chapter, should be volume intro.
-            data.data_type = Type.VOLUME_INTRO
+            data.type = Type.VOLUME_INTRO
         else:
             # Inside chapter, should be chapter content.
-            data.data_type = Type.CHAPTER_CONTENT
+            data.type = Type.CHAPTER_CONTENT
 
         self.first_line = False
         return data

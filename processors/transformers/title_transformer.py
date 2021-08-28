@@ -14,7 +14,7 @@ class Unit:
             if key == 'content':
                 match = match and data.content == val
             elif key == 'type':
-                match = match and data.data_type == Type[val.upper()]
+                match = match and data.type == Type[val.upper()]
             elif key == 'index':
                 match = match and data.index == val
             else:

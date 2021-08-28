@@ -15,18 +15,6 @@ def import_function(filename: str, base_package: str, func_name: str):
     return getattr(import_module(f'{base_package}.{filename}'), func_name)
 
 
-default_package = {
-    'name': '__default__',
-    'list': [
-        {'base': 'readers', 'ending': 'reader'},
-        {'base': 'processors.matchers', 'ending': 'matcher'},
-        {'base': 'processors.validators', 'ending': 'validator'},
-        {'base': 'processors.transformers', 'ending': 'transformer'},
-        {'base': 'writers', 'ending': 'writer'}
-    ]
-}
-
-
 class ClassFactory:
     def __init__(self, packages):
         self.classes = {}
@@ -48,19 +36,14 @@ class ClassFactory:
         return self.classes[name](args)
 
 
-def generate_objects(config_filename: str, default_config_filename: str, in_dir: str, additional_args=None):
-    """Generates corresponding objects from the config file."""
+def generate_objects(config: dict, default_package=None, additional_args=None):
+    """Generates corresponding objects from the config."""
     if additional_args is None:
         additional_args = {}
-    filename = os.path.join(in_dir, config_filename)
-    if not os.path.isfile(filename):
-        filename = os.path.join(os.curdir, default_config_filename)
-
-    with open(filename, 'rt') as f:
-        config = json.load(f)
 
     factories = {}
-    packages = [default_package] + config.get('packages', [])
+    packages = [] if default_package is None else [default_package]
+    packages += config.get('packages', [])
     for factory_config in packages:
         factories[factory_config['name']] = ClassFactory(factory_config['list'])
 
@@ -79,3 +62,15 @@ def generate_objects(config_filename: str, default_config_filename: str, in_dir:
             objects[key] = object_list
 
     return objects
+
+
+def generate_classes(config: dict, default_package=None):
+    """Generates corresponding classes from the config. Useful for extracting required fields."""
+
+    classes = {}
+    packages = [] if default_package is None else [default_package]
+    packages += config.get('packages', [])
+    for factory_config in packages:
+        classes[factory_config['name']] = ClassFactory(factory_config['list']).classes
+
+    return classes

@@ -37,9 +37,9 @@ class TocWriter(Writer):
             self.file = open(self.filename, 'wt')
 
         line = ''
-        if data.data_type == Type.CHAPTER_TITLE and self.has_volume:
+        if data.type == Type.CHAPTER_TITLE and self.has_volume:
             line += '\t'
-        elif data.data_type == Type.VOLUME_TITLE:
+        elif data.type == Type.VOLUME_TITLE:
             self.has_volume = True
 
         line += data.get('formatted')

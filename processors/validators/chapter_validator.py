@@ -25,14 +25,14 @@ class ChapterValidator(Validator):
         self.curr_volume = None
 
     def check(self, data: NovelData) -> bool:
-        if data.data_type == Type.VOLUME_TITLE:
+        if data.type == Type.VOLUME_TITLE:
             self.curr_volume = data
             if self.discard_chapters:
                 self.indices.clear()
                 self.curr_index = 0
             return False
 
-        return data.data_type == Type.CHAPTER_TITLE and data.index >= 0 and data.get('tag', None) == self.tag
+        return data.type == Type.CHAPTER_TITLE and data.index >= 0 and data.get('tag', None) == self.tag
 
     def duplicate_message(self, data: NovelData, corrected_index: int) -> str:
         return f'Duplicate chapter{self.volume_message} - expected: {corrected_index}, actual: {self.format(data)}'

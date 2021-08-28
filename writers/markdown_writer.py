@@ -40,11 +40,11 @@ class MarkdownWriter(Writer):
         if self.debug and data.has('error'):
             print(data.get('error'))
 
-        if data.data_type == Type.BLANK and not self.write_blank:
+        if data.type == Type.BLANK and not self.write_blank:
             return
 
         if not self.file:
-            filename = data.content + '.md' if self.use_title and data.data_type == Type.BOOK_TITLE else self.filename
+            filename = data.content + '.md' if self.use_title and data.type == Type.BOOK_TITLE else self.filename
             self.file = open(os.path.join(self.out_dir, purify_name(filename)), 'wt')
 
-        self.file.write(self.levels.get(data.data_type, '') + data.get('formatted', data.content) + '\n')
+        self.file.write(self.levels.get(data.type, '') + data.get('formatted', data.content) + '\n')

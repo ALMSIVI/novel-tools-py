@@ -5,7 +5,6 @@ description = 'Python tools for formatting novels.'
 authors = ['Yue Wu <wuyuejl97@gmail.com']
 license = 'WTFPL'
 
-
 [tool.yapf]
 based_on_style = 'pep8'
 column_limit = 120

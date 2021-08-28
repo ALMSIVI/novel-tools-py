@@ -20,7 +20,7 @@ class AggregateMatcher(Processor):
     def process(self, data: NovelData) -> NovelData:
         for matcher in self.matchers:
             new_data = matcher.process(data)
-            if new_data.data_type != Type.UNRECOGNIZED:
+            if new_data.type != Type.UNRECOGNIZED:
                 return new_data
 
         return data

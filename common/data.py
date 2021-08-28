@@ -1,5 +1,19 @@
 from copy import deepcopy
-from .type import Type
+from enum import Enum, auto
+
+
+class Type(Enum):
+    BOOK_TITLE = auto()
+    BOOK_INTRO = auto()
+    VOLUME_TITLE = auto()
+    VOLUME_INTRO = auto()
+    CHAPTER_TITLE = auto()
+    CHAPTER_CONTENT = auto()
+    UNRECOGNIZED = auto()
+    BLANK = auto()
+
+    def __str__(self):
+        return self.name
 
 
 class NovelData:
@@ -18,7 +32,7 @@ class NovelData:
 
     def __init__(self, content: str, data_type: Type = Type.UNRECOGNIZED, index: int = None, **kwargs):
         self.content = content
-        self.data_type = data_type
+        self.type = data_type
         self.index = index
         self.others = kwargs
 
@@ -37,10 +51,10 @@ class NovelData:
 
     def to_dict(self):
         return {
-           'type': self.data_type,
-           'content': self.content,
-           'index': self.index,
-        } | self.others
+                   'type': self.type,
+                   'content': self.content,
+                   'index': self.index,
+               } | self.others
 
     def copy(self):
         return deepcopy(self)

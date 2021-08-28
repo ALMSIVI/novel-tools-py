@@ -39,24 +39,24 @@ class DirectoryWriter(Writer):
 
     def write(self, data: NovelData):
         if not data.has('formatted'):  # Normally, should only contain volume and chapter titles
-            if data.data_type == Type.BLANK and not self.write_blank:
+            if data.type == Type.BLANK and not self.write_blank:
                 return
-            elif data.data_type == Type.BOOK_TITLE or data.data_type == Type.BOOK_INTRO:
+            elif data.type == Type.BOOK_TITLE or data.type == Type.BOOK_INTRO:
                 # Write to book intro file
                 if self.curr_type != Type.BOOK_INTRO:
                     if self.file:
                         self.file.close()
                     self.file = open(os.path.join(self.out_dir, self.intro_filename), 'wt')
                     self.curr_type = Type.BOOK_INTRO
-            elif data.data_type == Type.VOLUME_INTRO:
+            elif data.type == Type.VOLUME_INTRO:
                 # Write to _intro.txt in the volume directory
                 if self.curr_type != Type.VOLUME_INTRO:
                     if self.file:
                         self.file.close()
                     self.file = open(os.path.join(self.curr_dir, self.intro_filename), 'wt')
                     self.curr_type = Type.VOLUME_INTRO
-            elif data.data_type != Type.BLANK and data.data_type != Type.CHAPTER_CONTENT:
-                print(f'Unrecognized data type: {data.data_type}')
+            elif data.type != Type.BLANK and data.type != Type.CHAPTER_CONTENT:
+                print(f'Unrecognized data type: {data.type}')
                 return
 
             if self.file:
@@ -70,7 +70,7 @@ class DirectoryWriter(Writer):
                 error = data.get('error')
                 print(f'{error}\t- Adjusted to {title}')
 
-            if data.data_type == Type.VOLUME_TITLE:
+            if data.type == Type.VOLUME_TITLE:
                 # For volumes, create the volume directory
                 self.curr_dir = os.path.join(self.out_dir, filename)
                 if not os.path.isdir(self.curr_dir):
@@ -79,7 +79,7 @@ class DirectoryWriter(Writer):
                 if self.file:
                     self.file.close()  # Close current chapter
                     self.file = None
-            elif data.data_type == Type.CHAPTER_TITLE:
+            elif data.type == Type.CHAPTER_TITLE:
                 # For chapters, create the chapter file
                 # Close previous chapter file
                 if self.file:
