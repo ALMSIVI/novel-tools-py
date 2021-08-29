@@ -39,7 +39,7 @@ class CsvWriter(Writer, ACC):
             return
 
         if not self.file:
-            self.file = open(self.filename, 'wt')
+            self.file = open(self.filename, 'wt', newline='')
             self.writer = csv.DictWriter(self.file, fieldnames=self.field_names)
             self.writer.writeheader()
 
