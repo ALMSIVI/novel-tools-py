@@ -31,5 +31,5 @@ def test_generate_docs(mocker: MockerFixture):
     handle.write.assert_any_call('### StubACC\n\n')
     handle.write.assert_any_call('**Description:**\n')
     handle.write.assert_any_call('Docstring.')
-    handle.write.assert_any_call('\n**Arguments:**\n')
+    handle.write.assert_any_call('**Arguments:**\n')
     handle.write.assert_any_call(docstring)
