@@ -26,20 +26,20 @@ def tag_validator():
 
 def test_non_title(no_discard_validator: ChapterValidator, discard_validator: ChapterValidator):
     before = NovelData('Non chapter title', Type.VOLUME_TITLE, 1)
-    assert no_discard_validator.check(before) == False
-    assert discard_validator.check(before) == False
+    assert no_discard_validator.check(before) is False
+    assert discard_validator.check(before) is False
 
 
 def test_special_title(no_discard_validator: ChapterValidator, discard_validator: ChapterValidator):
     before = NovelData('Special Title', Type.CHAPTER_TITLE, -1)
-    assert no_discard_validator.check(before) == False
-    assert discard_validator.check(before) == False
+    assert no_discard_validator.check(before) is False
+    assert discard_validator.check(before) is False
 
 
 def test_regular_title(no_discard_validator: ChapterValidator, discard_validator: ChapterValidator):
     before = NovelData('Chapter title', Type.CHAPTER_TITLE, 1)
-    assert no_discard_validator.check(before) == True
-    assert discard_validator.check(before) == True
+    assert no_discard_validator.check(before) is True
+    assert discard_validator.check(before) is True
 
 
 def test_discard(no_discard_validator: ChapterValidator, discard_validator: ChapterValidator):
@@ -64,10 +64,10 @@ def test_discard(no_discard_validator: ChapterValidator, discard_validator: Chap
 
 def test_tag(tag_validator: ChapterValidator):
     before = NovelData('Chapter 1', Type.CHAPTER_TITLE, 1)
-    assert tag_validator.check(before) == False
+    assert tag_validator.check(before) is False
 
     before = NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, tag='extras')
-    assert tag_validator.check(before) == True
+    assert tag_validator.check(before) is True
 
 
 def test_no_volume_messages(no_discard_validator: ChapterValidator):

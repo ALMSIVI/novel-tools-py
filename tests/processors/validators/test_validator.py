@@ -89,4 +89,3 @@ def test_missing(overwrite_validator: StubValidator, no_overwrite_validator: Stu
                 error='Missing - expected: 3, actual: 10')
     assert_data(after2, 'Skipping Third', Type.VOLUME_TITLE, 10, corrected_index=3,
                 error='Missing - expected: 3, actual: 10')
-

@@ -19,25 +19,25 @@ def tag_validator():
 
 def test_non_title(volume_validator: VolumeValidator):
     before = NovelData('Non volume title', Type.CHAPTER_TITLE, 1)
-    assert volume_validator.check(before) == False
+    assert volume_validator.check(before) is False
 
 
 def test_regular_title(volume_validator: VolumeValidator):
     before = NovelData('Volume title', Type.VOLUME_TITLE, 1)
-    assert volume_validator.check(before) == True
+    assert volume_validator.check(before) is True
 
 
 def test_special_title(volume_validator: VolumeValidator):
     before = NovelData('Special Volume Title', Type.VOLUME_TITLE, -1)
-    assert volume_validator.check(before) == False
+    assert volume_validator.check(before) is False
 
 
 def test_tag(tag_validator: VolumeValidator):
     before = NovelData('Volume 1', Type.VOLUME_TITLE, 1)
-    assert tag_validator.check(before) == False
+    assert tag_validator.check(before) is False
 
     before = NovelData('Volume 1', Type.VOLUME_TITLE, 1, tag='extras')
-    assert tag_validator.check(before) == True
+    assert tag_validator.check(before) is True
 
 
 def test_messages(volume_validator: VolumeValidator):

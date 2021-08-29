@@ -1,6 +1,6 @@
 import argparse
 import os
-from toolkit import analyze, generate_list, create, add, convert, generate_docs
+from toolkit import analyze, listgen, create, add, convert, docgen
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Novel Tools command line interface.')
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     generate_list_parser.add_argument('-i', '--in_dir', help='Directory of the novel.')
     generate_list_parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output file.')
     generate_list_parser.add_argument('-c', '--config', default='list_config.json', help='Filename of the config file.')
-    generate_list_parser.set_defaults(func=lambda a: generate_list(a.in_dir, a.out_dir, a.config))
+    generate_list_parser.set_defaults(func=lambda a: listgen(a.in_dir, a.out_dir, a.config))
 
     # create
     create_parser = subparsers.add_parser('create', description='Recreates the novel from the cleaned up data.')
@@ -46,7 +46,7 @@ if __name__ == '__main__':
                             help='Filename of the config which specifies additional packages.')
     doc_parser.add_argument('-d', '--doc_filename', default=None,
                             help='Filename of the output doc file.')
-    doc_parser.set_defaults(func=lambda a: generate_docs(a.config_filename, a.doc_filename))
+    doc_parser.set_defaults(func=lambda a: docgen(a.config_filename, a.doc_filename))
 
     args = parser.parse_args()
     args.func(args)

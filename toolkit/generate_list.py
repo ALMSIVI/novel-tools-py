@@ -5,7 +5,7 @@ from utils import generate_objects
 from .helpers import get_config, default_packages
 
 
-def generate_list(in_dir: str, out_dir: Optional[str], config_filename: str):
+def listgen(in_dir: str, out_dir: Optional[str], config_filename: str):
     """
     Generates a list from the given directory.
     Usually, after analyzing the novel and splitting it into individual chapter files, one would manually inspect the

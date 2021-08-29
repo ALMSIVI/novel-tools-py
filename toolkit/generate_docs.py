@@ -6,7 +6,7 @@ from utils import generate_classes
 from .helpers import get_config, class_packages
 
 
-def generate_docs(config_filename: Optional[str], doc_filename: Optional[str] = None):
+def docgen(config_filename: Optional[str], doc_filename: Optional[str] = None):
     """
     Generates documentation for all specified ACCs.
 
@@ -29,7 +29,9 @@ def generate_docs(config_filename: Optional[str], doc_filename: Optional[str] = 
                 if ACC in cls.__bases__:
                     f.write(f'### {name}\n\n')
                     f.write('**Description:**\n')
-                    f.write(dedent(cls.__doc__))
-                    f.write('\n**Arguments:**\n')
+                    if cls.__doc__ is not None:
+                        f.write(dedent(cls.__doc__))
+                        f.write('\n')
+                    f.write('**Arguments:**\n')
                     f.write(cls.docstring())
                     f.write('\n\n')

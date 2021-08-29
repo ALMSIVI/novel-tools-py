@@ -1,7 +1,7 @@
 import os
 from pytest import mark
 from pytest_mock import MockerFixture
-from toolkit.analyze import analyze
+from toolkit.analyze_novel import analyze
 from tests.helpers.integrations import assert_directory
 
 
