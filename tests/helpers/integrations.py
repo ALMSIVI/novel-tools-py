@@ -4,12 +4,14 @@ import os
 def assert_file(filename1: str, filename2: str):
     f1 = open(filename1, 'rt')
     f2 = open(filename2, 'rt')
-    content1 = f1.read()
-    content2 = f2.read()
+    content1 = f1.readlines()
+    content2 = f2.readlines()
     f1.close()
     f2.close()
 
-    assert content1 == content2
+    assert len(content1) == len(content2)
+    for i in range(len(content1)):
+        assert content1[i].rstrip() == content2[i].rstrip()
 
 
 def assert_directory(dir1: str, dir2: str):
