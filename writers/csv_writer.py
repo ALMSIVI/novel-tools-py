@@ -43,4 +43,4 @@ class CsvWriter(Writer, ACC):
             self.writer = csv.DictWriter(self.file, fieldnames=self.field_names)
             self.writer.writeheader()
 
-        self.writer.writerow(data.to_dict())
+        self.writer.writerow(data.to_dict(self.field_names))

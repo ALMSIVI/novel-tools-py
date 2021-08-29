@@ -1,0 +1,30 @@
+测试
+
+This novel is written in Chinese and stored in chinese encoding.
+这本小说用中文编写，文件采用中文编码。
+
+For analyze, this novel will use both a TocWriter and a CsvWriter.
+分析时，这本小说会同时使用 TocWriter 和 CsvWriter。
+
+第一章
+
+This novel does not have volumes.
+这本小说没有分卷。
+
+小说的章节序号是中文，NumberedMatcher 可以识别中文数字并转换成 int 类型。
+
+小说章节并没有名称。
+
+第2章
+
+即使中文数字和阿拉伯数字混用也没有关系。
+
+这本小说没有重复或者缺漏的章节号，它仅用于中文编码和数字转换的测试。
+
+  第三章
+
+就算章节前面有空白也没有关系。
+
+TextReader 会自动删除每一行开头和结尾的空白字符。
+
+如果你的小说需要空白字符，那么你需要自定义一个 Reader。你可以在 TextReader 的基础上进行调整。

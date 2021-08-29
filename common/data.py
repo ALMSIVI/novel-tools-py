@@ -49,12 +49,17 @@ class NovelData:
         """Formats the novel data by a given format string. Use kw to overwrite existing fields if necessary."""
         return format_str.format(**(self.to_dict() | kwargs))
 
-    def to_dict(self):
-        return {
-                   'type': self.type,
-                   'content': self.content,
-                   'index': self.index,
-               } | self.others
+    def to_dict(self, fields: list[str] = None):
+        full_dict = self.others | {
+            'type': self.type,
+            'content': self.content,
+            'index': self.index,
+        }
+
+        if fields is None:
+            return full_dict
+
+        return {field: full_dict[field] for field in fields}
 
     def copy(self):
         return deepcopy(self)

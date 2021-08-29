@@ -18,7 +18,8 @@ class NumberedMatcher(Processor, ACC):
             FieldMetadata('index_group', 'int', default=0,
                           description='The group index for the title\'s order/index (starting from 0).'),
             FieldMetadata('content_group', 'int', default=1,
-                          description='The group index for the title\'s content (starting from 0).'),
+                          description='The group index for the title\'s content (starting from 0). Use 0 if there is '
+                                      'no content, in which case the entire title will be used as content.'),
             FieldMetadata('tag', 'str', default=None,
                           description='The tag to append to matched data. Sometimes there may exist several '
                                       'independent sets of indices within the same book; for example, there might be '

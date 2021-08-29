@@ -22,6 +22,7 @@ def directories(monkeypatch: MonkeyPatch):
     target_dir = os.path.join(test_dir, 'target')
     output_dir = os.path.join(test_dir, 'output')
 
-    os.mkdir(output_dir)
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
     yield data_dir, target_dir, output_dir
     shutil.rmtree(output_dir)

@@ -14,8 +14,7 @@ if __name__ == '__main__':
     analyze_parser.set_defaults(func=lambda a: analyze(a.filename, a.out_dir, a.config))
 
     # generate_list
-    generate_list_parser = subparsers.add_parser('generate_list',
-                                                 description='Generates a list from the given directory.')
+    generate_list_parser = subparsers.add_parser('listgen', description='Generates a list from the given directory.')
     generate_list_parser.add_argument('-i', '--in_dir', help='Directory of the novel.')
     generate_list_parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output file.')
     generate_list_parser.add_argument('-c', '--config', default='list_config.json', help='Filename of the config file.')
@@ -41,7 +40,7 @@ if __name__ == '__main__':
     convert_parser.set_defaults(func=lambda a: convert(a.dir))
 
     # generate_docs
-    doc_parser = subparsers.add_parser('generate_docs', description='Generates documentation for framework classes.')
+    doc_parser = subparsers.add_parser('docgen', description='Generates documentation for framework classes.')
     doc_parser.add_argument('-c', '--config_filename', default=None,
                             help='Filename of the config which specifies additional packages.')
     doc_parser.add_argument('-d', '--doc_filename', default=None,

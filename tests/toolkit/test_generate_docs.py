@@ -22,7 +22,7 @@ docstring = '''
 
 
 def test_generate_docs(mocker: MockerFixture):
-    p = mocker.patch('toolkit.generate_docs.generate_classes', return_value={'Default': {'StubACC': StubACC}})
+    mocker.patch('toolkit.generate_docs.generate_classes', return_value={'Default': {'StubACC': StubACC}})
     m = mocker.patch('builtins.open', mocker.mock_open())
     handle = m()
 

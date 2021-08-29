@@ -1,0 +1,72 @@
+{
+  "objects": {
+    "readers": {
+      "class": "TextReader",
+      "encoding": "utf-8",
+      "verbose": true
+    },
+    "matchers": [
+      {
+        "class": "NumberedMatcher",
+        "type": "volume_title",
+        "regex": "^Volume (.+)\\. (.*)$"
+      },
+      {
+        "class": "NumberedMatcher",
+        "type": "chapter_title",
+        "regex": "^Chapter (.+)\\. (.*)$"
+      },
+      {
+        "class": "NumberedMatcher",
+        "type": "chapter_title",
+        "regex": "^Summary (.+)\\. (.*)$",
+        "tag": "summary"
+      }
+    ],
+    "validators": [
+      { "class": "VolumeValidator" },
+      {
+        "class": "ChapterValidator",
+        "discard_chapters": true
+      },
+      {
+        "class": "ChapterValidator",
+        "discard_chapters": false,
+        "tag": "summary"
+      }
+    ],
+    "transformers": [
+      { "class": "TypeTransformer" },
+      {
+        "class": "TitleTransformer",
+        "units": [
+          {
+            "filter": {
+              "type": "volume_title"
+            },
+            "format": "Volume {index} {content}"
+          },
+          {
+            "filter": {
+              "type": "chapter_title",
+              "tag": "summary"
+            },
+            "format": "Summary {index} {content}"
+          },
+          {
+            "filter": {
+              "type": "chapter_title"
+            },
+            "format": "Chapter {index} {content}"
+          }
+        ]
+      }
+    ],
+    "writers": [
+      {
+        "class": "TocWriter",
+        "debug": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "objects": {
+    "readers": {
+      "class": "TextReader",
+      "encoding": "chinese",
+      "verbose": true
+    },
+    "matchers": [
+      {
+        "class": "NumberedMatcher",
+        "type": "chapter_title",
+        "regex": "^第(.+)章$",
+        "content_group": -1
+      }
+    ],
+    "validators": [],
+    "transformers": [
+      {
+        "class": "TypeTransformer"
+      },
+      {
+        "class": "TitleTransformer",
+        "units": [
+          {
+            "filter": {
+              "type": "chapter_title"
+            },
+            "format": "Chapter {index}"
+          }
+        ]
+      }
+    ],
+    "writers": [
+      {
+        "class": "CsvWriter",
+        "additional_fields": [
+          "line_num"
+        ]
+      },
+      {
+        "class": "TocWriter",
+        "debug": true
+      }
+    ]
+  }
+}
