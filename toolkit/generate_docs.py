@@ -2,8 +2,7 @@ import os
 from typing import Optional
 from textwrap import dedent
 from common import ACC
-from utils import generate_classes
-from .helpers import get_config, class_packages
+from utils import get_config, class_packages, generate_classes
 
 
 def docgen(config_filename: Optional[str], doc_filename: Optional[str] = None):
@@ -15,7 +14,7 @@ def docgen(config_filename: Optional[str], doc_filename: Optional[str] = None):
         doc_filename: The output doc filename. Default is 'docs.md' under the config's directory if config_filename is
                       specified, or the current directory if not.
     """
-    config = get_config(os.curdir, config_filename) if config_filename is not None else {}
+    config = get_config(config_filename, os.curdir) if config_filename is not None else {}
     class_dict = generate_classes(config, class_packages)
 
     if doc_filename is None:

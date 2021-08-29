@@ -19,10 +19,9 @@ def directories(monkeypatch: MonkeyPatch):
 
     test_dir = os.path.join(os.curdir, 'tests', 'toolkit')
     data_dir = os.path.join(test_dir, 'data')
-    target_dir = os.path.join(test_dir, 'target')
     output_dir = os.path.join(test_dir, 'output')
 
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
-    yield data_dir, target_dir, output_dir
+    yield data_dir, output_dir
     shutil.rmtree(output_dir)

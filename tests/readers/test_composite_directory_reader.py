@@ -2,7 +2,7 @@ from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
 from common import Type
 from readers.composite_directory_reader import CompositeDirectoryReader
-from tests.helpers.utils import assert_data, format_structure
+from tests.helpers import assert_data, format_structure
 
 
 @fixture

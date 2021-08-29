@@ -2,7 +2,7 @@ from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
 from common import Type
 from readers.text_reader import TextReader
-from tests.helpers.utils import assert_data
+from tests.helpers import assert_data
 
 
 @fixture

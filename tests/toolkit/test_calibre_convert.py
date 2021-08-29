@@ -1,6 +1,6 @@
 import os
 from pytest_mock import MockerFixture
-from toolkit.calibre_convert import convert
+from toolkit import convert
 
 
 def test_convert(mocker: MockerFixture):

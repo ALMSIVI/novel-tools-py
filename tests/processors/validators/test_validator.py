@@ -1,7 +1,7 @@
 from pytest import fixture
 from common import NovelData, Type
 from processors.validators.validator import Validator
-from tests.helpers.utils import assert_data
+from tests.helpers import assert_data
 
 
 class StubValidator(Validator):

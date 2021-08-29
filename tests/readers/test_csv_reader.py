@@ -3,7 +3,7 @@ from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from common import Type
 from readers.csv_reader import CsvReader
-from tests.helpers.utils import assert_data
+from tests.helpers import assert_data
 
 
 def format_csv(csv: str):

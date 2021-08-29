@@ -1,6 +1,6 @@
 import os
 from pytest_mock import MockerFixture
-from toolkit.add_to_calibre import add
+from toolkit import add
 
 
 def test_add(mocker: MockerFixture):

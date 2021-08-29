@@ -1,0 +1,80 @@
+{
+  "objects": {
+    "readers": {
+      "class": "TextReader",
+      "encoding": "utf-8",
+      "verbose": true
+    },
+    "matchers": [
+      {
+        "class": "NumberedMatcher",
+        "type": "volume_title",
+        "regex": "^第(.+)卷(.*)$"
+      },
+      {
+        "class": "SpecialMatcher",
+        "type": "volume_title",
+        "affixes": ["前传", "最终卷", "后记", "番外篇"],
+        "regex": "^{affixes}(.*)$"
+      },
+      {
+        "class": "NumberedMatcher",
+        "type": "chapter_title",
+        "regex": "^第(.+)章(.*)$"
+      },
+      {
+        "class": "SpecialMatcher",
+        "type": "chapter_title",
+        "affixes": ["序章", "楔子", "终章", "番外"],
+        "regex": "^{affixes}(.*)$"
+      }
+    ],
+    "validators": [
+      {
+        "class": "VolumeValidator",
+        "overwrite": true
+      },
+      {
+        "class": "ChapterValidator",
+        "discard_chapters": false,
+        "overwrite": true
+      }
+    ],
+    "transformers": [
+      { "class": "TypeTransformer" },
+      {
+        "class": "TitleTransformer",
+        "units": [
+          {
+            "filter": {
+              "tag": "special"
+            },
+            "format": "{affix} {content}"
+          },
+          {
+            "filter": {
+              "type": "volume_title"
+            },
+            "format": "第{index}卷 {content}"
+          },
+          {
+            "filter": {
+              "type": "chapter_title"
+            },
+            "format": "第{index}章 {content}"
+          }
+        ]
+      }
+    ],
+    "writers": [
+      {
+        "class": "CsvWriter",
+        "additional_fields": ["line_num", "raw"]
+      },
+      {
+        "class": "TocWriter",
+        "debug": true
+      }
+    ]
+  }
+}

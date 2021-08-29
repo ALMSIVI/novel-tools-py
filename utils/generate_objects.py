@@ -1,5 +1,7 @@
 import os
+import json
 from importlib import import_module
+from typing import Optional
 
 
 def snake_to_pascal(s: str):
@@ -12,6 +14,41 @@ def import_class(filename: str, base_package: str):
 
 def import_function(filename: str, base_package: str, func_name: str):
     return getattr(import_module(f'{base_package}.{filename}'), func_name)
+
+
+default_packages = [{
+    'name': '__default__',
+    'list': [
+        {'base': 'readers', 'ending': 'reader'},
+        {'base': 'processors.matchers', 'ending': 'matcher'},
+        {'base': 'processors.validators', 'ending': 'validator'},
+        {'base': 'processors.transformers', 'ending': 'transformer'},
+        {'base': 'writers', 'ending': 'writer'}
+    ]
+}]
+
+class_packages = [
+    {'name': 'Readers', 'list': [{'base': 'readers', 'ending': 'reader'}]},
+    {'name': 'Matchers', 'list': [{'base': 'processors.matchers', 'ending': 'matcher'}]},
+    {'name': 'Validators', 'list': [{'base': 'processors.validators', 'ending': 'validator'}]},
+    {'name': 'Transformers', 'list': [{'base': 'processors.transformers', 'ending': 'transformer'}]},
+    {'name': 'Writers', 'list': [{'base': 'writers', 'ending': 'writer'}]}
+]
+
+
+def get_config(config_filename: str, in_dir: Optional[str] = None, default_config_filename: Optional[str] = None):
+    filename = config_filename
+    if not os.path.isfile(filename):
+        filename = os.path.join(in_dir, config_filename)
+    if not os.path.isfile(filename):
+        if default_config_filename is None:
+            raise ValueError('Config filename is invalid.')
+        filename = os.path.join(os.curdir, default_config_filename)
+
+    with open(filename, 'rt') as f:
+        config = json.load(f)
+
+    return config
 
 
 class ClassFactory:

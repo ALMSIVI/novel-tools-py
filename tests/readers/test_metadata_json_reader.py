@@ -2,7 +2,7 @@ from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from common import Type
 from readers.metadata_json_reader import MetadataJsonReader
-from tests.helpers.utils import assert_data
+from tests.helpers import assert_data
 
 
 @fixture

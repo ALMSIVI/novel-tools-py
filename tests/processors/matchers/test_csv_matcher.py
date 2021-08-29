@@ -2,7 +2,7 @@ from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from common import NovelData, Type
 from processors.matchers.csv_matcher import CsvMatcher
-from tests.helpers.utils import assert_data, format_structure
+from tests.helpers import assert_data, format_structure
 
 
 @fixture

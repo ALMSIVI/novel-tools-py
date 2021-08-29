@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 from common import Type
 from readers.text_reader import TextReader
 from readers.composite_text_reader import CompositeTextReader
-from tests.helpers.utils import assert_data, format_structure
+from tests.helpers import assert_data, format_structure
 
 
 @fixture
