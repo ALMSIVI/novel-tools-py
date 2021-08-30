@@ -38,13 +38,16 @@ class NumberedMatcher(Processor, ACC):
         self.tag = args['tag']
 
     def process(self, data: NovelData) -> NovelData:
+        if data.type != Type.UNRECOGNIZED and data.type != self.type:
+            return data
+
         m = self.regex.match(data.content)
         if m:
             try:
                 index = to_num(m[self.index_group])
                 title = m[self.content_group].strip()
                 tag = {'tag': self.tag} if self.tag else {}
-                return NovelData(title, self.type, index, **(data.others | tag))
+                return NovelData(title, self.type, index, matched=True, **(data.others | tag))
             except ValueError:  # Not a valid number
                 return data
 

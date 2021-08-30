@@ -85,7 +85,8 @@ class DirectoryReader(Reader, ACC):
             # Check if there are any volume intro files; if so, move the file to the beginning of the list
             if self.intro_filename in self.chapters:
                 self.chapters.remove(self.intro_filename)
-                self.chapters.insert(0, self.intro_filename)
+                if self.read_contents:
+                    self.chapters.insert(0, self.intro_filename)
 
             self.chapter_index = -1
             if self.discard_chapters:
@@ -99,7 +100,7 @@ class DirectoryReader(Reader, ACC):
         # Read the next chapter or volume intro
         filename = self.chapters[self.chapter_index]
         full_filename = os.path.join(self.in_dir, self.volumes[self.curr_volume], filename)
-        if filename == self.intro_filename and self.read_contents:
+        if filename == self.intro_filename:
             with open(full_filename, 'rt', encoding=self.encoding) as f:
                 return NovelData(f.read(), Type.VOLUME_INTRO)
 

@@ -2,7 +2,6 @@
   "objects": {
     "readers": {
       "class": "TextReader",
-      "encoding": "utf-8",
       "verbose": true
     },
     "matchers": [

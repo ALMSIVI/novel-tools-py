@@ -1,0 +1,16 @@
+{
+  "objects": {
+    "readers": {
+      "class": "CompositeTextReader",
+      "structure": "toc",
+      "has_volume": true,
+      "discard_chapters": false
+    },
+    "writers": [
+      {
+        "class": "MarkdownWriter",
+        "use_title": false
+      }
+    ]
+  }
+}

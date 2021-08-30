@@ -44,12 +44,16 @@ class SpecialMatcher(Processor, ACC):
         self.tag = args['tag']
 
     def process(self, data: NovelData) -> NovelData:
+        if data.type != Type.UNRECOGNIZED and data.type != self.type:
+            return data
+
         m = self.regex.match(data.content)
         if m:
             for i in range(len(self.affixes)):
                 if m[self.affix_group] == self.affixes[i]:
                     title = m[self.content_group].strip()
                     tag = {'tag': self.tag} if self.tag else {}
-                    return NovelData(title, self.type, -i - 1, affix=self.affixes[i], **(data.others | tag))
+                    return NovelData(title, self.type, -i - 1, matched=True, affix=self.affixes[i],
+                                     **(data.others | tag))
 
         return data

@@ -24,7 +24,7 @@ def composite_reader(mocker: MockerFixture, request: FixtureRequest):
 
 
 @mark.args({'structure': 'csv'}, '''
-    type,content,index,raw
+    type,content,index,formatted
     volume_title,Test Volume,1,Test Volume One
     chapter_title,Test Chapter,1,Test Chapter One
 ''', False)
@@ -32,11 +32,11 @@ def test_csv(composite_reader: CompositeDirectoryReader, mocker: MockerFixture):
     mocker.patch('os.listdir', return_value=['Test Chapter One.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = composite_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, raw='Test Volume One')
+    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, formatted='Test Volume One')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Test Chapter\nLorem Ipsum'))
     data = composite_reader.read()
-    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, raw='Test Chapter One')
+    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test Chapter One')
 
     data = composite_reader.read()
     assert_data(data, 'Lorem Ipsum', Type.CHAPTER_CONTENT, None)

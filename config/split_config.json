@@ -13,7 +13,12 @@
       {
         "class": "SpecialMatcher",
         "type": "volume_title",
-        "affixes": ["前传", "最终卷", "后记", "番外篇"],
+        "affixes": [
+          "前传",
+          "最终卷",
+          "后记",
+          "番外篇"
+        ],
         "regex": "^{affixes}(.*)$"
       },
       {
@@ -24,7 +29,12 @@
       {
         "class": "SpecialMatcher",
         "type": "chapter_title",
-        "affixes": ["序章", "楔子", "终章", "番外"],
+        "affixes": [
+          "序章",
+          "楔子",
+          "终章",
+          "番外"
+        ],
         "regex": "^{affixes}(.*)$"
       }
     ],
@@ -38,7 +48,9 @@
       }
     ],
     "transformers": [
-      { "class": "TypeTransformer" },
+      {
+        "class": "TypeTransformer"
+      },
       {
         "class": "TitleTransformer",
         "units": [
@@ -65,11 +77,7 @@
     ],
     "writers": [
       {
-        "class": "CsvWriter",
-        "additional_fields": ["line_num", "raw"]
-      },
-      {
-        "class": "TocWriter",
+        "class": "DirectoryWriter",
         "debug": true
       }
     ]

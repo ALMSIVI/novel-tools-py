@@ -29,16 +29,16 @@ def composite_reader(mocker: MockerFixture, request: FixtureRequest):
 
 
 @mark.args({'structure': 'csv'}, 'Test Volume One\nTest Chapter One', '''
-    type,content,index,raw
+    type,content,index,formatted
     volume_title,Test Volume,1,Test Volume One
     chapter_title,Test Chapter,1,Test Chapter One
 ''')
 def test_csv(composite_reader: CompositeTextReader):
     data = composite_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, raw='Test Volume One')
+    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, formatted='Test Volume One')
 
     data = composite_reader.read()
-    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, raw='Test Chapter One')
+    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test Chapter One')
 
     data = composite_reader.read()
     assert data is None

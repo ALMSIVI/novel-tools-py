@@ -1,0 +1,51 @@
+## Volume 1 First Volume
+
+### Chapter 1 First Chapter of First Volume
+
+We don't have a book intro or volume intro for this chapter, so the summary will go here.
+
+This test novel contains volumes, but no introductions. It doesn't include special chapters or volumes, but there are two independent sets of indices, one for regular chapters and one for summaries.
+
+It discards chapter indices for regular chapters, but not for indices.
+
+It contains duplicate and missing volumes, but no such chapters.
+
+For analyze, this novel will be use a TocWriter.
+
+
+### Summary 1 First summary
+
+This is the first summary.
+
+Since this is indexed independently of the regular chapters, it does not count as a duplicate index. In practice, we will create a separate Matcher and Validator, and set the tag to "summary".
+
+
+## Volume 2 Second Volume
+
+
+### Chapter 1 First Chapter of Second Volume
+
+Notice that the chapter resets to 1 after entering a new volume.
+
+Also, the above volume should be the second volume.
+
+However, the author made a mistake and swapped the second and third volume indices. Hopefully our VolumeValidator and figure this out!
+
+
+### Summary 2 Second Summary
+
+This is the second summary.
+
+It does not follow the above "Chapter 1", but instead "Summary 1", as it will use the "summary" tag.
+
+
+## Volume 3 Third Volume
+
+
+### Summary 3 Third Summary
+
+There is no regular chapter within this volume.
+
+Also, the above volume should be the third volume.
+
+However, the author made a mistake and swapped the second and third volume indices. Hopefully our VolumeValidator and figure this out!

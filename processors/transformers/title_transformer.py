@@ -42,10 +42,10 @@ class TitleTransformer(Processor, ACC):
     """
     Formats the title, using the necessary information in the data.
 
-    To reduce the number of required transformers, this class will use a list of "unit" processors. Each unit contains a
-    "filter" and one or two format strings. One can filter based on any attribute of the given data, the most important
-    of which include type and tag. If one format string is given, then it will be used to fill the "formatted" field. If
-    a dict is given, then it will use the values to fill the custom key fields.
+    This class uses a list of "unit" processors. Each unit contains a "filter" and one or two format strings. One can
+    filter based on any attribute of the given data, the most important of which include type and tag. If one format
+    string is given, then it will be used to fill the "formatted" field. If a dict is given, then it will use the values
+    to fill the custom key fields.
 
     Be careful if you want to use this on non-title data, for most writers use 'formatted' to determine whether the data
     is a title.

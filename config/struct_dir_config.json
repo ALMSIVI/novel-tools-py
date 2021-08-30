@@ -1,43 +1,35 @@
 {
   "objects": {
     "readers": {
-      "class": "TextReader",
-      "encoding": "utf-8",
-      "verbose": true
+      "class": "DirectoryReader",
+      "read_contents": false,
+      "discard_chapters": false
     },
     "matchers": [
       {
         "class": "NumberedMatcher",
         "type": "volume_title",
-        "regex": "^Volume (.*)\\. (.*)$"
+        "regex": "^第(.+)卷(.*)$"
       },
       {
         "class": "SpecialMatcher",
         "type": "volume_title",
-        "affixes": ["Easter Egg"],
-        "regex": "^{affixes}\\. (.*)$"
+        "affixes": ["前传", "最终卷", "后记", "番外篇"],
+        "regex": "^{affixes}(.*)$"
       },
       {
         "class": "NumberedMatcher",
         "type": "chapter_title",
-        "regex": "^Chapter (.*)\\. (.*)$"
+        "regex": "^第(.+)章(.*)$"
       },
       {
         "class": "SpecialMatcher",
         "type": "chapter_title",
-        "affixes": ["Introduction"],
-        "regex": "^{affixes}\\. (.*)$"
-      }
-    ],
-    "validators": [
-      { "class": "VolumeValidator" },
-      {
-        "class": "ChapterValidator",
-        "discard_chapters": false
+        "affixes": ["序章", "楔子", "终章", "番外"],
+        "regex": "^{affixes}(.*)$"
       }
     ],
     "transformers": [
-      { "class": "TypeTransformer" },
       {
         "class": "TitleTransformer",
         "units": [
@@ -51,21 +43,24 @@
             "filter": {
               "type": "volume_title"
             },
-            "format": "Volume {index} {content}"
+            "format": "第{index}卷 {content}"
           },
           {
             "filter": {
               "type": "chapter_title"
             },
-            "format": "Chapter {index} {content}"
+            "format": "第{index}章 {content}"
           }
         ]
       }
     ],
     "writers": [
       {
-        "class": "DirectoryWriter",
-        "debug": true
+        "class": "CsvWriter"
+      },
+      {
+        "class": "TocWriter",
+        "debug": false
       }
     ]
   }

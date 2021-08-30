@@ -20,7 +20,10 @@ class CsvReader(Reader, ACC):
                           description='The directory to read the csv file from. Required if the filename does not '
                                       'contain the path.'),
             FieldMetadata('encoding', 'str', default='utf-8',
-                          description='Encoding of the csv file.')
+                          description='Encoding of the csv file.'),
+            FieldMetadata('types', 'dict', default={'line_num': 'int'},
+                          description='Type of each additional field to be fetched. Currently int and bool are '
+                                      'supported.')
         ]
 
     def __init__(self, args):
@@ -39,6 +42,8 @@ class CsvReader(Reader, ACC):
         if 'content' not in first or 'type' not in first or 'index' not in first:
             raise ValueError('csv does not contain valid columns.')
 
+        self.types = args['types']
+
     def read(self) -> Optional[NovelData]:
         if self.index >= len(self.list):
             return None
@@ -50,6 +55,15 @@ class CsvReader(Reader, ACC):
         data.pop('content')
         index = int(data['index'])
         data.pop('index')
+
+        for name, field_type in self.types.items():
+            if name not in data:
+                continue
+
+            if field_type == 'int':
+                data[name] = int(data[name])
+            if field_type == 'bool':
+                data[name] = bool(data[name])
 
         self.index += 1
         return NovelData(content, data_type, index, **data)

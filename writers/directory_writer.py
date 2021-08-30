@@ -45,7 +45,7 @@ class DirectoryWriter(Writer, ACC):
             self.file.close()
 
     def write(self, data: NovelData):
-        if not data.has('formatted'):  # Normally, should only contain volume and chapter titles
+        if not data.has('formatted'):  # Normally, only titles should contain this field
             if data.type == Type.BLANK and not self.write_blank:
                 return
             elif data.type == Type.BOOK_TITLE or data.type == Type.BOOK_INTRO:
@@ -69,6 +69,7 @@ class DirectoryWriter(Writer, ACC):
             if self.file:
                 self.file.write(data.content + '\n')
         else:
+            self.curr_type = data.type
             title = data.get('formatted')
             filename = purify_name(data.get('filename', title))
 

@@ -1,0 +1,16 @@
+{
+  "objects": {
+    "readers": {
+      "class": "CompositeDirectoryReader",
+      "structure": "csv",
+      "csv_filename": "../list.csv",
+      "metadata": "../metadata.json"
+    },
+    "writers": [
+      {
+        "class": "MarkdownWriter",
+        "use_title": true
+      }
+    ]
+  }
+}

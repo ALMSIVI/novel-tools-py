@@ -45,6 +45,9 @@ class NovelData:
     def set(self, **kwargs):
         self.others |= kwargs
 
+    def pop(self, key: str):
+        return self.others.pop(key)
+
     def format(self, format_str: str, **kwargs):
         """Formats the novel data by a given format string. Use kw to overwrite existing fields if necessary."""
         return format_str.format(**(self.to_dict() | kwargs))

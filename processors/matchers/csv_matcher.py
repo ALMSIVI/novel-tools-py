@@ -81,7 +81,8 @@ class CsvMatcher(Processor, ACC):
             if title_type not in self.indices:
                 self.indices[title_type] = 0
             self.indices[title_type] += 1
-            return NovelData(title, title_type, self.indices[title_type], list_index=self.list_index, **data.others)
+            return NovelData(title, title_type, self.indices[title_type], list_index=self.list_index, matched=True,
+                             **data.others)
 
         return data
 

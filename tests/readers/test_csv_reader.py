@@ -21,16 +21,16 @@ def csv_reader(mocker: MockerFixture, request: FixtureRequest):
 
 
 @mark.data('''
-    type,content,index,formatted
-    volume_title,Test Volume,1,Test
-    chapter_title,Test Chapter,1,Test
+    type,content,index,formatted,line_num
+    volume_title,Test Volume,1,Test,1
+    chapter_title,Test Chapter,1,Test,2
 ''')
 def test_read(csv_reader: CsvReader):
     data = csv_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, formatted='Test')
+    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, formatted='Test', line_num=1)
 
     data = csv_reader.read()
-    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test')
+    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test', line_num=2)
 
     data = csv_reader.read()
     assert data is None

@@ -13,7 +13,7 @@ class CompositeDirectoryReader(Reader, ACC):
     Additionally, could include a metadata reader for any additional information.
     Since the directory doesn't have an explicit structure, the DirectoryReader needs to read everything first before it
     can be matched against the structure. This might result in an extended initialization time.
-    - If csv is used, then it is preferred contain a "raw" column, instead "content".
+    - If csv is used, then it is preferred contain a "formatted" column, instead of "content".
     - If toc is used, then the titles MUST match the directory/file names.
 
     Notice that some arguments from DirectoryReader are not available:
@@ -111,7 +111,7 @@ class CompositeDirectoryReader(Reader, ACC):
         if data is None:
             return None
 
-        title = data.get('raw', data.content)
+        title = data.get('formatted', data.content)
         if data.type == Type.VOLUME_TITLE:
             self.curr_volume = title
             volume_dir = os.path.join(self.in_dir, self.curr_volume)

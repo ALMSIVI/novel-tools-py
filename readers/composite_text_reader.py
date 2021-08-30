@@ -12,7 +12,7 @@ class CompositeTextReader(Reader, ACC):
     Reads from a text file, but uses another reader (csv or toc) to provide the structure (volume/chapter titles).
     Additionally, could include a metadata reader for any additional information.
     Since the text file has a natural order, a TextReader will be used.
-    - If csv is used, then it is preferred to contain either a "raw" column or a "line_num" column.
+    - If csv is used, then it is preferred to contain either a "formatted" column or a "line_num" column.
     - If toc is used, then it is preferred to contain line numbers.
 
     Notice that, unlike CompositeDirectoryReader, this reader will not not assign types other than titles. Consider
@@ -93,7 +93,7 @@ class CompositeTextReader(Reader, ACC):
 
         # Compare line_num first, then raw/content. If there is a match, return curr_title.
         if self.curr_title.has('line_num') and self.curr_title.get('line_num') == data.get('line_num') or \
-                self.curr_title.get('raw', self.curr_title.content) == data.get('raw', data.content):
+                self.curr_title.get('formatted', self.curr_title.content) == data.get('formatted', data.content):
             title = self.curr_title
             self.curr_title = None
             return title
