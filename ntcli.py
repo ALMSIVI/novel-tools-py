@@ -3,7 +3,8 @@ import os
 from toolkit import analyze, add, convert, docgen
 from utils import get_config
 
-if __name__ == '__main__':
+
+def start():
     parser = argparse.ArgumentParser(description='Novel Tools command line interface.')
     subparsers = parser.add_subparsers(help='Tools provided by this package.', dest='command', required=True)
 
@@ -87,3 +88,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     args.func(args)
+
+
+if __name__ == '__main__':
+    start()
