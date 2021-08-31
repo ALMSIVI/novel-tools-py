@@ -8,7 +8,7 @@ Reads from a directory, but uses another reader (csv or toc) to provide the stru
 Additionally, could include a metadata reader for any additional information.
 Since the directory doesn't have an explicit structure, the DirectoryReader needs to read everything first before it
 can be matched against the structure. This might result in an extended initialization time.
-- If csv is used, then it is preferred contain a "raw" column, instead "content".
+- If csv is used, then it is preferred contain a "formatted" column, instead of "content".
 - If toc is used, then the titles MUST match the directory/file names.
 
 Notice that some arguments from DirectoryReader are not available:
@@ -34,7 +34,7 @@ Notice that some arguments from DirectoryReader are not available:
 Reads from a text file, but uses another reader (csv or toc) to provide the structure (volume/chapter titles).
 Additionally, could include a metadata reader for any additional information.
 Since the text file has a natural order, a TextReader will be used.
-- If csv is used, then it is preferred to contain either a "raw" column or a "line_num" column.
+- If csv is used, then it is preferred to contain either a "formatted" column or a "line_num" column.
 - If toc is used, then it is preferred to contain line numbers.
 
 Notice that, unlike CompositeDirectoryReader, this reader will not not assign types other than titles. Consider
@@ -64,6 +64,7 @@ Recovers the novel structure from the csv list.
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
 - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv file.
+- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently int and bool are supported.
 
 ### DirectoryReader
 
@@ -150,7 +151,7 @@ Accepts a line in a book and matches a regular chapter/volume, with an index and
 - type (str): Specifies the type for this matcher.
 - regex (str): The regex to match for. It will contain two groups: the first group is the index, the second (optional) is the title.
 - index_group (int, optional, default=0): The group index for the title's order/index (starting from 0).
-- content_group (int, optional, default=1): The group index for the title's content (starting from 0).
+- content_group (int, optional, default=1): The group index for the title's content (starting from 0). Use 0 if there is no content, in which case the entire title will be used as content.
 - tag (str, optional, default=None): The tag to append to matched data. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
 
 ### SpecialMatcher
@@ -203,10 +204,10 @@ ordering.
 
 Formats the title, using the necessary information in the data.
 
-To reduce the number of required transformers, this class will use a list of "unit" processors. Each unit contains a
-"filter" and one or two format strings. One can filter based on any attribute of the given data, the most important
-of which include type and tag. If one format string is given, then it will be used to fill the "formatted" field. If
-a dict is given, then it will use the values to fill the custom key fields.
+This class uses a list of "unit" processors. Each unit contains a "filter" and one or two format strings. One can
+filter based on any attribute of the given data, the most important of which include type and tag. If one format
+string is given, then it will be used to fill the "formatted" field. If a dict is given, then it will use the values
+to fill the custom key fields.
 
 Be careful if you want to use this on non-title data, for most writers use 'formatted' to determine whether the data
 is a title.
