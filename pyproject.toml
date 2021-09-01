@@ -5,13 +5,13 @@ description = 'Python tools for formatting novels.'
 authors = ['Yue Wu <wuyuejl97@gmail.com>']
 license = 'WTFPL'
 packages = [
-    { include = "common" },
-    { include = "framework" },
-    { include = "processors" },
-    { include = "readers" },
-    { include = "toolkit" },
-    { include = "utils" },
-    { include = "writers" }
+    { include = 'common' },
+    { include = 'framework' },
+    { include = 'processors' },
+    { include = 'readers' },
+    { include = 'toolkit' },
+    { include = 'utils' },
+    { include = 'writers' }
 ]
 
 [tool.poetry.dependencies]
@@ -21,7 +21,7 @@ natsort = '^7.1.1'
 [tool.poetry.dev-dependencies]
 pytest = '^6.2.4'
 pytest-mock = '^3.6.1'
-flake8 = "^3.9.2"
+flake8 = '^3.9.2'
 
 [tool.poetry.scripts]
 cli = 'ntcli:start'
