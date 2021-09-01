@@ -8,9 +8,15 @@ However, websites like Qidian would censor some/all chapters of a novel, which c
 
 - No support for custom/irregular volume/chapter titles;
 
+Some novels might use unorthodox titles, like "Songs of the North, Part 1".
+
 - Potential duplicate or missing chapter indices;
 
+The author might make a mistake and accidentally put two Chapter 10's, or skip Chapter 11 and directly advance to Chapter 12 after Chapter 10.
+
 - Varying formats of titles.
+
+The author might mix "Chapter 1: The Uprising" and "Chapter 1. The Uprising".
 
 This would result in a wrong table of content that is incomplete and full of mistakes, which also harms the reading experience. This toolkit tries to solve this problem by providing a unified framework for analyzing novel files, generating a better table of contents, and formatting the novel in general. All novels have their unique problems, and there is unlikely that a universal script would suit every need. However, at the very least, one can generate an initial novel structure, and manually correct it if needed.
 
@@ -28,13 +34,13 @@ pip3 install natsort
 
 ## Basic Concepts
 
-- A novel, or a book, can usually be divided into **volumes** and **chapters**. Some novels may only have chapters, but not volumes.
+- A novel, or any book, usually consists of **volumes** and **chapters**. Some novels may only have chapters, but not volumes.
 - Volumes and chapters are denoted by **titles**; namely, **volume titles** and **chapter titles** respectively.
 - The book might have a **book introduction** at be beginning of the text file. It may also contain **volume introductions** at the beginning of each volume.
 - Therefore, for a book, the common structure is: **book title** - book introduction - volume title - volume introduction - chapter title - **chapter content** - ...
-- **Regular titles** contain an index and a content.  Sometimes they may not have content at all, but an index is always necessary. For example, *Volume 1: The Escape* has the index *1* and content *The Escape*.
-- There might be several sets of indices within a same book. For example, there might be some *Interlude* chapters scattered across regular chapters. These interludes are indexed independently from the others.
-- **Special titles** do not contain an index. Like regular titles, they may or may not have content. Examples include *Introduction*, *Foreword*, and *Conclusion*.
+- **Regular titles** contain an **index** and a **content**.  Sometimes they may not have content at all, but an index is always necessary. For example, *Volume 1: The Escape* has the index *1* and content *The Escape*.
+- There might be several sets of indices within a same book. For example, there might be some *Interlude* chapters scattered across normal chapters. These interludes are indexed independently from the others.
+- **Special titles** do not contain an index. Like regular titles, they may or may not have content, but they may contain certain **affixes** that make them easy to recognize. Examples include *Introduction*, *Foreword*, and *Conclusion*.
 - **Metadata** are data about the book that are not part of the content itself, including the book author, id, languages, and tags. They are useful for organizing the books on a shelf or in a management software, including [Calibre](https://calibre-ebook.com/). A template metadata can be found [here](config/sample_metadata.json).
 
 The toolkit's job is to extract the different elements within a novel file, correct them of any errors (if any), and reformat them to be more regular and nicer.
@@ -54,7 +60,7 @@ You can also do the following:
 1. Split the source file into individual volume directories, and chapter files within these directories. (**split**)
 2. Manually inspect the individual volumes and chapters for any errors. This avoids the problem of editing a large text file, which many text editors have trouble reading
 3. Recreate a "structure file" from the volume and chapter files. (**struct_dir**)
-4. Manually inspect the structure file for any inconsistencies, and modify them as needed. If a book contains irregular volumes/chapters, the order of them might be lost during splitting (as they are not indexed). In this case, you might need to rearrange the order of such titles.
+4. Manually inspect the structure file for any inconsistencies, and modify them as needed. If a book contains special volumes/chapters, the order of them might be lost during splitting (as they are not indexed). In this case, you might need to rearrange the order of such titles.
 5. Use the structure file and the files, reconstruct a formatted file. (**create_dir**)
 
 An optional step is to create a metadata json file for your book, and include some of these metadata within the book.
@@ -63,7 +69,7 @@ After you get a formatted book, you may want to add the file to your favorite E-
 
 ## Samples and Documentation
 
-To see what inputs the toolkit can handle and what outputs it can produce, take a look at the [integration tests](tests/toolkit). To create your own toolkit configurations for your own novel, you may refer to the configs of these tests, and the [default configs](configs). For references on all built-in classes, refer to [References](docs/references.md). 
+To see what inputs the toolkit can handle and what outputs it can produce, take a look at the [integration tests](/tests/toolkit). To create your own toolkit configurations for your own novel, you may refer to the configs of these tests, and the [default configs](/configs). For references on all built-in classes, refer to [References](/docs/references.md). 
 
-The toolkit is very extensible, and you may want to write your own components for your own needs. To understand how the project is structured and what each part does, refer to [Design](docs/design.md).
+The toolkit is very extensible, and you may want to write your own components for your own needs. To understand how the project is structured and what each part does, refer to [Design](/docs/design.md).
 
