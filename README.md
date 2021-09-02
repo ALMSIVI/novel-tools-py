@@ -1,5 +1,7 @@
 # Novel tools
 
+[中文链接](/README_CN.md)
+
 ## Why am I doing this
 
 First I want to affirm that I do not support piracy. Please subscribe to the novels on their official websites/apps if possible. My tools are mainly used on novels that I subscribed.
@@ -69,7 +71,7 @@ After you get a formatted book, you may want to add the file to your favorite E-
 
 ## Samples and Documentation
 
-To see what inputs the toolkit can handle and what outputs it can produce, take a look at the [integration tests](/tests/toolkit). To create your own toolkit configurations for your own novel, you may refer to the configs of these tests, and the [default configs](/configs). For references on all built-in classes, refer to [References](/docs/references.md). 
+To see what inputs the toolkit can handle and what outputs it can produce, take a look at the [integration tests](/tests/toolkit). To create your own toolkit configurations for your own novel, you may refer to the configs of these tests, and the [default configs](/config). For references on all built-in classes, refer to [References](/docs/references.md). 
 
 The toolkit is very extensible, and you may want to write your own components for your own needs. To understand how the project is structured and what each part does, refer to [Design](/docs/design.md).
 
