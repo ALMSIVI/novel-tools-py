@@ -32,6 +32,7 @@ class TocMatcher(Processor, ACC):
         reader = TocReader(args)
         while title := reader.read():
             self.list.append(title)
+        reader.cleanup()
 
         self.list_index = 0
 

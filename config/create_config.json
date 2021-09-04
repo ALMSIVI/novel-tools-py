@@ -3,9 +3,12 @@
     "readers": [
       { "class": "MetadataJsonReader" },
       {
-        "class": "CompositeTextReader",
-        "structure": "csv"
+        "class": "TextReader",
+        "verbose": true
       }
+    ],
+    "matchers": [
+      { "class":  "CsvMatcher" }
     ],
     "writers": [
       {

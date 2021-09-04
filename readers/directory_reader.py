@@ -39,7 +39,7 @@ class DirectoryReader(Reader, ACC):
         self.intro_filename = args['intro_filename']
 
         # Create the list of volumes/directories to look for
-        self.read_intro = self.read_contents and os.path.isfile(os.path.join(self.in_dir, self.intro_filename))
+        self.need_intro = self.read_contents and os.path.isfile(os.path.join(self.in_dir, self.intro_filename))
         self.volumes = [dir_name for dir_name in natsorted(os.listdir(self.in_dir)) if
                         os.path.isdir(os.path.join(self.in_dir, dir_name))]
         if self.default_volume in self.volumes:
@@ -56,18 +56,12 @@ class DirectoryReader(Reader, ACC):
             self.chapter_file.close()
 
     def read(self) -> Optional[NovelData]:
-        if self.read_intro:
-            # Read intro
-            self.read_intro = False
-            with open(os.path.join(self.in_dir, self.intro_filename), 'rt', encoding=self.encoding) as f:
-                return NovelData(f.read(), Type.BOOK_INTRO)
+        if self.need_intro:
+            return self.read_intro()
 
         # Read chapter contents
         if self.chapter_file:
-            contents = self.chapter_file.read()
-            self.chapter_file.close()
-            self.chapter_file = None
-            return NovelData(contents, Type.CHAPTER_CONTENT)
+            return self.read_chapter()
 
         self.chapter_index += 1
         # Proceed to next volume
@@ -82,7 +76,7 @@ class DirectoryReader(Reader, ACC):
             self.chapters = [filename for filename in natsorted(os.listdir(volume_dir)) if
                              os.path.isfile(os.path.join(volume_dir, filename))]
 
-            # Check if there are any volume intro files; if so, move the file to the beginning of the list
+            # Check for volume intro files
             if self.intro_filename in self.chapters:
                 self.chapters.remove(self.intro_filename)
                 if self.read_contents:
@@ -112,3 +106,14 @@ class DirectoryReader(Reader, ACC):
             self.chapter_file.close()
             self.chapter_file = None
         return NovelData(title.strip(), Type.CHAPTER_TITLE, self.curr_chapter, filename=filename)
+
+    def read_intro(self):
+        self.need_intro = False
+        with open(os.path.join(self.in_dir, self.intro_filename), 'rt', encoding=self.encoding) as f:
+            return NovelData(f.read(), Type.BOOK_INTRO)
+
+    def read_chapter(self):
+        contents = self.chapter_file.read()
+        self.chapter_file.close()
+        self.chapter_file = None
+        return NovelData(contents, Type.CHAPTER_CONTENT)

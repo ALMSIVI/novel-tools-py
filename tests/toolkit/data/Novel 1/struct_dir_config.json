@@ -11,13 +11,13 @@
       {
         "class": "NumberedMatcher",
         "type": "volume_title",
-        "regex": "^Volume (\\d+) (.*)$"
+        "regex": "^\\(\\d+\\) Volume (\\d+) (.*)$"
       },
       {
         "class": "SpecialMatcher",
         "type": "volume_title",
         "affixes": ["Easter Egg"],
-        "regex": "^{affixes} (.*)$"
+        "regex": "^\\(\\d+\\) {affixes} (.*)$"
       },
       {
         "class": "NumberedMatcher",
@@ -39,26 +39,27 @@
             "filter": {
               "tag": "special"
             },
-            "format": "{affix}. {content}"
+            "format": "{affix} {content}"
           },
           {
             "filter": {
               "type": "volume_title"
             },
-            "format": "Volume {index}. {content}"
+            "format": "Volume {index} {content}"
           },
           {
             "filter": {
               "type": "chapter_title"
             },
-            "format": "Chapter {index}. {content}"
+            "format": "Chapter {index} {content}"
           }
         ]
       }
     ],
     "writers": [
       {
-        "class": "CsvWriter"
+        "class": "CsvWriter",
+        "additional_fields": ["filename"]
       },
       {
         "class": "TocWriter",

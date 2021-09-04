@@ -3,8 +3,18 @@
     "readers": [
       { "class": "MetadataJsonReader" },
       {
-        "class": "CompositeDirectoryReader",
-        "structure": "csv"
+        "class": "DirectoryReader",
+        "read_contents": true,
+        "discard_chapters": false
+      }
+    ],
+    "matchers": [
+      {
+        "class": "CsvMatcher",
+        "types": {
+          "filename": "str"
+        },
+        "fields": ["filename"]
       }
     ],
     "writers": [

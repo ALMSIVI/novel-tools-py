@@ -39,6 +39,7 @@
     ],
     "transformers": [
       { "class": "TypeTransformer" },
+      { "class": "OrderTransformer" },
       {
         "class": "TitleTransformer",
         "units": [
@@ -46,19 +47,25 @@
             "filter": {
               "tag": "special"
             },
-            "format": "{affix} {content}"
+            "format": {
+              "formatted": "{affix} {content}",
+              "filename": "({order}) {affix} {content}"
+            }
           },
           {
             "filter": {
               "type": "volume_title"
             },
-            "format": "Volume {index} {content}"
+            "format": "({order}) Volume {index} {content}"
           },
           {
             "filter": {
               "type": "chapter_title"
             },
-            "format": "Chapter {index} {content}"
+            "format": {
+              "formatted": "Chapter {index} {content}",
+              "filename": "({order}) Chapter {index} {content}"
+            }
           }
         ]
       }

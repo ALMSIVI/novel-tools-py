@@ -31,13 +31,13 @@ class CsvMatcher(Processor, ACC):
                                       'contain the path.'),
             FieldMetadata('encoding', 'str', default='utf-8',
                           description='Encoding of the csv list file.'),
-            FieldMetadata('fields', 'list[str]', default=['line_num', 'formatted', 'raw', 'content'],
-                          description='The fields to compare to when matching.'),
             FieldMetadata('types', 'dict', default={'line_num': 'int'},
-                          description='Type of each additional field to be fetched. Currently int and bool are '
+                          description='Type of each additional field to be fetched. Currently str, int and bool are '
                                       'supported.'),
             FieldMetadata('data_type', 'str', optional=True,
                           description='If present, specifies the type of all the titles.'),
+            FieldMetadata('fields', 'list[str]', default=['line_num', 'formatted', 'raw', 'content'],
+                          description='The fields to compare to when matching.')
         ]
 
     def __init__(self, args):
@@ -51,6 +51,7 @@ class CsvMatcher(Processor, ACC):
                 raise ValueError('Type of title is not specified in file or arguments.')
 
             self.list.append(title)
+        reader.cleanup()
 
         self.fields = args['fields']
 
@@ -69,8 +70,7 @@ class CsvMatcher(Processor, ACC):
         data_dict = data.flat_dict()
         next_title_dict = next_title.flat_dict()
         for field in self.fields:
-            # Use different default values to avoid field being absent from both dicts
-            if next_title_dict.get(field, -1) == data_dict.get(field, 1):
+            if field in next_title_dict and field in data_dict and next_title_dict[field] == data_dict[field]:
                 self.list_index += 1
                 # The original csv file may not have an `index` column. If it doesn't exist, an index will be auto
                 # generated.

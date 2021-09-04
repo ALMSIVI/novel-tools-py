@@ -1,68 +1,17 @@
 ## Readers
 
-### CompositeDirectoryReader
-
-**Description:**
-
-Reads from a directory, but uses another reader (csv or toc) to provide the structure (volume/chapter titles).
-
-Since the directory doesn't have an explicit structure, the DirectoryReader needs to read everything first before it
-can be matched against the structure. This might result in an extended initialization time.
-- If csv is used, then it is preferred contain a "formatted" column, instead of "content".
-- If toc is used, then the titles MUST match the directory/file names.
-
-Notice that some arguments from DirectoryReader are not available:
-- discard_chapters is not available; this will be automatically inferred from the structure provider.
-- read_contents is not available; please use the structure reader directly if you don't want the contents.
-
-**Arguments:**
-- in_dir (str): The working directory. Should also include the structure file and the metadata file, if specified.
-- structure (str): Structure provider. Currently supported structures are 'csv' and 'toc'.
-- encoding (str, optional, default=utf-8): Encoding of the chapter/structure/metadata files.
-- intro_filename (str, optional, default=_intro.txt): The filename of the book/volume introduction file(s).
-- default_volume (str, optional, default=None): If the novel does not have volumes but all chapters are stored in a directory, then the variable would store the directory name.
-- csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
-- toc_filename (str, optional, default=toc.txt): Filename of the toc file. This file should be generated from `TocWriter`.
-- has_volume (bool): Specifies whether the toc contains volumes.
-- discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
-
-### CompositeTextReader
-
-**Description:**
-
-Reads from a text file, but uses another reader (csv or toc) to provide the structure (volume/chapter titles).
-
-Since the text file has a natural order, a TextReader will be used.
-- If csv is used, then it is preferred to contain either a "formatted" column or a "line_num" column.
-- If toc is used, then it is preferred to contain line numbers.
-
-Notice that, unlike CompositeDirectoryReader, this reader will not not assign types other than titles. Consider
-pairing this with a TypeTransformer in order to get detailed types.
-
-Notice that some arguments from TextReader are not available:
-- verbose is not available; raw and line_num are needed to effectively matched against the structure data.
-
-**Arguments:**
-- in_dir (str, optional): The directory to read the text file, structure file and metadata file (if it exists) from. Required if any of these filenames does not contain the path.
-- structure (str): Structure provider. Currently supported structures are 'csv' and 'toc'.
-- encoding (str, optional, default=utf-8): Encoding of the chapter/structure/metadata files.
-- text_filename (str, optional, default=text.txt): Filename of the text file.
-- csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
-- toc_filename (str, optional, default=toc.txt): Filename of the toc file. This file should be generated from `TocWriter`.
-- has_volume (bool): Specifies whether the toc contains volumes.
-- discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
-
 ### CsvReader
 
 **Description:**
 
-Recovers the novel structure from the csv list.
+Recovers the novel structure from the csv list. The csv is required to contain a "content" column, but it does not
+have to contain the other fields from a NovelData.
 
 **Arguments:**
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
 - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv file.
-- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently int and bool are supported.
+- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently str, int and bool are supported.
 
 ### DirectoryReader
 
@@ -118,33 +67,33 @@ Reads from a table of contents (toc) file.
 
 **Description:**
 
-Accepts a line and matches titles by a given csv list. This matcher can be used in cases where the titles are
-irregular or do not have an explicit index. Examples include "Volume 12.5" or "Tales of the Wind".
-This does not have to be the list file generated from a CsvWriter; one might copy and paste the list from a website
-without the type of the content. Therefore, one of the following fields is required to determine the type.
+Matches data by a given csv list. This matcher can be used in cases where the titles are irregular or do not have
+an explicit index. Examples include "Volume 12.5" or "Tales of the Wind".
+
+This csv file does not have to be generated from a CsvWriter; one might copy and paste the list from a website
+without the type of the content. In such cases, it might not contain certain fields, such as `line_num` or `type`.
+Therefore, we will set up some rules to match the content and determine the type of the data:
+
+To make a successful match, the user will specify a list of fields to compare. The Matcher will return True if one
+of the fields matches.
 
 To determine the type of the line, the following three checks are done in order:
 - If the csv list contains a "type" field, then it will be used;
 - If a type is specified in the args, then all lines will be set to that specific type;
-- If a regex is specified in the args, then the title will be matched against the regexes;
 - If none of these is in the arguments, then an exception will be raised during construction.
-
-An object in the list consists of 3 fields:
-- type (optional): Type of the title,
-- raw: Raw title (to be matched against),
-- formatted (optional): Formatted title. If it is not present, the raw title will be used.
 
 **Arguments:**
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file.
 - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv list file.
-- type (str, optional): If present, specifies the type of all the matches.
-- regex (dict[str, str], optional): If present, specifies the regexes for each type.
+- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently str, int and bool are supported.
+- data_type (str, optional): If present, specifies the type of all the titles.
+- fields (list[str], optional, default=['line_num', 'formatted', 'raw', 'content']): The fields to compare to when matching.
 
 ### NumberedMatcher
 
 **Description:**
-Accepts a line in a book and matches a regular chapter/volume, with an index and/or a title.
+Matches a regular chapter/volume, with an index and/or a title.
 **Arguments:**
 - type (str): Specifies the type for this matcher.
 - regex (str): The regex to match for. It will contain two groups: the first group is the index, the second (optional) is the title.
@@ -156,7 +105,7 @@ Accepts a line in a book and matches a regular chapter/volume, with an index and
 
 **Description:**
 
-Accepts a line in a book and matches a special title, whose affixes are in the given list. Examples of special
+Matches a special title, whose affixes are in the given list. Examples of special
 titles include Introduction, Foreword, or Conclusion.
 
 As they usually don't have a regular index, they will be assigned negative values, depending on their order in the
@@ -170,6 +119,21 @@ field will be attached to the object.
 - affix_group (int, optional, default=0): The group index for the title's affix (starting from 0).
 - content_group (int, optional, default=1): The group index for the title's content (starting from 0).
 - tag (str, optional, default=special): The tag to append to matched data. This can be used in TitleValidator for different formats.
+
+### TocMatcher
+
+**Description:**
+
+Matches data by a given Table of Contents (TOC) file. It is not advised to use toc files as a matcher; while the
+file is better human readable, it contains less information than csv files and will not provide as many options as
+a csv file does.
+
+**Arguments:**
+- toc_filename (str, optional, default=toc.txt): Filename of the toc file. This file should be generated from `TocWriter`.
+- in_dir (str, optional): The directory to read the toc file from. Required if the filename does not contain the path.
+- encoding (str, optional, default=utf-8): Encoding of the toc file.
+- has_volume (bool): Specifies whether the toc contains volumes.
+- discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
 
 ## Validators
 

@@ -38,9 +38,8 @@
       }
     ],
     "transformers": [
-      {
-        "class": "TypeTransformer"
-      },
+      { "class": "TypeTransformer" },
+      { "class": "OrderTransformer" },
       {
         "class": "TitleTransformer",
         "units": [
@@ -48,19 +47,19 @@
             "filter": {
               "tag": "special"
             },
-            "format": "{affix} {content}"
+            "format": "({order}) {affix} {content}"
           },
           {
             "filter": {
               "type": "volume_title"
             },
-            "format": "第{index}卷 {content}"
+            "format": "({order}) 第{index}卷 {content}"
           },
           {
             "filter": {
               "type": "chapter_title"
             },
-            "format": "第{index}章 {content}"
+            "format": "({order}) 第{index}章 {content}"
           }
         ]
       }
