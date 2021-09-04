@@ -7,7 +7,8 @@ from common import NovelData, Type, ACC, FieldMetadata
 
 class CsvReader(Reader, ACC):
     """
-    Recovers the novel structure from the csv list.
+    Recovers the novel structure from the csv list. The csv is required to contain a "content" column, but it does not
+    have to contain the other fields from a NovelData.
     """
 
     @staticmethod
@@ -39,7 +40,7 @@ class CsvReader(Reader, ACC):
             self.index = 0
 
         first = self.list[0]
-        if 'content' not in first or 'type' not in first or 'index' not in first:
+        if 'content' not in first:
             raise ValueError('csv does not contain valid columns.')
 
         self.types = args['types']
@@ -49,12 +50,11 @@ class CsvReader(Reader, ACC):
             return None
 
         data = self.list[self.index]
-        data_type = Type[data['type'].upper()]
-        data.pop('type')
-        content = data['content']
-        data.pop('content')
-        index = int(data['index'])
-        data.pop('index')
+        content = data.pop('content')
+        data_type = Type[data.pop('type', 'unrecognized').upper()]
+        index = data.pop('index', None)
+        if index is not None:
+            index = int(index)
 
         for name, field_type in self.types.items():
             if name not in data:

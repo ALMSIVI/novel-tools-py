@@ -5,7 +5,7 @@ from common import NovelData, Type, ACC, FieldMetadata
 
 class SpecialMatcher(Processor, ACC):
     """
-    Accepts a line in a book and matches a special title, whose affixes are in the given list. Examples of special
+    Matches a special title, whose affixes are in the given list. Examples of special
     titles include Introduction, Foreword, or Conclusion.
 
     As they usually don't have a regular index, they will be assigned negative values, depending on their order in the

@@ -1,6 +1,6 @@
-from textwrap import dedent
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
+from textwrap import dedent
 from common import NovelData, Type
 from readers.csv_reader import CsvReader
 
@@ -37,8 +37,8 @@ def test_read(csv_reader: CsvReader):
 
 def test_invalid(mocker: MockerFixture):
     csv = format_csv('''
-    type,content
-    volume_title, Test Volume
+    type
+    volume_title
     ''')
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
     with raises(ValueError, match='csv does not contain valid columns.'):

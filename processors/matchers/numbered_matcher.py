@@ -5,7 +5,7 @@ from utils import to_num
 
 
 class NumberedMatcher(Processor, ACC):
-    """Accepts a line in a book and matches a regular chapter/volume, with an index and/or a title."""
+    """Matches a regular chapter/volume, with an index and/or a title."""
 
     @staticmethod
     def required_fields() -> list[FieldMetadata]:
