@@ -1,10 +1,14 @@
 {
   "objects": {
-    "readers": {
-      "class": "CompositeTextReader",
-      "structure": "csv",
-      "metadata": true
-    },
+    "readers": [
+      {
+        "class": "MetadataJsonReader"
+      },
+      {
+        "class": "CompositeTextReader",
+        "structure": "csv"
+      }
+    ],
     "writers": [
       {
         "class": "MarkdownWriter",

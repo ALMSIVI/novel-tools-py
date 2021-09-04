@@ -8,13 +8,7 @@ from tests.helpers import assert_data, format_structure
 @fixture
 def composite_reader(mocker: MockerFixture, request: FixtureRequest):
     args, texts, is_file = request.node.get_closest_marker('args').args
-    if args.get('metadata', False):
-        structure, metadata = texts
-        mocker.patch('json.load', return_value=metadata)
-    else:
-        structure = texts
-
-    structure = format_structure(structure)
+    structure = format_structure(texts)
     mocker.patch('os.path.isfile', return_value=is_file)
     mocker.patch('builtins.open', mocker.mock_open(read_data=structure))
 
@@ -61,22 +55,6 @@ def test_toc(composite_reader: CompositeDirectoryReader, mocker: MockerFixture):
 
     data = composite_reader.read()
     assert_data(data, 'Lorem Ipsum', Type.CHAPTER_CONTENT, None)
-
-    data = composite_reader.read()
-    assert data is None
-
-
-@mark.args({'structure': 'csv', 'metadata': True}, ('''
-    type,content,index
-    volume_title,Test Volume,1
-''', {'title': 'Title'}), False)
-def test_metadata(composite_reader: CompositeDirectoryReader, mocker: MockerFixture):
-    data = composite_reader.read()
-    assert_data(data, 'Title', Type.BOOK_TITLE, None)
-
-    mocker.patch('os.listdir', return_value=[])
-    data = composite_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1)
 
     data = composite_reader.read()
     assert data is None

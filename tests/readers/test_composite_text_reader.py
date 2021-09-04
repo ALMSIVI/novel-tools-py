@@ -9,13 +9,7 @@ from tests.helpers import assert_data, format_structure
 @fixture
 def composite_reader(mocker: MockerFixture, request: FixtureRequest):
     args, text, texts = request.node.get_closest_marker('args').args
-    if args.get('metadata', False):
-        structure, metadata = texts
-        mocker.patch('json.load', return_value=metadata)
-    else:
-        structure = texts
-
-    structure = format_structure(structure)
+    structure = format_structure(texts)
     mocker.patch('builtins.open', mocker.mock_open(read_data=structure))
 
     # We can only mock one file at a time, so we will mock structure first, and plug the FileReader in later
@@ -55,21 +49,6 @@ def test_toc(composite_reader: CompositeTextReader):
 
     data = composite_reader.read()
     assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, line_num=2)
-
-    data = composite_reader.read()
-    assert data is None
-
-
-@mark.args({'structure': 'csv', 'metadata': True}, 'Test Volume', ('''
-    type,content,index
-    volume_title,Test Volume,1
-''', {'title': 'Title'}))
-def test_metadata(composite_reader: CompositeTextReader):
-    data = composite_reader.read()
-    assert_data(data, 'Title', Type.BOOK_TITLE, None)
-
-    data = composite_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1)
 
     data = composite_reader.read()
     assert data is None

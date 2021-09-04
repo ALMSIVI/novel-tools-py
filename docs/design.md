@@ -8,7 +8,7 @@ If you consider the processes that the toolkit provides -- struct, split, create
 - **Process** the data that has been read,
 - and **Write** the processed data to some file(s).
 
-While there can only be one source and one Reader, there can be multiple Processors, in which the data goes through them one by one, and multiple Writers, in which the data is written into different formats. The **Worker** puts them together, creating a full work cycle. This is what the core tool, [**Analyze**](/toolkit/analyze_novel.py), is based on.
+There can be multiple readers, in which the readers are consumed one by one; multiple Processors, in which the data goes through them one by one; and multiple Writers, in which the data is written into different formats. The **Worker** puts them together, creating a full work cycle. This is what the core tool, [**Analyze**](/toolkit/analyze_novel.py), is based on.
 
 Readers and writers are pretty simple; most of the magic happens within the processors. The toolkit needs to recognize, correct, and format the data, so at least three different kinds of processers are needed. They are named **Matcher**, **Validator**, and **Transformer**, respectively.
 

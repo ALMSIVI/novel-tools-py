@@ -1,9 +1,11 @@
 {
   "objects": {
-    "readers": {
-      "class": "TextReader",
-      "verbose": true
-    },
+    "readers": [
+      {
+        "class": "TextReader",
+        "verbose": true
+      }
+    ],
     "matchers": [
       {
         "class": "NumberedMatcher",

@@ -1,10 +1,12 @@
 {
   "objects": {
-    "readers": {
-      "class": "TextReader",
-      "encoding": "chinese",
-      "verbose": true
-    },
+    "readers": [
+      {
+        "class": "TextReader",
+        "encoding": "chinese",
+        "verbose": true
+      }
+    ],
     "matchers": [
       {
         "class": "NumberedMatcher",

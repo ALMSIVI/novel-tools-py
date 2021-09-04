@@ -4,13 +4,12 @@ from framework import Reader
 from common import NovelData, Type, ACC, FieldMetadata
 from .csv_reader import CsvReader
 from .toc_reader import TocReader
-from .metadata_json_reader import MetadataJsonReader
 
 
 class CompositeDirectoryReader(Reader, ACC):
     """
     Reads from a directory, but uses another reader (csv or toc) to provide the structure (volume/chapter titles).
-    Additionally, could include a metadata reader for any additional information.
+
     Since the directory doesn't have an explicit structure, the DirectoryReader needs to read everything first before it
     can be matched against the structure. This might result in an extended initialization time.
     - If csv is used, then it is preferred contain a "formatted" column, instead of "content".
@@ -29,10 +28,6 @@ class CompositeDirectoryReader(Reader, ACC):
                                       'file, if specified.'),
             FieldMetadata('structure', 'str', options=['csv', 'toc'],
                           description='Structure provider. Currently supported structures are \'csv\' and \'toc\'.'),
-            FieldMetadata('metadata', 'str | bool', default=False,
-                          description='If it is not specified or False, then no metadata will be read. If it is True, '
-                                      'then the reader will use the default filename (specified in the reader). If it '
-                                      'is a string, then the filename will be provided to the reader.'),
             FieldMetadata('encoding', 'str', default='utf-8',
                           description='Encoding of the chapter/structure/metadata files.'),
             # DirectoryReader specific arguments
@@ -74,25 +69,12 @@ class CompositeDirectoryReader(Reader, ACC):
         self.file = None
         self.curr_type = Type.UNRECOGNIZED
 
-        if not args['metadata']:
-            self.metadata = None
-        else:
-            if type(args['metadata']) is str:
-                args['metadata_filename'] = args['metadata']
-            self.metadata = MetadataJsonReader(args)
-
     def cleanup(self):
         if self.file and not self.file.closed:
             self.file.close()
         self.structure.cleanup()
 
     def read(self) -> Optional[NovelData]:
-        if self.metadata:
-            metadata = self.metadata.read()
-            self.metadata.cleanup()
-            self.metadata = None
-            return metadata
-
         # Then read the intro
         if self.read_intro:
             self.read_intro = False

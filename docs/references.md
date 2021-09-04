@@ -5,7 +5,7 @@
 **Description:**
 
 Reads from a directory, but uses another reader (csv or toc) to provide the structure (volume/chapter titles).
-Additionally, could include a metadata reader for any additional information.
+
 Since the directory doesn't have an explicit structure, the DirectoryReader needs to read everything first before it
 can be matched against the structure. This might result in an extended initialization time.
 - If csv is used, then it is preferred contain a "formatted" column, instead of "content".
@@ -18,7 +18,6 @@ Notice that some arguments from DirectoryReader are not available:
 **Arguments:**
 - in_dir (str): The working directory. Should also include the structure file and the metadata file, if specified.
 - structure (str): Structure provider. Currently supported structures are 'csv' and 'toc'.
-- metadata (str | bool, optional, default=False): If it is not specified or False, then no metadata will be read. If it is True, then the reader will use the default filename (specified in the reader). If it is a string, then the filename will be provided to the reader.
 - encoding (str, optional, default=utf-8): Encoding of the chapter/structure/metadata files.
 - intro_filename (str, optional, default=_intro.txt): The filename of the book/volume introduction file(s).
 - default_volume (str, optional, default=None): If the novel does not have volumes but all chapters are stored in a directory, then the variable would store the directory name.
@@ -32,7 +31,7 @@ Notice that some arguments from DirectoryReader are not available:
 **Description:**
 
 Reads from a text file, but uses another reader (csv or toc) to provide the structure (volume/chapter titles).
-Additionally, could include a metadata reader for any additional information.
+
 Since the text file has a natural order, a TextReader will be used.
 - If csv is used, then it is preferred to contain either a "formatted" column or a "line_num" column.
 - If toc is used, then it is preferred to contain line numbers.
@@ -46,7 +45,6 @@ Notice that some arguments from TextReader are not available:
 **Arguments:**
 - in_dir (str, optional): The directory to read the text file, structure file and metadata file (if it exists) from. Required if any of these filenames does not contain the path.
 - structure (str): Structure provider. Currently supported structures are 'csv' and 'toc'.
-- metadata (str | bool, optional, default=False): If it is not specified or False, then no metadata will be read. If it is True, then the reader will use the default filename (specified in the reader). If it is a string, then the filename will be provided to the reader.
 - encoding (str, optional, default=utf-8): Encoding of the chapter/structure/metadata files.
 - text_filename (str, optional, default=text.txt): Filename of the text file.
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
