@@ -1,9 +1,8 @@
 from textwrap import dedent
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
-from common import Type
+from common import NovelData, Type
 from readers.csv_reader import CsvReader
-from tests.helpers import assert_data
 
 
 def format_csv(csv: str):
@@ -27,10 +26,10 @@ def csv_reader(mocker: MockerFixture, request: FixtureRequest):
 ''')
 def test_read(csv_reader: CsvReader):
     data = csv_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, formatted='Test', line_num=1)
+    assert data == NovelData('Test Volume', Type.VOLUME_TITLE, 1, formatted='Test', line_num=1)
 
     data = csv_reader.read()
-    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test', line_num=2)
+    assert data == NovelData('Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test', line_num=2)
 
     data = csv_reader.read()
     assert data is None

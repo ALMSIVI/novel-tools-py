@@ -1,8 +1,12 @@
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import Type
+from common import NovelData, Type
 from readers.toc_reader import TocReader
-from tests.helpers import assert_data, format_structure
+from textwrap import dedent
+
+
+def format_structure(structure: str) -> str:
+    return dedent(structure).strip()
 
 
 @fixture
@@ -24,19 +28,19 @@ def toc_reader(mocker: MockerFixture, request: FixtureRequest):
 ''', {'has_volume': True, 'discard_chapters': False})
 def test_read(toc_reader: TocReader):
     data = toc_reader.read()
-    assert_data(data, 'Volume 1', Type.VOLUME_TITLE, 1)
+    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1)
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 2', Type.CHAPTER_TITLE, 2)
+    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2)
 
     data = toc_reader.read()
-    assert_data(data, 'Volume 2', Type.VOLUME_TITLE, 2)
+    assert data == NovelData('Volume 2', Type.VOLUME_TITLE, 2)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 3', Type.CHAPTER_TITLE, 3)
+    assert data == NovelData('Chapter 3', Type.CHAPTER_TITLE, 3)
 
 
 @mark.data('''
@@ -47,16 +51,16 @@ def test_read(toc_reader: TocReader):
 ''', {'has_volume': True, 'discard_chapters': False})
 def test_read_line_num(toc_reader: TocReader):
     data = toc_reader.read()
-    assert_data(data, 'Volume 1', Type.VOLUME_TITLE, 1, line_num=1)
+    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, line_num=1)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1, line_num=2)
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, line_num=2)
 
     data = toc_reader.read()
-    assert_data(data, 'Volume 2', Type.VOLUME_TITLE, 2, line_num=25)
+    assert data == NovelData('Volume 2', Type.VOLUME_TITLE, 2, line_num=25)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 2', Type.CHAPTER_TITLE, 2, line_num=27)
+    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2, line_num=27)
 
 
 @mark.data('''
@@ -66,13 +70,13 @@ def test_read_line_num(toc_reader: TocReader):
 ''', {'has_volume': False, 'discard_chapters': False})
 def test_read_no_volume(toc_reader: TocReader):
     data = toc_reader.read()
-    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1)
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 2', Type.CHAPTER_TITLE, 2)
+    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 3', Type.CHAPTER_TITLE, 3)
+    assert data == NovelData('Chapter 3', Type.CHAPTER_TITLE, 3)
 
 
 @mark.data('''
@@ -83,13 +87,13 @@ def test_read_no_volume(toc_reader: TocReader):
 ''', {'has_volume': True, 'discard_chapters': True})
 def test_read_discard(toc_reader: TocReader):
     data = toc_reader.read()
-    assert_data(data, 'Volume 1', Type.VOLUME_TITLE, 1)
+    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1)
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1)
 
     data = toc_reader.read()
-    assert_data(data, 'Volume 2', Type.VOLUME_TITLE, 2)
+    assert data == NovelData('Volume 2', Type.VOLUME_TITLE, 2)
 
     data = toc_reader.read()
-    assert_data(data, 'Chapter 1', Type.CHAPTER_TITLE, 1)
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1)

@@ -1,9 +1,13 @@
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import Type
+from common import NovelData, Type
 from readers.text_reader import TextReader
 from readers.composite_text_reader import CompositeTextReader
-from tests.helpers import assert_data, format_structure
+from textwrap import dedent
+
+
+def format_structure(structure: str) -> str:
+    return dedent(structure).strip()
 
 
 @fixture
@@ -29,10 +33,10 @@ def composite_reader(mocker: MockerFixture, request: FixtureRequest):
 ''')
 def test_csv(composite_reader: CompositeTextReader):
     data = composite_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, formatted='Test Volume One')
+    assert data == NovelData('Test Volume', Type.VOLUME_TITLE, 1, formatted='Test Volume One')
 
     data = composite_reader.read()
-    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test Chapter One')
+    assert data == NovelData('Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test Chapter One')
 
     data = composite_reader.read()
     assert data is None
@@ -45,10 +49,10 @@ def test_csv(composite_reader: CompositeTextReader):
            ''')
 def test_toc(composite_reader: CompositeTextReader):
     data = composite_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, line_num=1)
+    assert data == NovelData('Test Volume', Type.VOLUME_TITLE, 1, line_num=1)
 
     data = composite_reader.read()
-    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, line_num=2)
+    assert data == NovelData('Test Chapter', Type.CHAPTER_TITLE, 1, line_num=2)
 
     data = composite_reader.read()
     assert data is None

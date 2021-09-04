@@ -50,19 +50,43 @@ class NovelData:
 
     def format(self, format_str: str, **kwargs):
         """Formats the novel data by a given format string. Use kw to overwrite existing fields if necessary."""
-        return format_str.format(**(self.to_dict() | kwargs))
+        return format_str.format(**(self.flat_dict() | kwargs))
 
-    def to_dict(self, fields: list[str] = None):
-        full_dict = self.others | {
+    def to_dict(self):
+        return {'type': self.type, 'content': self.content, 'index': self.index, 'others': self.others}
+
+    def flat_dict(self, fields: list[str] = None):
+        """Creates a flattened version of the dict."""
+        flat_dict = {
             'type': self.type,
             'content': self.content,
             'index': self.index,
         }
+        flat_dict |= self.others
 
         if fields is None:
-            return full_dict
+            return flat_dict
 
-        return {field: full_dict[field] for field in fields}
+        return {field: flat_dict[field] for field in fields}
 
     def copy(self):
         return deepcopy(self)
+
+    def __str__(self):
+        return str(self.to_dict())
+
+    def __repr__(self):
+        """Useful for pytest debugging."""
+        return str(self.to_dict())
+
+    def __eq__(self, other):
+        if type(other) is not NovelData:
+            return False
+
+        eq = self.type == other.type and self.content == other.content and self.index == other.index and len(
+            self.others) == len(other.others)
+
+        for key, item in self.others.items():
+            eq = eq and key in other.others and item == other.others[key]
+
+        return eq

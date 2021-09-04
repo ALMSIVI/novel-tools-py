@@ -1,8 +1,7 @@
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import Type
+from common import NovelData, Type
 from readers.text_reader import TextReader
-from tests.helpers import assert_data
 
 
 @fixture
@@ -17,10 +16,10 @@ def text_reader(mocker: MockerFixture, request: FixtureRequest):
 @mark.data('line\n ', {})
 def test_read(text_reader: TextReader):
     data = text_reader.read()
-    assert_data(data, 'line', Type.UNRECOGNIZED)
+    assert data == NovelData('line', Type.UNRECOGNIZED)
 
     data = text_reader.read()
-    assert_data(data, '', Type.UNRECOGNIZED)
+    assert data == NovelData('', Type.UNRECOGNIZED)
 
     data = text_reader.read()
     assert data is None
@@ -29,10 +28,10 @@ def test_read(text_reader: TextReader):
 @mark.data('line\n ', {'verbose': True})
 def test_verbose(text_reader: TextReader):
     data = text_reader.read()
-    assert_data(data, 'line', Type.UNRECOGNIZED, line_num=1, raw='line')
+    assert data == NovelData('line', Type.UNRECOGNIZED, source='text.txt', line_num=1, raw='line')
 
     data = text_reader.read()
-    assert_data(data, '', Type.UNRECOGNIZED, line_num=2, raw='')
+    assert data == NovelData('', Type.UNRECOGNIZED, source='text.txt', line_num=2, raw='')
 
     data = text_reader.read()
     assert data is None

@@ -1,8 +1,7 @@
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
-from common import Type
+from common import NovelData, Type
 from readers.metadata_json_reader import MetadataJsonReader
-from tests.helpers import assert_data
 
 
 @fixture
@@ -17,7 +16,7 @@ def metadata_json_reader(mocker: MockerFixture, request: FixtureRequest):
 @mark.data('{"title": "Test Title", "author": "Test Author"}')
 def test_read(metadata_json_reader: MetadataJsonReader):
     data = metadata_json_reader.read()
-    assert_data(data, 'Test Title', Type.BOOK_TITLE, author='Test Author')
+    assert data == NovelData('Test Title', Type.BOOK_TITLE, author='Test Author')
 
     data = metadata_json_reader.read()
     assert data is None

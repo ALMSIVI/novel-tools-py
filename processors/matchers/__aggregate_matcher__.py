@@ -1,5 +1,5 @@
 from framework import Processor
-from common import NovelData, Type
+from common import NovelData
 
 
 class AggregateMatcher(Processor):

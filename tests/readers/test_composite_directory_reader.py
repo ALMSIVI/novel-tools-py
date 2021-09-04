@@ -1,8 +1,12 @@
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import Type
+from common import NovelData, Type
 from readers.composite_directory_reader import CompositeDirectoryReader
-from tests.helpers import assert_data, format_structure
+from textwrap import dedent
+
+
+def format_structure(structure: str) -> str:
+    return dedent(structure).strip()
 
 
 @fixture
@@ -26,14 +30,14 @@ def test_csv(composite_reader: CompositeDirectoryReader, mocker: MockerFixture):
     mocker.patch('os.listdir', return_value=['Test Chapter One.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = composite_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1, formatted='Test Volume One')
+    assert data == NovelData('Test Volume', Type.VOLUME_TITLE, 1, formatted='Test Volume One')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Test Chapter\nLorem Ipsum'))
     data = composite_reader.read()
-    assert_data(data, 'Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test Chapter One')
+    assert data == NovelData('Test Chapter', Type.CHAPTER_TITLE, 1, formatted='Test Chapter One')
 
     data = composite_reader.read()
-    assert_data(data, 'Lorem Ipsum', Type.CHAPTER_CONTENT, None)
+    assert data == NovelData('Lorem Ipsum', Type.CHAPTER_CONTENT, None)
 
     data = composite_reader.read()
     assert data is None
@@ -47,14 +51,14 @@ def test_toc(composite_reader: CompositeDirectoryReader, mocker: MockerFixture):
     mocker.patch('os.listdir', return_value=['Test Chapter One.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = composite_reader.read()
-    assert_data(data, 'Test Volume One', Type.VOLUME_TITLE, 1)
+    assert data == NovelData('Test Volume One', Type.VOLUME_TITLE, 1)
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Test Chapter\nLorem Ipsum'))
     data = composite_reader.read()
-    assert_data(data, 'Test Chapter One', Type.CHAPTER_TITLE, 1)
+    assert data == NovelData('Test Chapter One', Type.CHAPTER_TITLE, 1)
 
     data = composite_reader.read()
-    assert_data(data, 'Lorem Ipsum', Type.CHAPTER_CONTENT, None)
+    assert data == NovelData('Lorem Ipsum', Type.CHAPTER_CONTENT, None)
 
     data = composite_reader.read()
     assert data is None
@@ -67,16 +71,16 @@ def test_toc(composite_reader: CompositeDirectoryReader, mocker: MockerFixture):
 def test_intro(composite_reader: CompositeDirectoryReader, mocker: MockerFixture):
     mocker.patch('builtins.open', mocker.mock_open(read_data='Book Intro'))
     data = composite_reader.read()
-    assert_data(data, 'Book Intro', Type.BOOK_INTRO, None)
+    assert data == NovelData('Book Intro', Type.BOOK_INTRO, None)
 
     mocker.patch('os.listdir', return_value=['_intro.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     mocker.patch('builtins.open', mocker.mock_open(read_data='Volume Intro'))
     data = composite_reader.read()
-    assert_data(data, 'Test Volume', Type.VOLUME_TITLE, 1)
+    assert data == NovelData('Test Volume', Type.VOLUME_TITLE, 1)
 
     data = composite_reader.read()
-    assert_data(data, 'Volume Intro', Type.VOLUME_INTRO, None)
+    assert data == NovelData('Volume Intro', Type.VOLUME_INTRO, None)
 
     data = composite_reader.read()
     assert data is None

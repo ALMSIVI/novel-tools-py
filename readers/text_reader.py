@@ -25,8 +25,9 @@ class TextReader(Reader, ACC):
     def __init__(self, args):
         args = self.extract_fields(args)
         filename = args['text_filename']
-        filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
-        self.file = open(filename, 'rt', encoding=args['encoding'])
+        full_filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
+        self.filename = filename
+        self.file = open(full_filename, 'rt', encoding=args['encoding'])
         self.verbose = args['verbose']
         self.line_num = 0
 
@@ -40,5 +41,5 @@ class TextReader(Reader, ACC):
             return None
 
         content = content.strip()
-        args = {'line_num': self.line_num, 'raw': content} if self.verbose else {}
+        args = {'source': self.filename, 'line_num': self.line_num, 'raw': content} if self.verbose else {}
         return NovelData(content.strip(), **args)

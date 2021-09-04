@@ -3,7 +3,30 @@ from pytest import mark
 from pytest_mock import MockerFixture
 from toolkit import analyze
 from utils import get_config
-from tests.helpers import assert_directory, assert_file
+
+
+def assert_file(actual: str, expected: str):
+    with open(actual, 'rt') as f:
+        actual_content = f.read()
+
+    with open(expected, 'rt') as f:
+        expected_content = f.read()
+
+    assert actual_content == expected_content
+
+
+def assert_directory(actual: str, expected: str):
+    actual_list = os.listdir(actual)
+    expected_list = os.listdir(expected)
+    assert sorted(actual_list) == sorted(expected_list)
+
+    for name in actual_list:
+        actual_name = os.path.join(actual, name)
+        expected_name = os.path.join(expected, name)
+        if os.path.isfile(actual_name):
+            assert_file(actual_name, expected_name)
+        else:
+            assert_directory(actual_name, expected_name)
 
 
 # Let us try the second workflow first: split -> struct_dir -> create_dir

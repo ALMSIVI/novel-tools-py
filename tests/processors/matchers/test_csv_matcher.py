@@ -1,8 +1,12 @@
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
+from textwrap import dedent
 from common import NovelData, Type
 from processors.matchers.csv_matcher import CsvMatcher
-from tests.helpers import assert_data, format_structure
+
+
+def format_structure(structure: str) -> str:
+    return dedent(structure).strip()
 
 
 @fixture
@@ -23,15 +27,15 @@ def csv_matcher(mocker: MockerFixture, request: FixtureRequest):
 def test_self_type(csv_matcher: CsvMatcher):
     before = NovelData('Chapter 1 Lorem')
     after = csv_matcher.process(before)
-    assert_data(after, 'Chapter 1 Lorem', Type.CHAPTER_TITLE, 1, list_index=1)
+    assert after == NovelData('Chapter 1 Lorem', Type.CHAPTER_TITLE, 1, list_index=1, matched=True)
 
     before = NovelData('Chapter 3 dolor')
     after = csv_matcher.process(before)
-    assert_data(after, 'Chapter 3 dolor', Type.UNRECOGNIZED, None)
+    assert after == NovelData('Chapter 3 dolor', Type.UNRECOGNIZED, None)
 
     before = NovelData('Chapter 2 Ipsum')
     after = csv_matcher.process(before)
-    assert_data(after, 'Chapter 2 Ipsum', Type.CHAPTER_TITLE, 2, list_index=2)
+    assert after == NovelData('Chapter 2 Ipsum', Type.CHAPTER_TITLE, 2, list_index=2, matched=True)
 
 
 @mark.data('''
@@ -42,11 +46,11 @@ def test_self_type(csv_matcher: CsvMatcher):
 def test_self_regex(csv_matcher: CsvMatcher):
     before = NovelData('Volume 1 Lorem')
     after = csv_matcher.process(before)
-    assert_data(after, 'Volume 1 Lorem', Type.VOLUME_TITLE, 1, list_index=1)
+    assert after == NovelData('Volume 1 Lorem', Type.VOLUME_TITLE, 1, list_index=1, matched=True)
 
     before = NovelData('Chapter 1 Ipsum')
     after = csv_matcher.process(before)
-    assert_data(after, 'Chapter 1 Ipsum', Type.CHAPTER_TITLE, 1, list_index=2)
+    assert after == NovelData('Chapter 1 Ipsum', Type.CHAPTER_TITLE, 1, list_index=2, matched=True)
 
 
 @mark.data('''
@@ -57,11 +61,11 @@ def test_self_regex(csv_matcher: CsvMatcher):
 def test_list_type(csv_matcher: CsvMatcher):
     before = NovelData('Volume 1 Lorem')
     after = csv_matcher.process(before)
-    assert_data(after, 'Volume 1 Lorem', Type.VOLUME_TITLE, 1, list_index=1)
+    assert after == NovelData('Volume 1 Lorem', Type.VOLUME_TITLE, 1, list_index=1, matched=True)
 
     before = NovelData('Chapter 1 Ipsum')
     after = csv_matcher.process(before)
-    assert_data(after, 'Chapter 1 Ipsum', Type.CHAPTER_TITLE, 1, list_index=2)
+    assert after == NovelData('Chapter 1 Ipsum', Type.CHAPTER_TITLE, 1, list_index=2, matched=True)
 
 
 @mark.data('''
@@ -71,7 +75,7 @@ def test_list_type(csv_matcher: CsvMatcher):
 def test_format(csv_matcher: CsvMatcher):
     before = NovelData('Chapter One Lorem')
     after = csv_matcher.process(before)
-    assert_data(after, 'Chapter 1 Lorem', Type.CHAPTER_TITLE, 1, list_index=1)
+    assert after == NovelData('Chapter 1 Lorem', Type.CHAPTER_TITLE, 1, list_index=1, matched=True)
 
 
 def test_invalid(mocker: MockerFixture):
