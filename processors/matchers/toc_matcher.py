@@ -6,7 +6,7 @@ from readers.toc_reader import TocReader
 class TocMatcher(Processor, ACC):
     """
     Matches data by a given Table of Contents (TOC) file. It is not advised to use toc files as a matcher; while the
-    file is better human readable, it contains less information than csv files and will not provide as many options as
+    file is better human-readable, it contains less information than csv files and will not provide as many options as
     a csv file does.
     """
 

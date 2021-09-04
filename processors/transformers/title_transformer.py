@@ -58,7 +58,7 @@ class TitleTransformer(Processor, ACC):
                           description='The list of processing units. The filter is a dictionary with the fields as the '
                                       'key. The format can be either a string or a dict containing the format strings '
                                       'for each custom field. Please put the units with the most specific filters '
-                                      'first, and leave the most generic last, to avoid short circuiting.')
+                                      'first, and leave the most generic last, to avoid short-circuiting.')
         ]
 
     def __init__(self, args):

@@ -15,7 +15,7 @@ class MarkdownWriter(Writer, ACC):
     def required_fields() -> list[FieldMetadata]:
         return [
             FieldMetadata('md_filename', 'str', default='text.md',
-                          description='Filename of the output Markdown file, if use_title is False.'),
+                          description='Filename of the output Markdown file, if `use_title` is False.'),
             FieldMetadata('out_dir', 'str',
                           description='The directory to write the markdown file to.'),
             FieldMetadata('use_title', 'bool',

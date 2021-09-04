@@ -23,7 +23,7 @@ class CsvReader(Reader, ACC):
             FieldMetadata('encoding', 'str', default='utf-8',
                           description='Encoding of the csv file.'),
             FieldMetadata('types', 'dict', default={'line_num': 'int'},
-                          description='Type of each additional field to be fetched. Currently str, int and bool are '
+                          description='Type of each additional field to be fetched. Currently, str, int and bool are '
                                       'supported.')
         ]
 

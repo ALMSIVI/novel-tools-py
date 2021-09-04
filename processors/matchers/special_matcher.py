@@ -21,7 +21,7 @@ class SpecialMatcher(Processor, ACC):
             FieldMetadata('affixes', 'list[str]',
                           description='List of special names to match for.'),
             FieldMetadata('regex', 'str',
-                          description='The regex to match for. It will contain a "affixes" format, that will be '
+                          description='The regex to match for. It will contain an "affixes" format, that will be '
                                       'replaced with the list of affixes. Example: ^{affixes}$ will match lines with '
                                       'any of the affixes.'),
             FieldMetadata('affix_group', 'int', default=0,

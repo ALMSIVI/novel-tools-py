@@ -11,7 +11,7 @@ have to contain the other fields from a NovelData.
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
 - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv file.
-- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently str, int and bool are supported.
+- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently, str, int and bool are supported.
 
 ### DirectoryReader
 
@@ -86,7 +86,7 @@ To determine the type of the line, the following three checks are done in order:
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file.
 - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv list file.
-- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently str, int and bool are supported.
+- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently, str, int and bool are supported.
 - data_type (str, optional): If present, specifies the type of all the titles.
 - fields (list[str], optional, default=['line_num', 'formatted', 'raw', 'content']): The fields to compare to when matching.
 
@@ -115,7 +115,7 @@ field will be attached to the object.
 **Arguments:**
 - type (str): Specifies the type for this matcher.
 - affixes (list[str]): List of special names to match for.
-- regex (str): The regex to match for. It will contain a "affixes" format, that will be replaced with the list of affixes. Example: ^{affixes}$ will match lines with any of the affixes.
+- regex (str): The regex to match for. It will contain an "affixes" format, that will be replaced with the list of affixes. Example: ^{affixes}$ will match lines with any of the affixes.
 - affix_group (int, optional, default=0): The group index for the title's affix (starting from 0).
 - content_group (int, optional, default=1): The group index for the title's content (starting from 0).
 - tag (str, optional, default=special): The tag to append to matched data. This can be used in TitleValidator for different formats.
@@ -125,7 +125,7 @@ field will be attached to the object.
 **Description:**
 
 Matches data by a given Table of Contents (TOC) file. It is not advised to use toc files as a matcher; while the
-file is better human readable, it contains less information than csv files and will not provide as many options as
+file is better human-readable, it contains less information than csv files and will not provide as many options as
 a csv file does.
 
 **Arguments:**
@@ -175,7 +175,7 @@ Be careful if you want to use this on non-title data, for most writers use 'form
 is a title.
 
 **Arguments:**
-- units (list[{filter: dict[str, str], format: str | dict[str, str]}]): The list of processing units. The filter is a dictionary with the fields as the key. The format can be either a string or a dict containing the format strings for each custom field. Please put the units with the most specific filters first, and leave the most generic last, to avoid short circuiting.
+- units (list[{filter: dict[str, str], format: str | dict[str, str]}]): The list of processing units. The filter is a dictionary with the fields as the key. The format can be either a string or a dict containing the format strings for each custom field. Please put the units with the most specific filters first, and leave the most generic last, to avoid short-circuiting.
 
 ### TypeTransformer
 
@@ -209,7 +209,7 @@ can also use the same transformer to attach a 'filename' field, and the writer w
 **Arguments:**
 - out_dir (str): The working directory.
 - debug (bool, optional, default=False): If set to True, will print the error message to the terminal.
-- default_volume (str, optional, default=default): If the volume doesn't have volumes, specify the directory name to place the chapter files.
+- default_volume (str, optional, default=default): If the volume does not have volumes, specify the directory name to place the chapter files.
 - intro_filename (str, optional, default=_intro.txt): The filename of the book/volume introduction file(s).
 - write_blank (bool, optional, default=True): If set to True, will write blank lines to the files. Sometimes blank lines serve as separators in novels, and we want to keep them.
 
@@ -222,7 +222,7 @@ If a title field has been passed from a TitleTransformer and has the 'formatted'
 be prioritized.
 
 **Arguments:**
-- md_filename (str, optional, default=text.md): Filename of the output Markdown file, if use_title is False.
+- md_filename (str, optional, default=text.md): Filename of the output Markdown file, if `use_title` is False.
 - out_dir (str): The directory to write the markdown file to.
 - use_title (bool): If set to True, will use the book title (if specified) as the Markdown filename.
 - levels (dict[str, int], optional, default={'book_title': 1, 'volume_title': 2, 'chapter_title': 3}): Specifies what level the header should be for each type.

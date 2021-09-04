@@ -19,7 +19,7 @@ class DirectoryWriter(Writer, ACC):
             FieldMetadata('debug', 'bool', default=False,
                           description='If set to True, will print the error message to the terminal.'),
             FieldMetadata('default_volume', 'str', default='default',
-                          description='If the volume doesn\'t have volumes, specify the directory name to place the '
+                          description='If the volume does not have volumes, specify the directory name to place the '
                                       'chapter files.'),
             FieldMetadata('intro_filename', 'str', default='_intro.txt',
                           description='The filename of the book/volume introduction file(s).'),

@@ -32,7 +32,7 @@ class CsvMatcher(Processor, ACC):
             FieldMetadata('encoding', 'str', default='utf-8',
                           description='Encoding of the csv list file.'),
             FieldMetadata('types', 'dict', default={'line_num': 'int'},
-                          description='Type of each additional field to be fetched. Currently str, int and bool are '
+                          description='Type of each additional field to be fetched. Currently, str, int and bool are '
                                       'supported.'),
             FieldMetadata('data_type', 'str', optional=True,
                           description='If present, specifies the type of all the titles.'),

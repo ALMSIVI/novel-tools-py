@@ -10,15 +10,15 @@ If you consider the processes that the toolkit provides -- struct, split, create
 
 There can be multiple readers, in which the readers are consumed one by one; multiple Processors, in which the data goes through them one by one; and multiple Writers, in which the data is written into different formats. The **Worker** puts them together, creating a full work cycle. This is what the core tool, [**Analyze**](/toolkit/analyze_novel.py), is based on.
 
-Readers and writers are pretty simple; most of the magic happens within the processors. The toolkit needs to recognize, correct, and format the data, so at least three different kinds of processers are needed. They are named **Matcher**, **Validator**, and **Transformer**, respectively.
+Readers and writers are pretty simple; most of the magic happens within the processors. The toolkit needs to recognize, correct, and format the data, so at least three different kinds of processors are needed. They are named **Matcher**, **Validator**, and **Transformer**, respectively.
 
-The data that we will be dealing with can be found [here](common/data.py). It defines all the data types, and the NovelData object that will be passed between all the units.
+The data that we will be dealing with can be found [here](/common/data.py). It defines all the data types, and the NovelData object that will be passed between all the units.
 
 ## Matchers
 
-When we are analyzing the novel, the most important step is to figure out the volume and chapter titles. After we determine the location of these titles, it would be easy to deduce the what the other parts of the novel are. So we will do just that at the very first step with Matchers. Apart from deciding whether the data is a title or not, a Matcher will also assign the title and content (if any) to the title.
+When we are analyzing the novel, the most important step is to figure out the volume and chapter titles. After we determine the location of these titles, it would be easy to deduce what the other parts of the novel are. So we will do just that at the very first step with Matchers. Apart from deciding whether the data is a title or not, a Matcher will also assign the title and content (if any) to the title.
 
-Matchers are different from the other two types of processors, in the sense that the data can only have one type. Therefore, an internal [Aggregate Matcher](/processors/matchers/aggregate_matcher.py) is created to short-circuit the matchers if there is a successful match.
+Matchers are different from the other two types of processors, in the sense that the data can only have one type. Therefore, an internal [Aggregate Matcher](/processors/matchers/__aggregate_matcher__.py) is created to short-circuit the matchers if there is a successful match.
 
 There are mainly two ways to determine whether the data is a title:
 
@@ -33,7 +33,7 @@ After we get the titles, we need to verify if the indices are correct, i.e., the
 
 Validators only work on regular titles; special titles do not have indices, so they will always be skipped. Validators are also able to handle different sets of indices by "tagging". You can assign tags to specific titles in the Matchers, and set up separate Validators for these tags.
 
-For volume titles, this is pretty straightforward. Chapter titles are a little bit different. Some books would reset chapter indices when starting a new volume. In this case, the first chapter in every volume is always Chapter 1. Other books will not reset; the first chapter in Volume 2 will be the index of the last chapter in Volume 1 plus 1. So for [Chapter Validator](/processors/validators/chapter_validator.py), there is an additional `discard_chapters` option, compared with [Volume Validator](/processors/validators/volume_validator.py).
+For volume titles, this is pretty straightforward. Chapter titles are a little different. Some books would reset chapter indices when starting a new volume. In this case, the first chapter in every volume is always Chapter 1. Other books will not reset; the first chapter in Volume 2 will be the index of the last chapter in Volume 1 plus 1. So for [Chapter Validator](/processors/validators/chapter_validator.py), there is an additional `discard_chapters` option, compared with [Volume Validator](/processors/validators/volume_validator.py).
 
 ## Transformers
 
@@ -50,7 +50,7 @@ Additionally, if you want to follow the second workflow, i.e., splitting the nov
 
 ## Output structures
 
-There are currently two support "structure files": a csv list and a Table of Contents (toc). TOC is more human readable, but lacks a lot of information about the data itself, so it is advised to use csv lists if you can.
+There are currently two support "structure files": a csv list and a Table of Contents (toc). TOC is more human-readable, but lacks a lot of information about the data itself, so it is advised to use csv lists if you can.
 
 ## Initializing the units
 
@@ -58,4 +58,4 @@ We will use config files to initialize these units. To extract the fields from t
 
 - We can easily extract these fields from an `args` dict when we are initializing the unit;
 - We can easily generate documentation using the metadata (see [docgen](/toolkit/generate_docs.py)). In fact, the [built-in class references](/docs/references.md) is auto generated by docgen;
-- If we want to make a GUI for the toolkit, we can take advantage of these metadata to dynamically generate config form fields.
+- If we want to make a GUI for the toolkit, we can take advantage of the metadata to dynamically generate config form fields.
