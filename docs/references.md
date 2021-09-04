@@ -160,6 +160,16 @@ ordering.
 **Arguments:**
 
 
+### PatternTransformer
+
+**Description:**
+
+Alters the content of the data by changing some patterns (usually in chapter contents). You can use this to
+format punctuation symbols in the novel, or change from custom dividers to Markdown-style ones.
+
+**Arguments:**
+- units (list[{filter: dict[str, str], subs: list[{pattern: str, new: str}]}]): The list of processing units. `filter` is a dictionary with the fields as the key, and `subs` lists the operations to be performed if the data is not filtered. `pattern` is a regex describing the pattern, and `new` is the string to replace the pattern.
+
 ### TitleTransformer
 
 **Description:**
@@ -175,7 +185,7 @@ Be careful if you want to use this on non-title data, for most writers use 'form
 is a title.
 
 **Arguments:**
-- units (list[{filter: dict[str, str], format: str | dict[str, str]}]): The list of processing units. The filter is a dictionary with the fields as the key. The format can be either a string or a dict containing the format strings for each custom field. Please put the units with the most specific filters first, and leave the most generic last, to avoid short-circuiting.
+- units (list[{filter: dict[str, str], format: str | dict[str, str]}]): The list of processing units. `filter` is a dictionary with the fields as the key, and `format` can be either a string or a dict containing the format strings for each custom field. Please put the units with the most specific filters first, and leave the most generic last, to avoid short-circuiting.
 
 ### TypeTransformer
 

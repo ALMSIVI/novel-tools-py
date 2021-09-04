@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from collections.abc import Callable
 from typing import Any
 
 
@@ -10,13 +9,12 @@ class Null:
 
 class FieldMetadata:
     def __init__(self, name: str, field_type: str, *, optional: bool = False, default: Any = Null(),
-                 options: list = None, include_when: Callable[[dict], bool] = None, description: str):
+                 options: list = None, description: str):
         self.name = name
         self.type = field_type
         self.optional = True if type(default) is not Null else optional
         self.default = default
         self.options = options
-        self.include_when = include_when
         self.description = description
 
     @property

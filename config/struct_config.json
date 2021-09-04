@@ -68,7 +68,7 @@
     "writers": [
       {
         "class": "CsvWriter",
-        "additional_fields": ["line_num", "raw"]
+        "additional_fields": ["line_num", "raw", "error"]
       },
       {
         "class": "TocWriter",

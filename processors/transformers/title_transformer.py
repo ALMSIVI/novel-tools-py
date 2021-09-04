@@ -1,6 +1,6 @@
 from typing import Union, Any
 from framework import Processor
-from common import NovelData, Type, ACC, FieldMetadata
+from common import NovelData, ACC, FieldMetadata
 
 
 class Unit:
@@ -9,21 +9,8 @@ class Unit:
         self.title_format = title_format
 
     def filter(self, data: NovelData) -> bool:
-        match = True
-        for key, val in self.title_filter.items():
-            if key == 'content':
-                match = match and data.content == val
-            elif key == 'type':
-                match = match and data.type == Type[val.upper()]
-            elif key == 'index':
-                match = match and data.index == val
-            else:
-                match = match and data.get(key, None) == val
-
-            if not match:
-                return match
-
-        return match
+        data_dict = data.flat_dict()
+        return all(data_dict.get(key, None) != val for key, val in self.title_filter.items())
 
     def format(self, data: NovelData) -> NovelData:
         if type(self.title_format) is str:
@@ -55,9 +42,9 @@ class TitleTransformer(Processor, ACC):
     def required_fields() -> list[FieldMetadata]:
         return [
             FieldMetadata('units', 'list[{filter: dict[str, str], format: str | dict[str, str]}]',
-                          description='The list of processing units. The filter is a dictionary with the fields as the '
-                                      'key. The format can be either a string or a dict containing the format strings '
-                                      'for each custom field. Please put the units with the most specific filters '
+                          description='The list of processing units. `filter` is a dictionary with the fields as the '
+                                      'key, and `format` can be either a string or a dict containing the format strings'
+                                      ' for each custom field. Please put the units with the most specific filters '
                                       'first, and leave the most generic last, to avoid short-circuiting.')
         ]
 

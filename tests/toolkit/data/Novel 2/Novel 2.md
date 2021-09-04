@@ -10,7 +10,7 @@ It discards chapter indices for regular chapters, but not for indices.
 
 It contains duplicate and missing volumes, but no such chapters.
 
-For analyze, this novel will be use a TocWriter.
+For analyze, this novel will use a TocWriter.
 
 
 ### Summary 1 First summary
