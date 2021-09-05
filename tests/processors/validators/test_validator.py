@@ -29,15 +29,8 @@ def no_overwrite_validator():
 
 
 @fixture
-def special_validator():
-    validator = StubValidator({'special_field': True})
-    yield validator
-    validator.cleanup()
-
-
-@fixture
-def custom_special_validator():
-    validator = StubValidator({'special_field': 'special'})
+def index_validator():
+    validator = StubValidator({'begin_index': 128})
     yield validator
     validator.cleanup()
 
@@ -88,3 +81,10 @@ def test_missing(overwrite_validator: StubValidator, no_overwrite_validator: Stu
                                error='Missing - expected: 3, actual: 10')
     assert after2 == NovelData('Skipping Third', Type.VOLUME_TITLE, 10, corrected_index=3,
                                error='Missing - expected: 3, actual: 10')
+
+
+def test_index(index_validator: StubValidator):
+    before = NovelData('First', Type.VOLUME_TITLE, 1)
+    after = index_validator.process(before)
+    assert after == NovelData('First', Type.VOLUME_TITLE, 128, original_index=1,
+                              error='Missing - expected: 128, actual: 1')

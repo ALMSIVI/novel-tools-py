@@ -22,7 +22,9 @@ class Validator(Processor, ACC):
                                       'different Introductions by different authors before the first chapter, '
                                       'or there might be several interludes across the volume. In such case, '
                                       'one can attach a tag to the data, and have a special Validator that only '
-                                      'checks for that tag.')
+                                      'checks for that tag.'),
+            FieldMetadata('begin_index', 'int', default=1,
+                          description='The starting index to validate against.')
         ]
 
     def __init__(self, args):
@@ -30,19 +32,18 @@ class Validator(Processor, ACC):
         self.overwrite = args['overwrite']
         self.tag = args['tag']
         self.indices = set()
-        self.curr_index = 0
+        self.curr_index = args['begin_index'] - 1
 
     def process(self, data: NovelData) -> NovelData:
         """
         Validates the index, and tries to fix any errors if the correct flag is set to true.
         Returns a copy of the original result if correct is false, or a fixed result if true.
         """
+        if not self.check(data):
+            return data
+
         new_data = data.copy()
         corrected_index = data.index
-
-        if not self.check(data):
-            self.set_index(new_data, corrected_index)
-            return new_data
 
         # Duplicate detection
         if corrected_index in self.indices:

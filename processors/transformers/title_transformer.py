@@ -1,16 +1,19 @@
 from typing import Union, Any
 from framework import Processor
-from common import NovelData, ACC, FieldMetadata
+from common import NovelData, Type, ACC, FieldMetadata
 
 
 class Unit:
     def __init__(self, title_filter: dict[str, Any], title_format: Union[str, dict[str, str]]):
         self.title_filter = title_filter
         self.title_format = title_format
+        for key in self.title_filter:
+            if key == 'type':
+                self.title_filter[key] = Type[self.title_filter[key].upper()]
 
     def filter(self, data: NovelData) -> bool:
         data_dict = data.flat_dict()
-        return all(data_dict.get(key, None) != val for key, val in self.title_filter.items())
+        return all(data_dict.get(key, None) == val for key, val in self.title_filter.items())
 
     def format(self, data: NovelData) -> NovelData:
         if type(self.title_format) is str:
