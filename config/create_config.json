@@ -10,6 +10,9 @@
     "matchers": [
       { "class":  "CsvMatcher" }
     ],
+    "transformers": [
+      { "class": "TypeTransformer" }
+    ],
     "writers": [
       {
         "class": "MarkdownWriter",

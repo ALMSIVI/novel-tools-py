@@ -23,9 +23,9 @@ class DirectoryWriter(Writer, ACC):
                                       'chapter files.'),
             FieldMetadata('intro_filename', 'str', default='_intro.txt',
                           description='The filename of the book/volume introduction file(s).'),
-            FieldMetadata('write_blank', 'bool', default=True,
-                          description='If set to True, will write blank lines to the files. Sometimes blank lines '
-                                      'serve as separators in novels, and we want to keep them.')
+            FieldMetadata('write_newline', 'bool', default=False,
+                          description='If set to True, will insert a newline after a non-blank line. This will avoid '
+                                      'contents on consecutive lines being treated as the same paragraph.'),
         ]
 
     def __init__(self, args):
@@ -34,7 +34,7 @@ class DirectoryWriter(Writer, ACC):
         self.debug = args['debug']
         self.default_volume = args['default_volume']
         self.intro_filename = args['intro_filename']
-        self.write_blank = args['write_blank']
+        self.write_newline = args['write_newline']
 
         self.curr_type = Type.UNRECOGNIZED  # Used to indicate what file is currently being written
         self.file = None
@@ -46,9 +46,7 @@ class DirectoryWriter(Writer, ACC):
 
     def write(self, data: NovelData):
         if not data.has('formatted'):  # Normally, only titles should contain this field
-            if data.type == Type.BLANK and not self.write_blank:
-                return
-            elif data.type == Type.BOOK_TITLE or data.type == Type.BOOK_INTRO:
+            if data.type == Type.BOOK_TITLE or data.type == Type.BOOK_INTRO:
                 # Write to book intro file
                 if self.curr_type != Type.BOOK_INTRO:
                     if self.file:
@@ -68,6 +66,8 @@ class DirectoryWriter(Writer, ACC):
 
             if self.file:
                 self.file.write(data.content + '\n')
+                if data.type != Type.BLANK and self.write_newline:
+                    self.file.write('\n')
         else:
             self.curr_type = data.type
             title = data.get('formatted')
@@ -98,3 +98,5 @@ class DirectoryWriter(Writer, ACC):
 
                 self.file = open(os.path.join(self.curr_dir, filename + '.txt'), 'wt')
                 self.file.write(title + '\n')
+                if data.type == Type.BLANK and self.write_newline:
+                    self.file.write('\n')

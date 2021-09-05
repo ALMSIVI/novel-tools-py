@@ -13,6 +13,9 @@
         "discard_chapters": false
       }
     ],
+    "transformers": [
+      { "class": "TypeTransformer" }
+    ],
     "writers": [
       {
         "class": "MarkdownWriter",

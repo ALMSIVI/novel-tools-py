@@ -132,16 +132,12 @@ def test_debug(directory_writer: DirectoryWriter, mocker: MockerFixture):
     mp.assert_called_once_with('Error\t- Adjusted to Chapter 1 Title')
 
 
-@mark.args({'write_blank': False})
-def test_write_blank(directory_writer: DirectoryWriter, mocker: MockerFixture):
+@mark.args({'write_newline': True})
+def test_newline(directory_writer: DirectoryWriter, mocker: MockerFixture):
     mocker.patch('os.mkdir')
     mo = mocker.patch('builtins.open', mocker.mock_open())
     handle = mo()
 
     data = NovelData('Title', Type.BOOK_TITLE)
     directory_writer.write(data)
-
-    handle.reset_mock()
-    data = NovelData('', Type.BLANK)
-    directory_writer.write(data)
-    handle.write.assert_not_called()
+    handle.write.assert_called_with('\n')
