@@ -74,15 +74,15 @@ def test_levels(markdown_writer: MarkdownWriter, mocker: MockerFixture):
 
 @mark.args({
     'use_title': False,
-    'write_blank': False
+    'write_newline': True
 })
-def test_no_write_blank(markdown_writer: MarkdownWriter, mocker: MockerFixture):
+def test_newline(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     m = mocker.patch('builtins.open', mocker.mock_open())
     handle = m()
 
-    data = NovelData('', Type.BLANK)
+    data = NovelData('Test', Type.CHAPTER_CONTENT)
     markdown_writer.write(data)
-    handle.write.assert_not_called()
+    handle.write.assert_called_with('\n')
 
 
 @mark.args({

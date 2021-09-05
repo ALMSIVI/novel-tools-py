@@ -23,9 +23,9 @@ class MarkdownWriter(Writer, ACC):
                                       'filename.'),
             FieldMetadata('levels', 'dict[str, int]', default={'book_title': 1, 'volume_title': 2, 'chapter_title': 3},
                           description='Specifies what level the header should be for each type.'),
-            FieldMetadata('write_blank', 'bool', default=True,
-                          description='If set to True, will write blank lines to the files. Sometimes blank lines '
-                                      'serve as separators in novels, and we want to keep them.'),
+            FieldMetadata('write_newline', 'bool', default=False,
+                          description='If set to True, will insert a newline after a non-blank line. This will avoid '
+                                      'contents on consecutive lines being treated as the same paragraph.'),
             FieldMetadata('debug', 'bool', default=False,
                           description='If set to True, will print the error message to the terminal.')
         ]
@@ -36,7 +36,7 @@ class MarkdownWriter(Writer, ACC):
         self.filename = args['md_filename']
         self.out_dir = args['out_dir']
         self.levels = {Type[key.upper()]: '#' * value + ' ' for key, value in args['levels'].items()}
-        self.write_blank = args['write_blank']
+        self.write_newline = args['write_newline']
         self.debug = args['debug']
 
         self.file = None
@@ -49,11 +49,10 @@ class MarkdownWriter(Writer, ACC):
         if self.debug and data.has('error'):
             print(data.get('error'))
 
-        if data.type == Type.BLANK and not self.write_blank:
-            return
-
         if not self.file:
             filename = data.content + '.md' if self.use_title and data.type == Type.BOOK_TITLE else self.filename
             self.file = open(os.path.join(self.out_dir, purify_name(filename)), 'wt')
 
         self.file.write(self.levels.get(data.type, '') + data.get('formatted', data.content) + '\n')
+        if data.type != Type.BLANK and self.write_newline:
+            self.file.write('\n')

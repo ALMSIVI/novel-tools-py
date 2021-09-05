@@ -146,6 +146,7 @@ Validates whether the title indices are continuous, i.e., whether there exist du
 **Arguments:**
 - overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one, and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored in the 'corrected_index' field. In either case, a field called 'error' will be created if a validation error occurs.
 - tag (str, optional, default=None): Only validate on the given tag. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
+- begin_index (int, optional, default=1): The starting index to validate against.
 
 ## Transformers
 
@@ -164,8 +165,8 @@ ordering.
 
 **Description:**
 
-Alters the content of the data by changing some patterns (usually in chapter contents). You can use this to
-format punctuation symbols in the novel, or change from custom dividers to Markdown-style ones.
+Alters the content of the data by changing some patterns (usually in chapter contents). You can use this to format
+punctuation symbols in the novel, or change from custom dividers to Markdown-style ones.
 
 **Arguments:**
 - units (list[{filter: dict[str, str], subs: list[{pattern: str, new: str}]}]): The list of processing units. `filter` is a dictionary with the fields as the key, and `subs` lists the operations to be performed if the data is not filtered. `pattern` is a regex describing the pattern, and `new` is the string to replace the pattern.
@@ -236,7 +237,7 @@ be prioritized.
 - out_dir (str): The directory to write the markdown file to.
 - use_title (bool): If set to True, will use the book title (if specified) as the Markdown filename.
 - levels (dict[str, int], optional, default={'book_title': 1, 'volume_title': 2, 'chapter_title': 3}): Specifies what level the header should be for each type.
-- write_blank (bool, optional, default=True): If set to True, will write blank lines to the files. Sometimes blank lines serve as separators in novels, and we want to keep them.
+- write_newline (bool, optional, default=False): If set to True, will insert a newline after a non-blank line. This will avoid contents on consecutive lines being treated as the same paragraph.
 - debug (bool, optional, default=False): If set to True, will print the error message to the terminal.
 
 ### TocWriter

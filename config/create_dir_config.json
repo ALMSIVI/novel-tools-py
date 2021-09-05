@@ -20,7 +20,8 @@
     "writers": [
       {
         "class": "MarkdownWriter",
-        "use_title": true
+        "use_title": true,
+        "write_newline": true
       }
     ]
   }
