@@ -10,7 +10,7 @@
       {
         "class": "NumberedMatcher",
         "type": "volume_title",
-        "regex": "^第(.+)卷(.*)$"
+        "regex": "^第(.+?)卷(.*)$"
       },
       {
         "class": "SpecialMatcher",
@@ -21,7 +21,7 @@
       {
         "class": "NumberedMatcher",
         "type": "chapter_title",
-        "regex": "^第(.+)章(.*)$"
+        "regex": "^第(.+?)章(.*)$"
       },
       {
         "class": "SpecialMatcher",
@@ -68,7 +68,7 @@
     "writers": [
       {
         "class": "CsvWriter",
-        "additional_fields": ["line_num", "raw", "error"]
+        "additional_fields": ["struct", "line_num", "raw", "error"]
       },
       {
         "class": "TocWriter",

@@ -11,7 +11,7 @@
       {
         "class": "NumberedMatcher",
         "type": "chapter_title",
-        "regex": "^第(.+)章$",
+        "regex": "^第(.+?)章$",
         "content_group": -1
       }
     ],

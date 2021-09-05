@@ -67,7 +67,7 @@ class NovelData:
         if fields is None:
             return flat_dict
 
-        return {field: flat_dict[field] for field in fields}
+        return {field: flat_dict.get(field) for field in fields}
 
     def copy(self):
         return deepcopy(self)

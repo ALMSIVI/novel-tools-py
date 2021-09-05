@@ -4,66 +4,32 @@ from toolkit import analyze, add, convert, docgen
 from utils import get_config
 
 
+def do_analyze(args):
+    config_filename = args.toolkit + '_config.json'
+    if os.path.isfile(args.input):
+        in_dir = os.path.basename(args.input)
+        config = get_config(config_filename, in_dir)
+        analyze(config, filename=args.input, out_dir=args.output)
+    else:
+        config = get_config(config_filename, args.input)
+        analyze(config, in_dir=args.input, out_dir=args.output)
+
+
 def start():
     parser = argparse.ArgumentParser(description='Novel Tools command line interface.')
     subparsers = parser.add_subparsers(help='Tools provided by this package.', dest='command', required=True)
 
     # Framework functions #
-    # struct
-    config = 'struct_config.json'
-    analyze_parser = subparsers.add_parser('struct', description='Generates the structure from the text file.')
-    analyze_parser.add_argument('-f', '--filename', help='Filename of the book file.')
-    analyze_parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output file(s).')
-    analyze_parser.add_argument('-c', '--config', default=config, help='Filename of the config file.')
-    analyze_parser.set_defaults(func=lambda a: analyze(get_config(a.config, os.path.dirname(a.filename),
-                                                                  os.path.join('config', config)),
-                                                       filename=a.filename,
-                                                       out_dir=a.out_dir))
-
-    # create
-    config = 'create_config.json'
-    analyze_parser = subparsers.add_parser('create', description='Creates the formatted novel from the structure and '
-                                                                 'single text file.')
-    analyze_parser.add_argument('-f', '--filename', help='Filename of the book file.')
-    analyze_parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output file(s).')
-    analyze_parser.add_argument('-c', '--config', default=config, help='Filename of the config file.')
-    analyze_parser.set_defaults(func=lambda a: analyze(get_config(a.config, os.path.dirname(a.filename),
-                                                                  os.path.join('config', config)),
-                                                       filename=a.filename,
-                                                       out_dir=a.out_dir))
-
-    # split
-    config = 'split_config.json'
-    analyze_parser = subparsers.add_parser('split', description='Splits the novel into individual text files.')
-    analyze_parser.add_argument('-f', '--filename', help='Filename of the book file.')
-    analyze_parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output file(s).')
-    analyze_parser.add_argument('-c', '--config', default=config, help='Filename of the config file.')
-    analyze_parser.set_defaults(func=lambda a: analyze(get_config(a.config, os.path.dirname(a.filename),
-                                                                  os.path.join('config', config)),
-                                                       filename=a.filename,
-                                                       out_dir=a.out_dir))
-
-    # struct_dir
-    config = 'struct_dir_config.json'
-    analyze_parser = subparsers.add_parser('struct_dir', description='Recreates the structure from individual text '
-                                                                     'files.')
-    analyze_parser.add_argument('-i', '--in_dir', help='Filename of the book file.')
-    analyze_parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output file(s).')
-    analyze_parser.add_argument('-c', '--config', default=config, help='Filename of the config file.')
-    analyze_parser.set_defaults(func=lambda a: analyze(get_config(a.config, a.in_dir, os.path.join('config', config)),
-                                                       in_dir=a.in_dir,
-                                                       out_dir=a.out_dir))
-
-    # create_dir
-    config = 'create_dir_config.json'
-    analyze_parser = subparsers.add_parser('create_dir', description='Creates the formatted novel from the structure '
-                                                                     'and individual files.')
-    analyze_parser.add_argument('-i', '--in_dir', help='Filename of the book file.')
-    analyze_parser.add_argument('-o', '--out_dir', default=None, help='Directory of the output file(s).')
-    analyze_parser.add_argument('-c', '--config', default=config, help='Filename of the config file.')
-    analyze_parser.set_defaults(func=lambda a: analyze(get_config(a.config, a.in_dir, os.path.join('config', config)),
-                                                       in_dir=a.in_dir,
-                                                       out_dir=a.out_dir))
+    analyze_parser = subparsers.add_parser('analyze', description='Analyzes the novel file(s).')
+    analyze_parser.add_argument('-t', '--toolkit',
+                                help='The toolkit that will be executed. Built-in toolkits include'
+                                     'struct, create, split, struct_dir, and create_dir. If a custom toolkit is given, '
+                                     'make sure to have <toolkit>_config.json under the input directory.')
+    analyze_parser.add_argument('-i', '--input',
+                                help='Input filename or directory name. If it is a file, it will only be recognized by'
+                                     ' TextReader, and it must contain the full path.')
+    analyze_parser.add_argument('-o', '--output', default=None, help='Output directory name.')
+    analyze_parser.set_defaults(func=do_analyze)
 
     # Other functions #
     # add_to_calibre

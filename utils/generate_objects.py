@@ -36,14 +36,12 @@ class_packages = [
 ]
 
 
-def get_config(config_filename: str, in_dir: Optional[str] = None, default_config_filename: Optional[str] = None):
+def get_config(config_filename: str, in_dir: Optional[str] = None):
     filename = config_filename
     if not os.path.isfile(filename):
         filename = os.path.join(in_dir, config_filename)
     if not os.path.isfile(filename):
-        if default_config_filename is None:
-            raise ValueError('Config filename is invalid.')
-        filename = os.path.join(os.curdir, default_config_filename)
+        filename = os.path.join(os.curdir, 'config', config_filename)
 
     with open(filename, 'rt') as f:
         config = json.load(f)

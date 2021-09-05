@@ -11,7 +11,7 @@
       {
         "class": "NumberedMatcher",
         "type": "volume_title",
-        "regex": "^\\(\\d+\\) 第(.+)卷(.*)$"
+        "regex": "^\\(\\d+\\) 第(.+?)卷(.*)$"
       },
       {
         "class": "SpecialMatcher",
@@ -22,7 +22,7 @@
       {
         "class": "NumberedMatcher",
         "type": "chapter_title",
-        "regex": "^\\(\\d+\\) 第(.+)章(.*)$"
+        "regex": "^\\(\\d+\\) 第(.+?)章(.*)$"
       },
       {
         "class": "SpecialMatcher",
