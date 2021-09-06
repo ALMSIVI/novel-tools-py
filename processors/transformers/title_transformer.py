@@ -13,7 +13,7 @@ class Unit:
 
     def filter(self, data: NovelData) -> bool:
         data_dict = data.flat_dict()
-        return all(data_dict.get(key, None) == val for key, val in self.title_filter.items())
+        return all(data_dict.get(key) == val for key, val in self.title_filter.items())
 
     def format(self, data: NovelData) -> NovelData:
         if type(self.title_format) is str:

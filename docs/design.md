@@ -4,19 +4,19 @@ The entire project is built on the [framework](/framework) composed of 4 files: 
 
 If you consider the processes that the toolkit provides -- struct, split, create -- you may find out that they:
 
-- **Read** from a source (be it the source text file, entire directory, novel structures, or a combination of these),
+- **Read** from a source (be it the a big text file, or the entire directory consisting of chapter files),
 - **Process** the data that has been read,
 - and **Write** the processed data to some file(s).
 
-There can be multiple readers, in which the readers are consumed one by one; multiple Processors, in which the data goes through them one by one; and multiple Writers, in which the data is written into different formats. The **Worker** puts them together, creating a full work cycle. This is what the core tool, [**Analyze**](/toolkit/analyze_novel.py), is based on.
+There can be multiple readers, in which the readers are consumed one by one; multiple Processors, in which the data goes through them one by one; and multiple Writers, in which the data is written into different formats. The **Worker** puts them together, creating a full work cycle. This is what the core tool, [**analyze**](/toolkit/analyze_novel.py), is based on.
 
 Readers and writers are pretty simple; most of the magic happens within the processors. The toolkit needs to recognize, correct, and format the data, so at least three different kinds of processors are needed. They are named **Matcher**, **Validator**, and **Transformer**, respectively.
 
-The data that we will be dealing with can be found [here](/common/data.py). It defines all the data types, and the NovelData object that will be passed between all the units.
+We define the data format [here](/common/data.py). It contains all the data types, and the NovelData object that will be passed across all the units.
 
 ## Matchers
 
-When we are analyzing the novel, the most important step is to figure out the volume and chapter titles. After we determine the location of these titles, it would be easy to deduce what the other parts of the novel are. So we will do just that at the very first step with Matchers. Apart from deciding whether the data is a title or not, a Matcher will also assign the title and content (if any) to the title.
+When we are analyzing the novel, the most important step is to figure out the volume and chapter titles. After we determine the location of these titles, it would be much easier to deduce what the other parts of the novel are. So we will do just that at the very first step. A Matcher, as its name suggests, matches the current data against some predefined title format. Apart from deciding whether the data is a title or not, a Matcher will also assign the index and content (if any) to the title.
 
 Matchers are different from the other two types of processors, in the sense that the data can only have one type. Therefore, an internal [Aggregate Matcher](/processors/matchers/__aggregate_matcher__.py) is created to short-circuit the matchers if there is a successful match.
 
@@ -29,7 +29,7 @@ For the first method, [Numbered Matcher](/processors/matchers/numbered_matcher.p
 
 ## Validators
 
-After we get the titles, we need to verify if the indices are correct, i.e., there are no duplicate or missing indices. This is where Validators come in; they keep track of the current index and compares this index against the incoming data's index.
+After we get the titles, we need to verify if the indices are correct, i.e., there are no duplicate or missing indices. This is where Validators come in; they keep track of the current index and compares this internal index against the incoming data's index.
 
 Validators only work on regular titles; special titles do not have indices, so they will always be skipped. Validators are also able to handle different sets of indices by "tagging". You can assign tags to specific titles in the Matchers, and set up separate Validators for these tags.
 
@@ -46,11 +46,13 @@ For the first process we have [Type Transformer](/processors/transformers/type_t
 
 For the second process we have [Title Transformer](/processors/transformers/title_transformer.py). It will filter out the data based on type and tag, and then uses a format string to format the data.
 
-Additionally, if you want to follow the second workflow, i.e., splitting the novel into individual files, you will notice that special titles will lose their original order in the novel, and when you try to generate the structure file, the order of the titles will be incorrect. If you want to avoid this, you can try adding an [Order Transformer](/processors/transformers/order_transformer.py) in between. It will keep the read order, and append that order to the data. You can then use that order as part of the filename.
+Additionally, if you want to follow the second workflow, i.e., splitting the novel into individual files, you will notice that special titles will lose their original order in the novel, and when you try to generate the structure file, the order of the titles will be incorrect. If you want to avoid this, you can try adding an [Order Transformer](/processors/transformers/order_transformer.py) in between. It will keep the order that is passed in, and append that order to the data. You can then use that order as part of the filename.
+
+If you want to do some batch processing, you can do so with [Pattern Transformer](/processors/transformers/pattern_transformer.py). It will replace patterns in the content with user-defined ones. It could be useful if the author does not use regular punctuation marks, or uses a different format for the divider line.
 
 ## Output structures
 
-There are currently two support "structure files": a csv list and a Table of Contents (toc). TOC is more human-readable, but lacks a lot of information about the data itself, so it is advised to use csv lists if you can.
+There are currently two support "structure files": a csv list and a Table of Contents (toc). TOC is more human-readable, but lacks a lot of information about the data itself, so it is advised to use csv lists when you do the processing.
 
 ## Initializing the units
 

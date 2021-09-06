@@ -13,7 +13,7 @@ class Unit:
 
     def replace(self, data: NovelData):
         data_dict = data.flat_dict()
-        if not all(data_dict.get(key, None) != val for key, val in self.data_filter.items()):
+        if not all(data_dict.get(key) != val for key, val in self.data_filter.items()):
             return data
 
         content = data.content
