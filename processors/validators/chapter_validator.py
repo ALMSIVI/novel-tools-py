@@ -6,18 +6,14 @@ class ChapterValidator(Validator):
     """
     Validates a chapter, potentially within a volume.
     """
-
     @staticmethod
     def required_fields() -> list[FieldMetadata]:
         fields = Validator.required_fields()
         fields += [
             FieldMetadata('discard_chapters', 'bool',
                           description='If set to True, restart indexing at the beginning of each new volume.'),
-            FieldMetadata('volume_special_field', 'bool | str', default=False,
-                          description='Similar to special_field, but only applies to the volume. The volume is not '
-                                      'used for validation, only for outputting error messages. So volume will be '
-                                      'processed regardless of whether the volume is a special volume. This field '
-                                      'only specifies what field to look for if a special volume is found.')
+            FieldMetadata('volume_tag', 'str', default=None,
+                          description='Only validates if the current volume is the given tag.')
         ]
         return fields
 
@@ -25,24 +21,23 @@ class ChapterValidator(Validator):
         args = self.extract_fields(args)
         super().__init__(args)
         self.discard_chapters = args['discard_chapters']
-        if 'volume_special_field' not in args or args['volume_special_field'] is False:
-            self.volume_special_field = None
-        elif args['volume_special_field'] is True:
-            self.volume_special_field = 'volume_special_field'
-        else:
-            self.volume_special_field = args['volume_special_field']
+        self.volume_tag = args['volume_tag']
 
         self.curr_volume = None
+        self.validate_curr_volume = True
 
     def check(self, data: NovelData) -> bool:
         if data.type == Type.VOLUME_TITLE:
+            self.validate_curr_volume = data.get('tag') == self.volume_tag
+
             self.curr_volume = data
             if self.discard_chapters:
                 self.indices.clear()
                 self.curr_index = 0
             return False
 
-        return data.type == Type.CHAPTER_TITLE and data.index >= 0 and data.get('tag', None) == self.tag
+        return self.validate_curr_volume and data.type == Type.CHAPTER_TITLE and data.index >= 0 and data.get(
+            'tag') == self.tag
 
     def duplicate_message(self, data: NovelData, corrected_index: int) -> str:
         return f'Duplicate chapter{self.volume_message} - expected: {corrected_index}, actual: {self.format(data)}'
@@ -52,11 +47,7 @@ class ChapterValidator(Validator):
 
     @property
     def volume_message(self):
-        return f' in volume ({self.curr_volume_formatted})' if self.curr_volume else ''
-
-    @property
-    def curr_volume_formatted(self):
-        format_str = 'index = {index}, content = {content}' \
-            if self.volume_special_field is None or not self.curr_volume.has(self.volume_special_field) \
-            else f'index = {{{self.volume_special_field}}}, content={{content}}'
-        return self.curr_volume.format(format_str)
+        if self.curr_volume:
+            volume_format = self.curr_volume.format('index = {index}, content = {content}')
+            return f' in volume ({volume_format})'
+        return ''

@@ -1,4 +1,4 @@
-type,index,content,formatted,filename
+type,index,content,formatted,source
 VOLUME_TITLE,1,First Volume,Volume 1 First Volume,(1) Volume 1 First Volume
 CHAPTER_TITLE,-1,Intro,Introduction Intro,(1) Introduction Intro.txt
 CHAPTER_TITLE,1,First Chapter,Chapter 1 First Chapter,(2) Chapter 1 First Chapter.txt

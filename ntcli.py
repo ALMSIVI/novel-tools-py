@@ -7,7 +7,7 @@ from utils import get_config
 def do_analyze(args):
     config_filename = args.toolkit + '_config.json'
     if os.path.isfile(args.input):
-        in_dir = os.path.basename(args.input)
+        in_dir = os.path.dirname(args.input)
         config = get_config(config_filename, in_dir)
         analyze(config, filename=args.input, out_dir=args.output)
     else:

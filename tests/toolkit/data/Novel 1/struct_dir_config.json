@@ -59,7 +59,7 @@
     "writers": [
       {
         "class": "CsvWriter",
-        "additional_fields": ["filename"]
+        "additional_fields": ["source"]
       },
       {
         "class": "TocWriter",

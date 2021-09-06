@@ -22,6 +22,8 @@ The author might mix "Chapter 1: The Uprising" and "Chapter 1. The Uprising".
 
 This would result in a wrong table of content that is incomplete and full of mistakes, which also harms the reading experience. This toolkit tries to solve this problem by providing a unified framework for analyzing novel files, generating a better table of contents, and formatting the novel in general. All novels have their unique problems, and there is unlikely that a universal script would suit every need. However, at the very least, one can generate an initial novel structure, and manually correct it if needed.
 
+There are plans to create a GUI version of this toolkit, and/or a [Calibre](https://calibre-ebook.com/) plugin, but there is no timeline.
+
 ## Installation
 
 This project is managed by [Poetry](https://python-poetry.org/), and is built on Python 3.9. After installing Poetry, run `poetry install` to install all dependencies. Run `poetry run pytest` to run all the tests.

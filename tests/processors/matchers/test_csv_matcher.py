@@ -54,11 +54,51 @@ def test_list_type(csv_matcher: CsvMatcher):
 
 
 @mark.data('''
+    content,source,line_num
+    Lorem,test1.txt,1
+    Ipsum,test2.txt,10
+''', {'data_type': 'chapter_title'})
+def test_source_line_num(csv_matcher: CsvMatcher):
+    before = NovelData('Chapter One Lorem', source='test1.txt', line_num=1)
+    after = csv_matcher.process(before)
+    assert after == NovelData('Lorem', Type.CHAPTER_TITLE, 1, source='test1.txt', line_num=1, list_index=1,
+                              matched=True)
+
+    before = NovelData('Chapter Two Ipsum', source='test2.txt', line_num=1)
+    after = csv_matcher.process(before)
+    assert after == NovelData('Chapter Two Ipsum', source='test2.txt', line_num=1)
+
+    before = NovelData('Chapter Two Ipsum', source='test2.txt', line_num=10)
+    after = csv_matcher.process(before)
+    assert after == NovelData('Ipsum', Type.CHAPTER_TITLE, 2, source='test2.txt', line_num=10, list_index=2,
+                              matched=True)
+
+
+@mark.data('''
+    content,line_num
+    Lorem,2
+    Ipsum,5
+''', {'data_type': 'chapter_title'})
+def test_line_num(csv_matcher: CsvMatcher):
+    before = NovelData('Chapter One Lorem', line_num=1)
+    after = csv_matcher.process(before)
+    assert after == NovelData('Chapter One Lorem', line_num=1)
+
+    before = NovelData('Chapter One Lorem', line_num=2)
+    after = csv_matcher.process(before)
+    assert after == NovelData('Lorem', Type.CHAPTER_TITLE, 1, line_num=2, list_index=1, matched=True)
+
+    before = NovelData('Chapter Two Ipsum', line_num=5)
+    after = csv_matcher.process(before)
+    assert after == NovelData('Ipsum', Type.CHAPTER_TITLE, 2, line_num=5, list_index=2, matched=True)
+
+
+@mark.data('''
     content,raw
     Lorem,Chapter One Lorem
     Ipsum,Chapter Two Ipsum
 ''', {'data_type': 'chapter_title', 'fields': ['raw']})
-def test_custom_field(csv_matcher: CsvMatcher):
+def test_raw(csv_matcher: CsvMatcher):
     before = NovelData('Chapter One Lorem', raw='Chapter One Lorem')
     after = csv_matcher.process(before)
     assert after == NovelData('Lorem', Type.CHAPTER_TITLE, 1, list_index=1, matched=True, raw='Chapter One Lorem')

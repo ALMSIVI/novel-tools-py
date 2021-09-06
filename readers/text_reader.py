@@ -26,7 +26,7 @@ class TextReader(Reader, ACC):
         args = self.extract_fields(args)
         filename = args['text_filename']
         full_filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
-        self.filename = filename
+        self.filename = os.path.basename(filename)
         self.file = open(full_filename, 'rt', encoding=args['encoding'])
         self.verbose = args['verbose']
         self.line_num = 0

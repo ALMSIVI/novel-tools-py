@@ -20,24 +20,24 @@ def test_no_discard(directory_reader: DirectoryReader, mocker: MockerFixture):
     mocker.patch('os.listdir', return_value=['Chapter 1.txt', 'Chapter 2.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = directory_reader.read()
-    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, filename='Volume 1')
+    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, source='Volume 1')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 1\n'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, filename='Chapter 1.txt')
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, source='Chapter 1.txt')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 2\n'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2, filename='Chapter 2.txt')
+    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2, source='Chapter 2.txt')
 
     mocker.patch('os.listdir', return_value=['Chapter 3.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = directory_reader.read()
-    assert data == NovelData('Volume 2', Type.VOLUME_TITLE, 2, filename='Volume 2')
+    assert data == NovelData('Volume 2', Type.VOLUME_TITLE, 2, source='Volume 2')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 3\n'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 3', Type.CHAPTER_TITLE, 3, filename='Chapter 3.txt')
+    assert data == NovelData('Chapter 3', Type.CHAPTER_TITLE, 3, source='Chapter 3.txt')
 
     data = directory_reader.read()
     assert data is None
@@ -48,24 +48,24 @@ def test_discard(directory_reader: DirectoryReader, mocker: MockerFixture):
     mocker.patch('os.listdir', return_value=['Chapter 1.txt', 'Chapter 2.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = directory_reader.read()
-    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, filename='Volume 1')
+    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, source='Volume 1')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 1\n'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, filename='Chapter 1.txt')
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, source='Chapter 1.txt')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 2\n'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2, filename='Chapter 2.txt')
+    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2, source='Chapter 2.txt')
 
     mocker.patch('os.listdir', return_value=['Chapter 1.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = directory_reader.read()
-    assert data == NovelData('Volume 2', Type.VOLUME_TITLE, 2, filename='Volume 2')
+    assert data == NovelData('Volume 2', Type.VOLUME_TITLE, 2, source='Volume 2')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 1\n'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, filename='Chapter 1.txt')
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, source='Chapter 1.txt')
 
     data = directory_reader.read()
     assert data is None
@@ -76,17 +76,17 @@ def test_contents(directory_reader: DirectoryReader, mocker: MockerFixture):
     mocker.patch('os.listdir', return_value=['Chapter 1.txt', 'Chapter 2.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = directory_reader.read()
-    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, filename='Volume 1')
+    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, source='Volume 1')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 1\nLorem Ipsum'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, filename='Chapter 1.txt')
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, source='Chapter 1.txt')
     data = directory_reader.read()
     assert data == NovelData('Lorem Ipsum', Type.CHAPTER_CONTENT, None)
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 2\n'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2, filename='Chapter 2.txt')
+    assert data == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2, source='Chapter 2.txt')
     data = directory_reader.read()
     assert data == NovelData('', Type.CHAPTER_CONTENT, None)
 
@@ -103,7 +103,7 @@ def test_intro(directory_reader: DirectoryReader, mocker: MockerFixture):
     mocker.patch('os.listdir', return_value=['Chapter 1.txt', '_intro.txt'])
     mocker.patch('os.path.isfile', return_value=True)
     data = directory_reader.read()
-    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, filename='Volume 1')
+    assert data == NovelData('Volume 1', Type.VOLUME_TITLE, 1, source='Volume 1')
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Volume Intro'))
     data = directory_reader.read()
@@ -111,7 +111,7 @@ def test_intro(directory_reader: DirectoryReader, mocker: MockerFixture):
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 1\nLorem Ipsum'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, filename='Chapter 1.txt')
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, source='Chapter 1.txt')
     data = directory_reader.read()
     assert data == NovelData('Lorem Ipsum', Type.CHAPTER_CONTENT, None)
 
@@ -125,7 +125,7 @@ def test_default_volume(directory_reader: DirectoryReader, mocker: MockerFixture
     mocker.patch('os.path.isfile', return_value=True)
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 1\nLorem Ipsum'))
     data = directory_reader.read()
-    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, filename='Chapter 1.txt')
+    assert data == NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, source='Chapter 1.txt')
 
     data = directory_reader.read()
     assert data is None

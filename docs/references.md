@@ -11,7 +11,7 @@ have to contain the other fields from a NovelData.
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
 - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv file.
-- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently, str, int and bool are supported.
+- types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently, int and bool are supported.
 
 ### DirectoryReader
 
@@ -74,8 +74,8 @@ This csv file does not have to be generated from a CsvWriter; one might copy and
 without the type of the content. In such cases, it might not contain certain fields, such as `line_num` or `type`.
 Therefore, we will set up some rules to match the content and determine the type of the data:
 
-To make a successful match, the user will specify a list of fields to compare. The Matcher will return True if one
-of the fields matches.
+To make a successful match, the Matcher will first check the source and line_num. If they don't exist, it will then
+check for raw and/or content.
 
 To determine the type of the line, the following three checks are done in order:
 - If the csv list contains a "type" field, then it will be used;
@@ -88,7 +88,6 @@ To determine the type of the line, the following three checks are done in order:
 - encoding (str, optional, default=utf-8): Encoding of the csv list file.
 - types (dict, optional, default={'line_num': 'int'}): Type of each additional field to be fetched. Currently, str, int and bool are supported.
 - data_type (str, optional): If present, specifies the type of all the titles.
-- fields (list[str], optional, default=['line_num', 'formatted', 'raw', 'content']): The fields to compare to when matching.
 
 ### NumberedMatcher
 
@@ -222,7 +221,7 @@ can also use the same transformer to attach a 'filename' field, and the writer w
 - debug (bool, optional, default=False): If set to True, will print the error message to the terminal.
 - default_volume (str, optional, default=default): If the volume does not have volumes, specify the directory name to place the chapter files.
 - intro_filename (str, optional, default=_intro.txt): The filename of the book/volume introduction file(s).
-- write_blank (bool, optional, default=True): If set to True, will write blank lines to the files. Sometimes blank lines serve as separators in novels, and we want to keep them.
+- write_newline (bool, optional, default=False): If set to True, will insert a newline after a non-blank line. This will avoid contents on consecutive lines being treated as the same paragraph.
 
 ### MarkdownWriter
 

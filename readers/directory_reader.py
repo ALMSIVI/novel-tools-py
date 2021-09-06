@@ -87,7 +87,7 @@ class DirectoryReader(Reader, ACC):
                 self.curr_chapter = 0
 
             if volume_name != self.default_volume:
-                return NovelData(volume_name, Type.VOLUME_TITLE, self.curr_volume + 1, filename=volume_name)
+                return NovelData(volume_name, Type.VOLUME_TITLE, self.curr_volume + 1, source=volume_name)
             else:
                 self.chapter_index += 1
 
@@ -105,7 +105,7 @@ class DirectoryReader(Reader, ACC):
         if not self.read_contents:
             self.chapter_file.close()
             self.chapter_file = None
-        return NovelData(title.strip(), Type.CHAPTER_TITLE, self.curr_chapter, filename=filename)
+        return NovelData(title.strip(), Type.CHAPTER_TITLE, self.curr_chapter, source=filename)
 
     def read_intro(self):
         self.need_intro = False

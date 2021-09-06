@@ -17,8 +17,7 @@
         "csv_filename": "../list.csv",
         "types": {
           "filename": "str"
-        },
-        "fields": ["filename"]
+        }
       }
     ],
     "writers": [

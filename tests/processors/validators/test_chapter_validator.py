@@ -24,6 +24,13 @@ def tag_validator():
     validator.cleanup()
 
 
+@fixture
+def volume_tag_validator():
+    validator = ChapterValidator({'discard_chapters': False, 'volume_tag': 'extras'})
+    yield validator
+    validator.cleanup()
+
+
 def test_non_title(no_discard_validator: ChapterValidator, discard_validator: ChapterValidator):
     before = NovelData('Non chapter title', Type.VOLUME_TITLE, 1)
     assert no_discard_validator.check(before) is False
@@ -68,6 +75,26 @@ def test_tag(tag_validator: ChapterValidator):
 
     before = NovelData('Chapter 1', Type.CHAPTER_TITLE, 1, tag='extras')
     assert tag_validator.check(before) is True
+
+
+def test_volume_tag(volume_tag_validator: ChapterValidator):
+    before = NovelData('Volume 1', Type.VOLUME_TITLE, 1)
+    assert volume_tag_validator.check(before) is False
+
+    before = NovelData('Chapter 1', Type.CHAPTER_TITLE, 1)
+    assert volume_tag_validator.check(before) is False
+
+    before = NovelData('Volume 1', Type.VOLUME_TITLE, 1, tag='Test')
+    assert volume_tag_validator.check(before) is False
+
+    before = NovelData('Chapter 1', Type.CHAPTER_TITLE, 1)
+    assert volume_tag_validator.check(before) is False
+
+    before = NovelData('Volume 1', Type.VOLUME_TITLE, 1, tag='extras')
+    assert volume_tag_validator.check(before) is False
+
+    before = NovelData('Chapter 1', Type.CHAPTER_TITLE, 1)
+    assert volume_tag_validator.check(before) is True
 
 
 def test_no_volume_messages(no_discard_validator: ChapterValidator):

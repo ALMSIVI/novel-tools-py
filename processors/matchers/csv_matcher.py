@@ -12,8 +12,8 @@ class CsvMatcher(Processor, ACC):
     without the type of the content. In such cases, it might not contain certain fields, such as `line_num` or `type`.
     Therefore, we will set up some rules to match the content and determine the type of the data:
 
-    To make a successful match, the user will specify a list of fields to compare. The Matcher will return True if one
-    of the fields matches.
+    To make a successful match, the Matcher will first check the source and line_num. If they don't exist, it will then
+    check for raw and/or content.
 
     To determine the type of the line, the following three checks are done in order:
     - If the csv list contains a "type" field, then it will be used;
@@ -36,8 +36,6 @@ class CsvMatcher(Processor, ACC):
                                       'supported.'),
             FieldMetadata('data_type', 'str', optional=True,
                           description='If present, specifies the type of all the titles.'),
-            FieldMetadata('fields', 'list[str]', default=['line_num', 'formatted', 'raw', 'content'],
-                          description='The fields to compare to when matching.')
         ]
 
     def __init__(self, args):
@@ -53,8 +51,6 @@ class CsvMatcher(Processor, ACC):
             self.list.append(title)
         reader.cleanup()
 
-        self.fields = args['fields']
-
         # We assume that the list is in order, and can only be matched from the beginning.
         # Therefore, we will keep track of the number of objects that have already been matched.
         # If it exceeds the length of the list we stop matching.
@@ -67,20 +63,41 @@ class CsvMatcher(Processor, ACC):
             return data
 
         next_title = self.list[self.list_index]
-        data_dict = data.flat_dict()
-        next_title_dict = next_title.flat_dict()
-        for field in self.fields:
-            if field in next_title_dict and field in data_dict and next_title_dict[field] == data_dict[field]:
-                self.list_index += 1
-                # The original csv file may not have an `index` column. If it doesn't exist, an index will be auto
-                # generated.
-                data_type = next_title.type
-                if data_type not in self.indices:
-                    self.indices[data_type] = 0
-                self.indices[data_type] += 1
 
-                others = data.others | next_title.others
-                return NovelData(next_title.content, data_type, next_title.index or self.indices[data_type],
-                                 list_index=self.list_index, matched=True, **others)
+        # First, check for `source` (if it exists). This is usually populated if we use a DirectoryWriter or multiple
+        # TextReaders. If we only have one TextReader, there is only one file, so source is not necessary, and we can
+        # simply omit this field when we write the results using a CsvWriter.
+        # If `source` exist and match, compare `line_num`. This will always work because:
+        # - if we used multiple TextReaders, `line_num` will be properly populated;
+        # - if we used a DirectoryWriter previously, there will be no `line_num`, as we are getting titles from the
+        #   directory names and the first line of each file. In this case, if `source` match we are done, and
+        #   `get('line_num')` will always give us None, so the comparison will always be True.
+        if next_title.has('source') and data.has('source'):
+            if next_title.get('source') != data.get('source') or next_title.get('line_num') != data.get('line_num'):
+                return data
+            return self.merge(next_title, data)
+
+        # If we only have one TextReader and don't have `source` in the csv, we simply compare line_num.
+        if next_title.has('line_num') and data.has('line_num'):
+            if next_title.get('line_num') != data.get('line_num'):
+                return data
+            return self.merge(next_title, data)
+
+        # If the csv is not created from a CsvWriter and doesn't have `line_num`, we will use raw and/or content.
+        if next_title.get('raw', next_title.content) == data.get('raw', data.content):
+            return self.merge(next_title, data)
 
         return data
+
+    def merge(self, title: NovelData, data: NovelData) -> NovelData:
+        self.list_index += 1
+        # The original csv file may not have an `index` column. If it doesn't exist, an index will be auto
+        # generated.
+        data_type = title.type
+        if data_type not in self.indices:
+            self.indices[data_type] = 0
+        self.indices[data_type] += 1
+
+        others = data.others | title.others
+        return NovelData(title.content, data_type, title.index or self.indices[data_type],
+                         list_index=self.list_index, matched=True, **others)
