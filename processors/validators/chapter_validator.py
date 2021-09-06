@@ -28,7 +28,7 @@ class ChapterValidator(Validator):
 
     def check(self, data: NovelData) -> bool:
         if data.type == Type.VOLUME_TITLE:
-            self.validate_curr_volume = data.get('tag') == self.volume_tag
+            self.validate_curr_volume = self.volume_tag is None or self.volume_tag == data.get('tag')
 
             self.curr_volume = data
             if self.discard_chapters:
