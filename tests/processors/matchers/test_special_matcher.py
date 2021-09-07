@@ -1,67 +1,54 @@
-from pytest import fixture
+from pytest import fixture, mark, FixtureRequest
 from common import NovelData, Type
 from processors.matchers.special_matcher import SpecialMatcher
 
 
 @fixture
-def simple_matcher():
-    matcher = SpecialMatcher({
+def special_matcher(request: FixtureRequest):
+    node = request.node.get_closest_marker('args')
+    custom_args = node.args[0] if node else {}
+    args = {
         'type': 'chapter_title',
         'affixes': ['Introduction', 'Prelude'],
         'regex': '^{affixes} (.+)$'
-    })
+    }
+    matcher = SpecialMatcher(args | custom_args)
     yield matcher
     matcher.cleanup()
 
 
-@fixture
-def group_matcher():
-    matcher = SpecialMatcher({
-        'type': 'chapter_title',
-        'affixes': ['Introduction'],
-        'regex': '^(.+) of {affixes}$',
-        'affix_group': 1,
-        'content_group': 0
-    })
-    yield matcher
-    matcher.cleanup()
-
-
-@fixture
-def tag_matcher():
-    matcher = SpecialMatcher({
-        'type': 'chapter_title',
-        'affixes': ['Introduction'],
-        'regex': '^{affixes} (.+)$',
-        'tag': 'intro'
-    })
-    yield matcher
-    matcher.cleanup()
-
-
-def test_process(simple_matcher: SpecialMatcher):
+def test_process(special_matcher: SpecialMatcher):
     before = NovelData('Introduction Test')
-    after = simple_matcher.process(before)
+    after = special_matcher.process(before)
     assert after == NovelData('Test', Type.CHAPTER_TITLE, -1, affix='Introduction', tag='special', matched=True)
 
     before = NovelData('Prelude Test')
-    after = simple_matcher.process(before)
+    after = special_matcher.process(before)
     assert after == NovelData('Test', Type.CHAPTER_TITLE, -2, affix='Prelude', tag='special', matched=True)
 
 
-def test_process_fail(simple_matcher: SpecialMatcher):
+def test_process_fail(special_matcher: SpecialMatcher):
     before = NovelData('Foreword Test')
-    after = simple_matcher.process(before)
+    after = special_matcher.process(before)
     assert after == NovelData('Foreword Test', Type.UNRECOGNIZED, None)
 
 
-def test_group(group_matcher: SpecialMatcher):
+@mark.args({'regex': '^(.+) of {affixes}$', 'affix_group': 1, 'content_group': 0})
+def test_group(special_matcher: SpecialMatcher):
     before = NovelData('Test of Introduction')
-    after = group_matcher.process(before)
+    after = special_matcher.process(before)
     assert after == NovelData('Test', Type.CHAPTER_TITLE, -1, affix='Introduction', tag='special', matched=True)
 
 
-def test_tag(tag_matcher: SpecialMatcher):
+@mark.args({'regex': '^{affixes}$', 'content_group': -1})
+def test_no_content(special_matcher: SpecialMatcher):
+    before = NovelData('Introduction')
+    after = special_matcher.process(before)
+    assert after == NovelData('', Type.CHAPTER_TITLE, -1, affix='Introduction', tag='special', matched=True)
+
+
+@mark.args({'regex': '^{affixes} (.+)$', 'tag': 'intro'})
+def test_tag(special_matcher: SpecialMatcher):
     before = NovelData('Introduction Test')
-    after = tag_matcher.process(before)
+    after = special_matcher.process(before)
     assert after == NovelData('Test', Type.CHAPTER_TITLE, -1, affix='Introduction', tag='intro', matched=True)

@@ -1,4 +1,4 @@
 type,index,content,formatted,line_num
-CHAPTER_TITLE,1,第一章,Chapter 1,9
-CHAPTER_TITLE,2,第2章,Chapter 2,18
-CHAPTER_TITLE,3,第三章,Chapter 3,24
+CHAPTER_TITLE,1,,Chapter 1,9
+CHAPTER_TITLE,2,,Chapter 2,18
+CHAPTER_TITLE,3,,Chapter 3,24

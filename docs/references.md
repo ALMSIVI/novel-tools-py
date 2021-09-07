@@ -97,7 +97,7 @@ Matches a regular chapter/volume, with an index and/or a title.
 - type (str): Specifies the type for this matcher.
 - regex (str): The regex to match for. It will contain two groups: the first group is the index, the second (optional) is the title.
 - index_group (int, optional, default=0): The group index for the title's order/index (starting from 0).
-- content_group (int, optional, default=1): The group index for the title's content (starting from 0). Use 0 if there is no content, in which case the entire title will be used as content.
+- content_group (int, optional, default=1): The group index for the title's content (starting from 0). Use -1 if there is no content.
 - tag (str, optional, default=None): The tag to append to matched data. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
 
 ### SpecialMatcher
@@ -116,7 +116,7 @@ field will be attached to the object.
 - affixes (list[str]): List of special names to match for.
 - regex (str): The regex to match for. It will contain an "affixes" format, that will be replaced with the list of affixes. Example: ^{affixes}$ will match lines with any of the affixes.
 - affix_group (int, optional, default=0): The group index for the title's affix (starting from 0).
-- content_group (int, optional, default=1): The group index for the title's content (starting from 0).
+- content_group (int, optional, default=1): The group index for the title's content (starting from 0). Use -1 if there is no content.
 - tag (str, optional, default=special): The tag to append to matched data. This can be used in TitleValidator for different formats.
 
 ### TocMatcher

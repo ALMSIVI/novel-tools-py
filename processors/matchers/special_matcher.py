@@ -27,7 +27,8 @@ class SpecialMatcher(Processor, ACC):
             FieldMetadata('affix_group', 'int', default=0,
                           description='The group index for the title\'s affix (starting from 0).'),
             FieldMetadata('content_group', 'int', default=1,
-                          description='The group index for the title\'s content (starting from 0).'),
+                          description='The group index for the title\'s content (starting from 0). Use -1 if there is '
+                                      'no content.'),
             FieldMetadata('tag', 'str', default='special',
                           description='The tag to append to matched data. This can be used in TitleValidator for '
                                       'different formats.')
@@ -51,7 +52,7 @@ class SpecialMatcher(Processor, ACC):
         if m:
             for i in range(len(self.affixes)):
                 if m[self.affix_group] == self.affixes[i]:
-                    title = m[self.content_group].strip()
+                    title = m[self.content_group].strip() if self.content_group != 0 else ''
                     tag = {'tag': self.tag} if self.tag else {}
                     return NovelData(title, self.type, -i - 1, matched=True, affix=self.affixes[i],
                                      **(data.others | tag))
