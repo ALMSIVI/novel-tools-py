@@ -54,7 +54,7 @@ class ACC(ABC):
                 fields[key] = val
 
         for key, val in metadata_dict.items():
-            if not val.optional and val.include_when(args):
+            if not val.optional:
                 raise ValueError(f'Required argument {key} not found')
             if type(val.default) is not Null:
                 fields[key] = val.default
