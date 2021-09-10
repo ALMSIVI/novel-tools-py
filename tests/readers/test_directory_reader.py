@@ -94,7 +94,7 @@ def test_contents(directory_reader: DirectoryReader, mocker: MockerFixture):
     assert data is None
 
 
-@mark.args({'read_contents': True, 'discard_chapters': False}, ['Volume 1', '_intro.txt'], [True, False], True)
+@mark.args({'read_contents': True, 'discard_chapters': False}, ['Volume 1', '_intro.txt'], [False, True], True)
 def test_intro(directory_reader: DirectoryReader, mocker: MockerFixture):
     mocker.patch('builtins.open', mocker.mock_open(read_data='Book Intro'))
     data = directory_reader.read()

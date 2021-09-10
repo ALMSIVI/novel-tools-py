@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from natsort import natsorted
+from natsort import os_sorted
 from common import NovelData, Type, ACC, FieldMetadata
 from framework import Reader
 
@@ -40,7 +40,7 @@ class DirectoryReader(Reader, ACC):
 
         # Create the list of volumes/directories to look for
         self.need_intro = self.read_contents and os.path.isfile(os.path.join(self.in_dir, self.intro_filename))
-        self.volumes = [dir_name for dir_name in natsorted(os.listdir(self.in_dir)) if
+        self.volumes = [dir_name for dir_name in os_sorted(os.listdir(self.in_dir)) if
                         os.path.isdir(os.path.join(self.in_dir, dir_name))]
         if self.default_volume in self.volumes:
             self.volumes = [self.default_volume]
@@ -73,7 +73,7 @@ class DirectoryReader(Reader, ACC):
 
             volume_name = self.volumes[self.curr_volume]
             volume_dir = os.path.join(self.in_dir, volume_name)
-            self.chapters = [filename for filename in natsorted(os.listdir(volume_dir)) if
+            self.chapters = [filename for filename in os_sorted(os.listdir(volume_dir)) if
                              os.path.isfile(os.path.join(volume_dir, filename))]
 
             # Check for volume intro files

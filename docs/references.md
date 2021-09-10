@@ -104,12 +104,13 @@ Matches a regular chapter/volume, with an index and/or a title.
 
 **Description:**
 
-Matches a special title, whose affixes are in the given list. Examples of special
-titles include Introduction, Foreword, or Conclusion.
+Matches a special title, whose affixes are in the given list. Examples of special titles include Introduction,
+Foreword, or Conclusion. It can also be used without any affixes, in which you can simply use an empty affix array
+and just match the content.
 
-As they usually don't have a regular index, they will be assigned negative values, depending on their order in the
-list. The use of negative values is to avoid collision with regular titles in validators. Additionally, an "affix"
-field will be attached to the object.
+As special titles don't have an index, they will be assigned non-positive values, depending on their order in
+the list. It is done to avoid collision with regular titles in validators. Additionally, an "affix" field will be
+attached to the object.
 
 **Arguments:**
 - type (str): Specifies the type for this matcher.

@@ -5,12 +5,13 @@ from common import NovelData, Type, ACC, FieldMetadata
 
 class SpecialMatcher(Processor, ACC):
     """
-    Matches a special title, whose affixes are in the given list. Examples of special
-    titles include Introduction, Foreword, or Conclusion.
+    Matches a special title, whose affixes are in the given list. Examples of special titles include Introduction,
+    Foreword, or Conclusion. It can also be used without any affixes, in which you can simply use an empty affix array
+    and just match the content.
 
-    As they usually don't have a regular index, they will be assigned negative values, depending on their order in the
-    list. The use of negative values is to avoid collision with regular titles in validators. Additionally, an "affix"
-    field will be attached to the object.
+    As special titles don't have an index, they will be assigned non-positive values, depending on their order in
+    the list. It is done to avoid collision with regular titles in validators. Additionally, an "affix" field will be
+    attached to the object.
     """
 
     @staticmethod
@@ -56,5 +57,11 @@ class SpecialMatcher(Processor, ACC):
                     tag = {'tag': self.tag} if self.tag else {}
                     return NovelData(title, self.type, -i - 1, matched=True, affix=self.affixes[i],
                                      **(data.others | tag))
+
+            # If there is a match but no affixes are found, it might be the case that there is no affix at all.
+            # In this case, leave the affix empty.
+            title = m[self.content_group].strip() if self.content_group != 0 else ''
+            tag = {'tag': self.tag} if self.tag else {}
+            return NovelData(title, self.type, 0, matched=True, affix='', **(data.others | tag))
 
         return data
