@@ -48,7 +48,7 @@ class StructureWriter(Writer, ACC, ABC):
         self.has_volumes = False
 
     def accept(self, data: NovelData) -> None:
-        if data.has('error'):
+        if data.get('error', '') != '':
             print(data.get('error'))
 
         if data.type == Type.BOOK_TITLE:

@@ -13,7 +13,7 @@ def pattern_transformer():
                 },
                 'subs': [
                     {
-                        'pattern': '\*{3,}',
+                        'pattern': '\\*{3,}',
                         'new': '---'
                     },
                     {
