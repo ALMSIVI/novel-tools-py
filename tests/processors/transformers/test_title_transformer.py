@@ -5,7 +5,7 @@ from processors.transformers.title_transformer import TitleTransformer
 
 @fixture
 def title_transformer():
-    transformer = TitleTransformer({
+    return TitleTransformer({
         'units': [
             {
                 'filter': {
@@ -32,8 +32,6 @@ def title_transformer():
             }
         ]
     })
-    yield transformer
-    transformer.cleanup()
 
 
 def test_transform(title_transformer: TitleTransformer):

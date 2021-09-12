@@ -11,8 +11,7 @@ def read(mocker: MockerFixture, request: FixtureRequest):
     mocker.patch('os.listdir', return_value=dir_list)
     mocker.patch('os.path.isdir', side_effect=is_dir)
     mocker.patch('os.path.isfile', return_value=isfile)
-    reader = DirectoryReader(args | {'in_dir': '.'})
-    return reader.read()
+    return DirectoryReader(args | {'in_dir': '.'}).read()
 
 
 @mark.args({'read_contents': False, 'discard_chapters': False}, ['Volume 1', 'Volume 2'], [True, True], False)

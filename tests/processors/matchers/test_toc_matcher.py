@@ -14,9 +14,7 @@ def toc_matcher(mocker: MockerFixture, request: FixtureRequest):
     toc, args = request.node.get_closest_marker('data').args
     toc = format_structure(toc)
     mocker.patch('builtins.open', mocker.mock_open(read_data=toc))
-    matcher = TocMatcher(args | {'in_dir': ''})
-    yield matcher
-    matcher.cleanup()
+    return TocMatcher(args | {'in_dir': ''})
 
 
 @mark.data('''

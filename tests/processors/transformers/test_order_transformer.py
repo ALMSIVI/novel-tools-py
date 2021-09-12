@@ -5,9 +5,7 @@ from processors.transformers.order_transformer import OrderTransformer
 
 @fixture
 def order_transformer():
-    transformer = OrderTransformer({})
-    yield transformer
-    transformer.cleanup()
+    return OrderTransformer({})
 
 
 def test_process(order_transformer):

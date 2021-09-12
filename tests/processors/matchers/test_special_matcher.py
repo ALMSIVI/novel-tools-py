@@ -12,9 +12,7 @@ def special_matcher(request: FixtureRequest):
         'affixes': ['Introduction', 'Prelude'],
         'regex': '^{affixes} (.+)$'
     }
-    matcher = SpecialMatcher(args | custom_args)
-    yield matcher
-    matcher.cleanup()
+    return SpecialMatcher(args | custom_args)
 
 
 def test_process(special_matcher: SpecialMatcher):

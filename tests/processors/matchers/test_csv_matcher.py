@@ -14,9 +14,7 @@ def csv_matcher(mocker: MockerFixture, request: FixtureRequest):
     csv, args = request.node.get_closest_marker('data').args
     csv = format_structure(csv)
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
-    matcher = CsvMatcher(args | {'in_dir': ''})
-    yield matcher
-    matcher.cleanup()
+    return CsvMatcher(args | {'in_dir': ''})
 
 
 @mark.data('''

@@ -11,9 +11,7 @@ def numbered_matcher(request: FixtureRequest):
         'type': 'volume_title',
         'regex': '^Volume (.+) (.+)$'
     }
-    matcher = NumberedMatcher(args | custom_args)
-    yield matcher
-    matcher.cleanup()
+    return NumberedMatcher(args | custom_args)
 
 
 def test_process(numbered_matcher: NumberedMatcher):

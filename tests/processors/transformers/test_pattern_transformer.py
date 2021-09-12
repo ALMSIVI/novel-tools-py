@@ -5,7 +5,7 @@ from processors.transformers.pattern_transformer import PatternTransformer
 
 @fixture
 def pattern_transformer():
-    transformer = PatternTransformer({
+    return PatternTransformer({
         'units': [
             {
                 'filter': {
@@ -35,8 +35,6 @@ def pattern_transformer():
             }
         ]
     })
-    yield transformer
-    transformer.cleanup()
 
 
 def test_pattern(pattern_transformer: PatternTransformer):

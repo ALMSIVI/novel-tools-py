@@ -15,8 +15,7 @@ def read(mocker: MockerFixture, request: FixtureRequest):
     csv = request.node.get_closest_marker('data').args[0]
     csv = format_csv(csv)
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
-    reader = CsvReader({'in_dir': ''})
-    return reader.read()
+    return CsvReader({'in_dir': ''}).read()
 
 
 @mark.data('''

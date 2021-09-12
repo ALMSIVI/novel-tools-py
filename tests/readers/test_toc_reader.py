@@ -15,8 +15,7 @@ def read(mocker: MockerFixture, request: FixtureRequest):
     toc, args = request.node.get_closest_marker('data').args
     toc = format_structure(toc)
     mocker.patch('builtins.open', mocker.mock_open(read_data=toc))
-    reader = TocReader(args | {'in_dir': ''})
-    return reader.read()
+    return TocReader(args | {'in_dir': ''}).read()
 
 
 @mark.data('''

@@ -5,30 +5,22 @@ from processors.validators.chapter_validator import ChapterValidator
 
 @fixture
 def no_discard_validator():
-    validator = ChapterValidator({'discard_chapters': False})
-    yield validator
-    validator.cleanup()
+    return ChapterValidator({'discard_chapters': False})
 
 
 @fixture
 def discard_validator():
-    validator = ChapterValidator({'discard_chapters': True})
-    yield validator
-    validator.cleanup()
+    return ChapterValidator({'discard_chapters': True})
 
 
 @fixture
 def tag_validator():
-    validator = ChapterValidator({'discard_chapters': False, 'tag': 'extras'})
-    yield validator
-    validator.cleanup()
+    return ChapterValidator({'discard_chapters': False, 'tag': 'extras'})
 
 
 @fixture
 def volume_tag_validator():
-    validator = ChapterValidator({'discard_chapters': False, 'volume_tag': 'extras'})
-    yield validator
-    validator.cleanup()
+    return ChapterValidator({'discard_chapters': False, 'volume_tag': 'extras'})
 
 
 def test_non_title(no_discard_validator: ChapterValidator, discard_validator: ChapterValidator):

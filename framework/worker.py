@@ -18,7 +18,5 @@ class Worker:
                 for writer in self.writers:
                     writer.write(obj)
 
-        for processor in self.processors:
-            processor.cleanup()
         for writer in self.writers:
             writer.cleanup()

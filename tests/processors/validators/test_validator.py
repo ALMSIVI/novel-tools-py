@@ -16,23 +16,17 @@ class StubValidator(Validator):
 
 @fixture
 def overwrite_validator():
-    validator = StubValidator({})
-    yield validator
-    validator.cleanup()
+    return StubValidator({})
 
 
 @fixture
 def no_overwrite_validator():
-    validator = StubValidator({'overwrite': False})
-    yield validator
-    validator.cleanup()
+    return StubValidator({'overwrite': False})
 
 
 @fixture
 def index_validator():
-    validator = StubValidator({'begin_index': 128})
-    yield validator
-    validator.cleanup()
+    return StubValidator({'begin_index': 128})
 
 
 def test_duplicate(overwrite_validator: StubValidator, no_overwrite_validator: StubValidator):

@@ -9,8 +9,7 @@ from readers.text_reader import TextReader
 def read(mocker: MockerFixture, request: FixtureRequest):
     text, args = request.node.get_closest_marker('data').args
     mocker.patch('builtins.open', mocker.mock_open(read_data=text))
-    reader = TextReader(args | {'filename': 'text.txt', 'in_dir': ''})
-    return reader.read()
+    return TextReader(args | {'filename': 'text.txt', 'in_dir': ''}).read()
 
 
 @mark.data('line\n ', {})

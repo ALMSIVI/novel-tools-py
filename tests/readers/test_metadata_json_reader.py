@@ -9,8 +9,7 @@ from readers.metadata_json_reader import MetadataJsonReader
 def read(mocker: MockerFixture, request: FixtureRequest):
     text = request.node.get_closest_marker('data').args[0]
     mocker.patch('builtins.open', mocker.mock_open(read_data=text))
-    reader = MetadataJsonReader({'in_dir': ''})
-    return reader.read()
+    return MetadataJsonReader({'in_dir': ''}).read()
 
 
 @mark.data('{"title": "Test Title", "author": "Test Author"}')

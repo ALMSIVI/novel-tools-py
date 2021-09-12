@@ -7,12 +7,10 @@ from processors.matchers.__aggregate_matcher__ import AggregateMatcher
 
 @fixture
 def aggregate_matcher():
-    matcher = AggregateMatcher([
+    return AggregateMatcher([
         NumberedMatcher({'type': 'volume_title', 'regex': 'Volume (.+) (.+)'}),
         SpecialMatcher({'type': 'chapter_title', 'affixes': ['Introduction', 'Prelude'], 'regex': '^{affixes} (.+)$'})
     ])
-    yield matcher
-    matcher.cleanup()
 
 
 def test_numbered(aggregate_matcher: AggregateMatcher):
