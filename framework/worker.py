@@ -11,14 +11,12 @@ class Worker:
 
     def work(self):
         for reader in self.readers:
-            while obj := reader.read():
+            for obj in reader.read():
                 for processor in self.processors:
                     obj = processor.process(obj)
 
                 for writer in self.writers:
                     writer.write(obj)
-
-            reader.cleanup()
 
         for processor in self.processors:
             processor.cleanup()

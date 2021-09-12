@@ -28,12 +28,7 @@ class TocMatcher(Processor, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        self.list = []
-        reader = TocReader(args)
-        while title := reader.read():
-            self.list.append(title)
-        reader.cleanup()
-
+        self.list = list(TocReader(args).read())
         self.list_index = 0
 
     def process(self, data: NovelData) -> NovelData:

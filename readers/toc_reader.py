@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Iterator
 from framework import Reader
 from common import NovelData, Type, ACC, FieldMetadata
 
@@ -27,40 +27,36 @@ class TocReader(Reader, ACC):
         args = self.extract_fields(args)
         self.has_volume = args['has_volume']
         self.discard_chapters = args['discard_chapters']
-        filename = args['toc_filename']
-        filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
-        self.file = open(filename, 'rt', encoding=args['encoding'])
-        self.indices = {Type.VOLUME_TITLE: 0, Type.CHAPTER_TITLE: 0}
+        self.filename = args['toc_filename']
+        self.in_dir = args['in_dir']
+        self.encoding = args['encoding']
 
-    def cleanup(self):
-        self.file.close()
+    def read(self) -> Iterator[NovelData]:
+        full_filename = self.filename if os.path.isfile(self.filename) else os.path.join(self.in_dir, self.filename)
+        with open(full_filename, 'rt', encoding=self.encoding) as f:
+            indices = {Type.VOLUME_TITLE: 0, Type.CHAPTER_TITLE: 0}
+            for line in f:
+                elements = line.split('\t')
+                line_num = None
+                if elements[0] == '':
+                    # Must be chapter
+                    content = elements[1]
+                    data_type = Type.CHAPTER_TITLE
+                    if len(elements) > 2:
+                        line_num = int(elements[2])
+                else:
+                    # Could be volume or chapter depending on has_volume
+                    content = elements[0]
+                    data_type = Type.VOLUME_TITLE if self.has_volume else Type.CHAPTER_TITLE
+                    if len(elements) > 1:
+                        line_num = int(elements[1])
 
-    def read(self) -> Optional[NovelData]:
-        line = self.file.readline()
-        if not line:
-            return None
+                    if data_type == Type.VOLUME_TITLE and self.discard_chapters:
+                        indices[Type.CHAPTER_TITLE] = 0
 
-        elements = line.split('\t')
-        line_num = None
-        if elements[0] == '':
-            # Must be chapter
-            content = elements[1]
-            data_type = Type.CHAPTER_TITLE
-            if len(elements) > 2:
-                line_num = int(elements[2])
-        else:
-            # Could be volume or chapter depending on has_volume
-            content = elements[0]
-            data_type = Type.VOLUME_TITLE if self.has_volume else Type.CHAPTER_TITLE
-            if len(elements) > 1:
-                line_num = int(elements[1])
+                indices[data_type] += 1
+                data = NovelData(content.strip(), data_type, indices[data_type])
+                if line_num is not None:
+                    data.set(line_num=line_num)
 
-            if data_type == Type.VOLUME_TITLE and self.discard_chapters:
-                self.indices[Type.CHAPTER_TITLE] = 0
-
-        self.indices[data_type] += 1
-        data = NovelData(content.strip(), data_type, self.indices[data_type])
-        if line_num is not None:
-            data.set(line_num=line_num)
-
-        return data
+                yield data

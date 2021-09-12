@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import Iterator
 
 
 class Reader(ABC):
-    def cleanup(self):
-        pass
-
     @abstractmethod
-    def read(self):
+    def read(self) -> Iterator:
         pass

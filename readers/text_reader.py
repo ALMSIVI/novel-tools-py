@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Iterator
 from framework import Reader
 from common import NovelData, ACC, FieldMetadata
 
@@ -24,22 +24,17 @@ class TextReader(Reader, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        filename = args['text_filename']
-        full_filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
-        self.filename = os.path.basename(filename)
-        self.file = open(full_filename, 'rt', encoding=args['encoding'])
+        self.filename = args['text_filename']
+        self.in_dir = args['in_dir']
+        self.encoding = args['encoding']
         self.verbose = args['verbose']
-        self.line_num = 0
 
-    def cleanup(self):
-        self.file.close()
-
-    def read(self) -> Optional[NovelData]:
-        self.line_num += 1
-        content = self.file.readline()
-        if not content:
-            return None
-
-        content = content.strip()
-        args = {'source': self.filename, 'line_num': self.line_num, 'raw': content} if self.verbose else {}
-        return NovelData(content.strip(), **args)
+    def read(self) -> Iterator[NovelData]:
+        full_filename = self.filename if os.path.isfile(self.filename) else os.path.join(self.in_dir, self.filename)
+        source = os.path.basename(self.filename)
+        with open(full_filename, 'rt', encoding=self.encoding) as f:
+            line_num = 0
+            for line in f:
+                line_num += 1
+                args = {'source': source, 'line_num': line_num, 'raw': line.rstrip()} if self.verbose else {}
+                yield NovelData(line.strip(), **args)

@@ -40,16 +40,12 @@ class CsvMatcher(Processor, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        self.list = []
-        reader = CsvReader(args)
-        while title := reader.read():
+        self.list = list(CsvReader(args).read())
+        for title in self.list:
             if 'data_type' in args:
                 title.type = Type[args['data_type'].upper()]
             elif title.type == Type.UNRECOGNIZED:
                 raise ValueError('Type of title is not specified in file or arguments.')
-
-            self.list.append(title)
-        reader.cleanup()
 
         # We assume that the list is in order, and can only be matched from the beginning.
         # Therefore, we will keep track of the number of objects that have already been matched.

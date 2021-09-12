@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Iterator
 from natsort import os_sorted
 from common import NovelData, Type, ACC, FieldMetadata
 from framework import Reader
@@ -39,81 +39,41 @@ class DirectoryReader(Reader, ACC):
         self.intro_filename = args['intro_filename']
 
         # Create the list of volumes/directories to look for
-        self.need_intro = self.read_contents and os.path.isfile(os.path.join(self.in_dir, self.intro_filename))
         self.volumes = [dir_name for dir_name in os_sorted(os.listdir(self.in_dir)) if
                         os.path.isdir(os.path.join(self.in_dir, dir_name))]
         if self.default_volume in self.volumes:
             self.volumes = [self.default_volume]
 
-        self.chapters = []
-        self.curr_volume = -1
-        self.curr_chapter = 0  # The true chapter index, i.e., it will be affected by discard_chapters.
-        self.chapter_index = -1  # The index in self.chapters, and will be reset when entering a new volume.
-        self.chapter_file = None
+    def read(self) -> Iterator[NovelData]:
+        # Read intro file
+        intro_filename = os.path.join(self.in_dir, self.intro_filename)
+        if self.read_contents and os.path.isfile(intro_filename):
+            with open(intro_filename, 'rt', encoding=self.encoding) as f:
+                yield NovelData(f.read(), Type.BOOK_INTRO)
 
-    def cleanup(self):
-        if self.chapter_file and not self.chapter_file.closed:
-            self.chapter_file.close()
-
-    def read(self) -> Optional[NovelData]:
-        if self.need_intro:
-            return self.read_intro()
-
-        # Read chapter contents
-        if self.chapter_file:
-            return self.read_chapter()
-
-        self.chapter_index += 1
-        # Proceed to next volume
-        if self.curr_volume == -1 or self.chapter_index == len(self.chapters):
-            self.curr_volume += 1
-            if self.curr_volume == len(self.volumes):
-                # End of novel
-                return None
-
-            volume_name = self.volumes[self.curr_volume]
-            volume_dir = os.path.join(self.in_dir, volume_name)
-            self.chapters = [filename for filename in os_sorted(os.listdir(volume_dir)) if
-                             os.path.isfile(os.path.join(volume_dir, filename))]
-
-            # Check for volume intro files
-            if self.intro_filename in self.chapters:
-                self.chapters.remove(self.intro_filename)
-                if self.read_contents:
-                    self.chapters.insert(0, self.intro_filename)
-
-            self.chapter_index = -1
+        volume_index = 0
+        chapter_index = 0
+        for volume in self.volumes:
+            volume_index += 1
             if self.discard_chapters:
-                self.curr_chapter = 0
+                chapter_index = 0
 
-            if volume_name != self.default_volume:
-                return NovelData(volume_name, Type.VOLUME_TITLE, self.curr_volume + 1, source=volume_name)
-            else:
-                self.chapter_index += 1
+            if volume != self.default_volume:
+                yield NovelData(volume, Type.VOLUME_TITLE, volume_index, source=volume)
 
-        # Read the next chapter or volume intro
-        filename = self.chapters[self.chapter_index]
-        full_filename = os.path.join(self.in_dir, self.volumes[self.curr_volume], filename)
-        if filename == self.intro_filename:
-            with open(full_filename, 'rt', encoding=self.encoding) as f:
-                return NovelData(f.read(), Type.VOLUME_INTRO)
+            volume_path = os.path.join(self.in_dir, volume)
+            chapters = [chapter for chapter in os_sorted(os.listdir(volume_path))
+                        if os.path.isfile(os.path.join(volume_path, chapter))]
+            # Read intro file
+            if self.intro_filename in chapters:
+                chapters.remove(self.intro_filename)
+                if self.read_contents:
+                    with open(os.path.join(volume_path, self.intro_filename), 'rt', encoding=self.encoding) as f:
+                        yield NovelData(f.read(), Type.VOLUME_INTRO)
 
-        # Read chapter title
-        self.curr_chapter += 1
-        self.chapter_file = open(full_filename, 'rt', encoding=self.encoding)
-        title = self.chapter_file.readline()
-        if not self.read_contents:
-            self.chapter_file.close()
-            self.chapter_file = None
-        return NovelData(title.strip(), Type.CHAPTER_TITLE, self.curr_chapter, source=filename)
-
-    def read_intro(self):
-        self.need_intro = False
-        with open(os.path.join(self.in_dir, self.intro_filename), 'rt', encoding=self.encoding) as f:
-            return NovelData(f.read(), Type.BOOK_INTRO)
-
-    def read_chapter(self):
-        contents = self.chapter_file.read()
-        self.chapter_file.close()
-        self.chapter_file = None
-        return NovelData(contents, Type.CHAPTER_CONTENT)
+            for chapter in chapters:
+                chapter_index += 1
+                with open(os.path.join(volume_path, chapter), 'rt', encoding=self.encoding) as f:
+                    yield NovelData(f.readline().strip(), Type.CHAPTER_TITLE, chapter_index, source=chapter)
+                    if self.read_contents:
+                        yield NovelData(f.read(), Type.CHAPTER_CONTENT)

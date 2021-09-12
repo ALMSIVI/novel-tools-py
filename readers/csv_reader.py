@@ -1,6 +1,6 @@
 import csv
 import os
-from typing import Optional
+from typing import Iterator
 from framework import Reader
 from common import NovelData, Type, ACC, FieldMetadata
 
@@ -37,33 +37,27 @@ class CsvReader(Reader, ACC):
             for row in reader:
                 self.list.append(row)
 
-            self.index = 0
-
-        first = self.list[0]
-        if 'content' not in first:
+        if 'content' not in self.list[0]:
             raise ValueError('csv does not contain valid columns.')
 
         self.types = args['types']
 
-    def read(self) -> Optional[NovelData]:
-        if self.index >= len(self.list):
-            return None
+    def read(self) -> Iterator[NovelData]:
+        for i in range(len(self.list)):
+            data = self.list[i]
+            content = data.pop('content')
+            data_type = Type[data.pop('type', 'unrecognized').upper()]
+            index = data.pop('index', None)
+            if index is not None:
+                index = int(index)
 
-        data = self.list[self.index]
-        content = data.pop('content')
-        data_type = Type[data.pop('type', 'unrecognized').upper()]
-        index = data.pop('index', None)
-        if index is not None:
-            index = int(index)
+            for name, field_type in self.types.items():
+                if name not in data:
+                    continue
 
-        for name, field_type in self.types.items():
-            if name not in data:
-                continue
+                if field_type == 'int':
+                    data[name] = int(data[name])
+                if field_type == 'bool':
+                    data[name] = bool(data[name])
 
-            if field_type == 'int':
-                data[name] = int(data[name])
-            if field_type == 'bool':
-                data[name] = bool(data[name])
-
-        self.index += 1
-        return NovelData(content, data_type, index, **data)
+            yield NovelData(content, data_type, index, **data)

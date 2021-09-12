@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Optional
+from typing import Iterator
 from framework import Reader
 from common import NovelData, Type, ACC, FieldMetadata
 
@@ -34,13 +34,7 @@ class MetadataJsonReader(Reader, ACC):
         if 'title' not in self.metadata:
             raise ValueError('Metadata does not contain "title" field.')
 
-        self.consumed = False
-
-    def read(self) -> Optional[NovelData]:
-        if self.consumed:
-            return None
-
-        self.consumed = True
+    def read(self) -> Iterator[NovelData]:
         title = self.metadata['title']
         self.metadata.pop('title')
-        return NovelData(title, Type.BOOK_TITLE, **self.metadata)
+        yield NovelData(title, Type.BOOK_TITLE, **self.metadata)
