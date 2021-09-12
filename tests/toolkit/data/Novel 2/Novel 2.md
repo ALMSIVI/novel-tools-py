@@ -12,16 +12,13 @@ It contains duplicate and missing volumes, but no such chapters.
 
 For analyze, this novel will use a TocWriter.
 
-
 ### Summary 1 First summary
 
 This is the first summary.
 
 Since this is indexed independently of the regular chapters, it does not count as a duplicate index. In practice, we will create a separate Matcher and Validator, and set the tag to "summary".
 
-
 ## Volume 2 Second Volume
-
 
 ### Chapter 1 First Chapter of Second Volume
 
@@ -31,16 +28,13 @@ Also, the above volume should be the second volume.
 
 However, the author made a mistake and swapped the second and third volume indices. Hopefully our VolumeValidator and figure this out!
 
-
 ### Summary 2 Second Summary
 
 This is the second summary.
 
 It does not follow the above "Chapter 1", but instead "Summary 1", as it will use the "summary" tag.
 
-
 ## Volume 3 Third Volume
-
 
 ### Summary 3 Third Summary
 

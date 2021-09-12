@@ -24,18 +24,13 @@ class TypeTransformer(Processor, ACC):
         elif data.type == Type.CHAPTER_TITLE:
             # After this, should only be chapter content.
             self.in_chapter = True
-        elif not data.content:
-            # Empty content that is not a title, treat as BLANK.
-            data.type = Type.BLANK
-        elif not self.in_volume:
-            # Outside of volume, should be book metadata or intro. Treat first line as book title.
-            data.type = Type.BOOK_TITLE if self.first_line else Type.BOOK_INTRO
-        elif not self.in_chapter:
-            # Outside of chapter, should be volume intro.
+        elif self.in_chapter:
+            data.type = Type.CHAPTER_CONTENT
+        elif self.in_volume:
             data.type = Type.VOLUME_INTRO
         else:
-            # Inside chapter, should be chapter content.
-            data.type = Type.CHAPTER_CONTENT
+            # Outside of volume, should be book metadata or intro. Treat first line as book title.
+            data.type = Type.BOOK_TITLE if self.first_line else Type.BOOK_INTRO
 
         self.first_line = False
         return data

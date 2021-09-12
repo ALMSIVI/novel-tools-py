@@ -8,9 +8,7 @@ from writers.markdown_writer import MarkdownWriter
 @fixture
 def markdown_writer(request: FixtureRequest):
     args = request.node.get_closest_marker('args').args[0]
-    writer = MarkdownWriter(args | {'out_dir': '.'})
-    yield writer
-    writer.cleanup()
+    return MarkdownWriter(args | {'out_dir': '.'})
 
 
 @mark.args({
@@ -18,36 +16,35 @@ def markdown_writer(request: FixtureRequest):
 })
 def test_write(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     m = mocker.patch('builtins.open', mocker.mock_open())
-    handle = m()
+    handle = m().write
 
     data = NovelData('Title', Type.BOOK_TITLE)
-    markdown_writer.write(data)
-    m.assert_called_with(os.path.join('.', 'text.md'), 'wt')
-    handle.write.assert_called_with('# Title\n')
-
+    markdown_writer.accept(data)
     data = NovelData('Book Intro', Type.BOOK_INTRO)
-    markdown_writer.write(data)
-    handle.write.assert_called_with('Book Intro\n')
-
+    markdown_writer.accept(data)
     data = NovelData('Volume', Type.VOLUME_TITLE)
-    markdown_writer.write(data)
-    handle.write.assert_called_with('## Volume\n')
-
+    markdown_writer.accept(data)
     data = NovelData('Volume Intro', Type.VOLUME_INTRO)
-    markdown_writer.write(data)
-    handle.write.assert_called_with('Volume Intro\n')
-
+    markdown_writer.accept(data)
     data = NovelData('Title', Type.CHAPTER_TITLE, formatted='Chapter')
-    markdown_writer.write(data)
-    handle.write.assert_called_with('### Chapter\n')
-
+    markdown_writer.accept(data)
     data = NovelData('Chapter Content', Type.CHAPTER_CONTENT)
-    markdown_writer.write(data)
-    handle.write.assert_called_with('Chapter Content\n')
+    markdown_writer.accept(data)
+    data = NovelData('', Type.CHAPTER_CONTENT)
+    markdown_writer.accept(data)
 
-    data = NovelData('', Type.BLANK)
-    markdown_writer.write(data)
-    handle.write.assert_called_with('\n')
+    markdown_writer.write()
+    m.assert_called_with(os.path.join('.', 'text.md'), 'wt')
+    handle.assert_has_calls([
+        mocker.call('# Title\n\n'),
+        mocker.call('Book Intro'),
+        mocker.call('\n\n'),
+        mocker.call('## Volume\n\n'),
+        mocker.call('Volume Intro'),
+        mocker.call('\n\n'),
+        mocker.call('### Chapter\n\n'),
+        mocker.call('Chapter Content')
+    ])
 
 
 @mark.args({
@@ -56,20 +53,22 @@ def test_write(markdown_writer: MarkdownWriter, mocker: MockerFixture):
 })
 def test_levels(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     m = mocker.patch('builtins.open', mocker.mock_open())
-    handle = m()
+    handle = m().write
 
     data = NovelData('Title', Type.BOOK_TITLE)
-    markdown_writer.write(data)
-    m.assert_called_with(os.path.join('.', 'text.md'), 'wt')
-    handle.write.assert_called_with('Title\n')
-
+    markdown_writer.accept(data)
     data = NovelData('Volume', Type.VOLUME_TITLE)
-    markdown_writer.write(data)
-    handle.write.assert_called_with('# Volume\n')
-
+    markdown_writer.accept(data)
     data = NovelData('Title', Type.CHAPTER_TITLE, formatted='Chapter')
-    markdown_writer.write(data)
-    handle.write.assert_called_with('## Chapter\n')
+    markdown_writer.accept(data)
+
+    markdown_writer.write()
+    m.assert_called_with(os.path.join('.', 'text.md'), 'wt')
+    handle.assert_has_calls([
+        mocker.call('Title\n\n'),
+        mocker.call('# Volume\n\n'),
+        mocker.call('## Chapter\n\n')
+    ])
 
 
 @mark.args({
@@ -78,11 +77,22 @@ def test_levels(markdown_writer: MarkdownWriter, mocker: MockerFixture):
 })
 def test_newline(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     m = mocker.patch('builtins.open', mocker.mock_open())
-    handle = m()
+    handle = m().write
+
+    data = NovelData('Title', Type.CHAPTER_TITLE)
+    markdown_writer.accept(data)
 
     data = NovelData('Test', Type.CHAPTER_CONTENT)
-    markdown_writer.write(data)
-    handle.write.assert_called_with('\n')
+    markdown_writer.accept(data)
+
+    data = NovelData('Test 2', Type.CHAPTER_CONTENT)
+    markdown_writer.accept(data)
+
+    markdown_writer.write()
+    handle.assert_has_calls([
+        mocker.call('### Title\n\n'),
+        mocker.call('Test\n\nTest 2')
+    ])
 
 
 @mark.args({
@@ -92,7 +102,9 @@ def test_use_title(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     m = mocker.patch('builtins.open', mocker.mock_open())
 
     data = NovelData('Title', Type.BOOK_TITLE)
-    markdown_writer.write(data)
+    markdown_writer.accept(data)
+
+    markdown_writer.write()
     m.assert_called_with(os.path.join('.', 'Title.md'), 'wt')
 
 
@@ -104,7 +116,9 @@ def test_custom_title(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     m = mocker.patch('builtins.open', mocker.mock_open())
 
     data = NovelData('Title', Type.BOOK_TITLE)
-    markdown_writer.write(data)
+    markdown_writer.accept(data)
+
+    markdown_writer.write()
     m.assert_called_with(os.path.join('.', 'markdown.md'), 'wt')
 
 
@@ -117,5 +131,7 @@ def test_debug(markdown_writer: MarkdownWriter, mocker: MockerFixture):
     mp = mocker.patch('builtins.print')
 
     data = NovelData('Title', Type.BOOK_TITLE, error='Error')
-    markdown_writer.write(data)
+    markdown_writer.accept(data)
+
+    markdown_writer.write()
     mp.assert_called_once_with('Error')

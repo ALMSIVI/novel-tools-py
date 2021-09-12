@@ -27,6 +27,7 @@
       <list>
         <option value="$MODULE_DIR$/processors" />
         <option value="$MODULE_DIR$/readers" />
+        <option value="$MODULE_DIR$/writers" />
       </list>
     </option>
   </component>

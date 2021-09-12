@@ -1,8 +1,7 @@
 import os
 from typing import Optional
-from textwrap import dedent
 from common import ACC
-from utils import get_config, class_packages, generate_classes
+from utils import get_config, class_packages, generate_classes, format_text
 
 
 def docgen(config_filename: Optional[str], doc_filename: Optional[str] = None):
@@ -29,7 +28,7 @@ def docgen(config_filename: Optional[str], doc_filename: Optional[str] = None):
                     f.write(f'### {name}\n\n')
                     f.write('**Description:**\n')
                     if cls.__doc__ is not None:
-                        f.write(dedent(cls.__doc__))
+                        f.write(format_text(cls.__doc__))
                         f.write('\n')
                     f.write('**Arguments:**\n')
                     f.write(cls.docstring())

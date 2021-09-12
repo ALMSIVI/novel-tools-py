@@ -1,19 +1,15 @@
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
-from textwrap import dedent
 from typing import Iterator
 from common import NovelData, Type
 from readers.csv_reader import CsvReader
-
-
-def format_csv(csv: str):
-    return dedent(csv).strip()
+from utils import format_text
 
 
 @fixture
 def read(mocker: MockerFixture, request: FixtureRequest):
     csv = request.node.get_closest_marker('data').args[0]
-    csv = format_csv(csv)
+    csv = format_text(csv)
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
     return CsvReader({'in_dir': ''}).read()
 
@@ -31,7 +27,7 @@ def test_read(read: Iterator[NovelData]):
 
 
 def test_invalid(mocker: MockerFixture):
-    csv = format_csv('''
+    csv = format_text('''
     type
     volume_title
     ''')

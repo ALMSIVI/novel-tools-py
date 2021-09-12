@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import NoReturn
 
 
 class Writer(ABC):
-    def cleanup(self):
+    @abstractmethod
+    def accept(self, data) -> None:
         pass
 
     @abstractmethod
-    def write(self, data) -> NoReturn:
+    def write(self) -> None:
         pass

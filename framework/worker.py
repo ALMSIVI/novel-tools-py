@@ -16,7 +16,7 @@ class Worker:
                     obj = processor.process(obj)
 
                 for writer in self.writers:
-                    writer.write(obj)
+                    writer.accept(obj)
 
         for writer in self.writers:
-            writer.cleanup()
+            writer.write()

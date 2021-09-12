@@ -3,5 +3,3 @@ Introduction Intro
 This is a special chapter.
 
 It cannot be matched using a regular NumberedMatcher; instead, one needs a SpecialMatcher.
-
-

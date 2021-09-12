@@ -8,14 +8,12 @@ class ChapterValidator(Validator):
     """
     @staticmethod
     def required_fields() -> list[FieldMetadata]:
-        fields = Validator.required_fields()
-        fields += [
+        return Validator.required_fields() + [
             FieldMetadata('discard_chapters', 'bool',
                           description='If set to True, restart indexing at the beginning of each new volume.'),
             FieldMetadata('volume_tag', 'str', default=None,
                           description='Only validates if the current volume is the given tag.')
         ]
-        return fields
 
     def __init__(self, args):
         args = self.extract_fields(args)

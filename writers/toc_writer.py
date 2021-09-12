@@ -27,32 +27,30 @@ class TocWriter(Writer, ACC):
         self.filename = os.path.join(args['out_dir'], purify_name(args['toc_filename']))
         self.debug = args['debug']
 
-        self.file = None
+        self.list = []
         self.has_volume = False  # Whether we need to indent chapter titles
 
-    def cleanup(self):
-        if self.file:
-            self.file.close()
-
-    def write(self, data: NovelData):
-        if not data.has('formatted'):  # Normally, should only contain volume and chapter titles
+    def accept(self, data: NovelData) -> None:
+        if not data.has('formatted'):  # Normally, only titles should contain this field
             return
 
-        if not self.file:
-            self.file = open(self.filename, 'wt')
-
-        line = ''
-        if data.type == Type.CHAPTER_TITLE and self.has_volume:
-            line += '\t'
-        elif data.type == Type.VOLUME_TITLE:
+        if data.type == Type.VOLUME_TITLE:
             self.has_volume = True
+        self.list.append(data)
 
-        line += data.get('formatted')
+    def write(self) -> None:
+        with open(self.filename, 'wt') as f:
+            for data in self.list:
+                line = ''
+                if data.type == Type.CHAPTER_TITLE and self.has_volume:
+                    line += '\t'
 
-        if data.has('line_num'):
-            line += '\t' + str(data.get('line_num'))
+                line += data.get('formatted')
 
-        if self.debug and data.has('error'):
-            line += '\t' + data.get('error')
+                if data.has('line_num'):
+                    line += '\t' + str(data.get('line_num'))
 
-        self.file.write(line + '\n')
+                if self.debug and data.has('error'):
+                    line += '\t' + data.get('error')
+
+                f.write(line + '\n')

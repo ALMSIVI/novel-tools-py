@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 num_dict = {
     "零": 0,
     "〇": 0,
@@ -18,6 +20,8 @@ num_dict = {
     "百": 100,
     "千": 1000
 }
+
+valid_filenames = dict((ord(char), None) for char in '\\/*?:"<>|\n')
 
 
 def to_num(num: str) -> int:
@@ -44,8 +48,9 @@ def to_num(num: str) -> int:
     return value
 
 
-valid_filenames = dict((ord(char), None) for char in '\\/*?:"<>|\n')
-
-
 def purify_name(filename: str) -> str:
     return filename.translate(valid_filenames).strip()
+
+
+def format_text(text: str) -> str:
+    return dedent(text).strip()

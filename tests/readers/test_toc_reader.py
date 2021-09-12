@@ -1,19 +1,15 @@
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
-from textwrap import dedent
 from typing import Iterator
 from common import NovelData, Type
 from readers.toc_reader import TocReader
-
-
-def format_structure(structure: str) -> str:
-    return dedent(structure).strip()
+from utils import format_text
 
 
 @fixture
 def read(mocker: MockerFixture, request: FixtureRequest):
     toc, args = request.node.get_closest_marker('data').args
-    toc = format_structure(toc)
+    toc = format_text(toc)
     mocker.patch('builtins.open', mocker.mock_open(read_data=toc))
     return TocReader(args | {'in_dir': ''}).read()
 

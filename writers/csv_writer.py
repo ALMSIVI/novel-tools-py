@@ -27,20 +27,17 @@ class CsvWriter(Writer, ACC):
         self.filename = os.path.join(args['out_dir'], purify_name(args['csv_filename']))
         self.field_names = ['type', 'index', 'content', 'formatted'] + args['additional_fields']
 
-        self.file = None
-        self.writer = None
+        self.list = []
 
-    def cleanup(self):
-        if self.file:
-            self.file.close()
-
-    def write(self, data: NovelData):
-        if not data.has('formatted'):  # Normally, should only contain volume and chapter titles
+    def accept(self, data: NovelData) -> None:
+        if not data.has('formatted'):  # Normally, only titles should contain this field
             return
 
-        if not self.file:
-            self.file = open(self.filename, 'wt', newline='')
-            self.writer = csv.DictWriter(self.file, fieldnames=self.field_names)
-            self.writer.writeheader()
+        self.list.append(data)
 
-        self.writer.writerow(data.flat_dict(self.field_names))
+    def write(self) -> None:
+        with open(self.filename, 'wt', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=self.field_names)
+            writer.writeheader()
+            for data in self.list:
+                writer.writerow(data.flat_dict(self.field_names))

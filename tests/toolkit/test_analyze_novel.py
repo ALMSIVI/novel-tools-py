@@ -39,10 +39,12 @@ def test_split(directories: tuple[str, str], mocker: MockerFixture):
             out_dir=output_dir)
 
     assert_directory(output_dir, os.path.join(data_dir, 'dir'))
-    mp.assert_any_call('Duplicate chapter in volume (index = 1, content = First Volume) - expected: 2, actual: '
-                       'index = 1, content = Second Chapter	- Adjusted to Chapter 2 Second Chapter')
-    mp.assert_any_call('Missing chapter in volume (index = -1, content = Extra Volume) - expected: 4, actual: '
-                       'index = 5, content = Fourth Chapter	- Adjusted to Chapter 4 Fourth Chapter')
+    mp.assert_has_calls([
+        mocker.call('Duplicate chapter in volume (index = 1, content = First Volume) - expected: 2, actual: index = 1,'
+                    ' content = Second Chapter'),
+        mocker.call('Missing chapter in volume (index = -1, content = Extra Volume) - expected: 4, actual: index = 5,'
+                    ' content = Fourth Chapter')
+    ])
 
 
 @mark.slow

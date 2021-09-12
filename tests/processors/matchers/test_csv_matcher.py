@@ -1,18 +1,14 @@
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
-from textwrap import dedent
 from common import NovelData, Type
 from processors.matchers.csv_matcher import CsvMatcher
-
-
-def format_structure(structure: str) -> str:
-    return dedent(structure).strip()
+from utils import format_text
 
 
 @fixture
 def csv_matcher(mocker: MockerFixture, request: FixtureRequest):
     csv, args = request.node.get_closest_marker('data').args
-    csv = format_structure(csv)
+    csv = format_text(csv)
     mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
     return CsvMatcher(args | {'in_dir': ''})
 
@@ -122,7 +118,7 @@ def test_index(csv_matcher: CsvMatcher):
 
 
 def test_invalid(mocker: MockerFixture):
-    csv = format_structure('''
+    csv = format_text('''
             content
             Chapter 1 Lorem
             Chapter 2 Ipsum

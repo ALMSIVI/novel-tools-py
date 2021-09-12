@@ -3,5 +3,3 @@ Chapter 2 Second Chapter
 This should be the second chapter.
 
 However, the author made a mistake and put a duplicate index. Hopefully our ChapterValidator can figure this out!
-
-
