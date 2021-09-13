@@ -5,6 +5,7 @@ from toolkit import docgen
 
 class StubACC(ACC):
     """Docstring."""
+
     @staticmethod
     def required_fields() -> list[FieldMetadata]:
         return [
@@ -24,12 +25,17 @@ docstring = '''
 def test_generate_docs(mocker: MockerFixture):
     mocker.patch('toolkit.generate_docs.generate_classes', return_value={'Default': {'StubACC': StubACC}})
     m = mocker.patch('builtins.open', mocker.mock_open())
-    handle = m()
+    handle = m().write
 
     docgen(None)
-    handle.write.assert_any_call('## Default\n\n')
-    handle.write.assert_any_call('### StubACC\n\n')
-    handle.write.assert_any_call('**Description:**\n')
-    handle.write.assert_any_call('Docstring.')
-    handle.write.assert_any_call('**Arguments:**\n')
-    handle.write.assert_any_call(docstring)
+    handle.assert_has_calls([
+        mocker.call('## Default\n\n'),
+        mocker.call('### StubACC\n\n'),
+        mocker.call('**Description:**\n\n'),
+        mocker.call('Docstring.'),
+        mocker.call('\n'),
+        mocker.call('\n**Arguments:**\n\n'),
+        mocker.call(docstring),
+        mocker.call('\n'),
+        mocker.call('\n')
+    ])
