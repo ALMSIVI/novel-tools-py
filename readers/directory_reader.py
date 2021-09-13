@@ -4,6 +4,8 @@ from natsort import os_sorted
 from common import NovelData, Type, ACC, FieldMetadata
 from framework import Reader
 
+supported_extensions = ['.txt', '.md']
+
 
 class DirectoryReader(Reader, ACC):
     """
@@ -63,7 +65,8 @@ class DirectoryReader(Reader, ACC):
 
             volume_path = os.path.join(self.in_dir, volume)
             chapters = [chapter for chapter in os_sorted(os.listdir(volume_path))
-                        if os.path.isfile(os.path.join(volume_path, chapter))]
+                        if os.path.isfile(os.path.join(volume_path, chapter))
+                        and os.path.splitext(chapter)[1] in supported_extensions]
             # Read intro file
             if self.intro_filename in chapters:
                 chapters.remove(self.intro_filename)

@@ -26,10 +26,13 @@ def docgen(config_filename: Optional[str], doc_filename: Optional[str] = None):
             for name, cls in classes.items():
                 if ACC in cls.__bases__:
                     f.write(f'### {name}\n\n')
-                    f.write('**Description:**\n')
+                    f.write('**Description:**\n\n')
                     if cls.__doc__ is not None:
                         f.write(format_text(cls.__doc__))
                         f.write('\n')
-                    f.write('**Arguments:**\n')
-                    f.write(cls.docstring())
-                    f.write('\n\n')
+                    docstring = cls.docstring()
+                    if docstring != '':
+                        f.write('\n**Arguments:**\n\n')
+                        f.write(cls.docstring())
+                        f.write('\n')
+                    f.write('\n')

@@ -8,6 +8,7 @@ Recovers the novel structure from the csv list. The csv is required to contain a
 have to contain the other fields from a NovelData.
 
 **Arguments:**
+
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
 - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv file.
@@ -21,6 +22,7 @@ Reads from a directory structure. This directory should be generated from FileWr
 conventions, such as the first line of the chapter file being the title.
 
 **Arguments:**
+
 - in_dir (str): The working directory.
 - read_contents (bool): If set to True, will open the files to read the contents.
 - discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
@@ -36,6 +38,7 @@ Reads a json that contains the metadata of the book file. Will only generate a B
 populated with the other metadata.
 
 **Arguments:**
+
 - metadata_filename (str, optional, default=metadata.json): Filename of the metadata json file. The metadata MUST contain a 'title' field.
 - in_dir (str, optional): The directory to read the metadata file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the json file.
@@ -43,8 +46,11 @@ populated with the other metadata.
 ### TextReader
 
 **Description:**
+
 Reads from a plain text file.
+
 **Arguments:**
+
 - text_filename (str, optional, default=text.txt): The filename of the text.
 - in_dir (str, optional): The directory to read the text file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): The encoding of the file.
@@ -53,8 +59,11 @@ Reads from a plain text file.
 ### TocReader
 
 **Description:**
+
 Reads from a table of contents (toc) file.
+
 **Arguments:**
+
 - toc_filename (str, optional, default=toc.txt): Filename of the toc file. This file should be generated from `TocWriter`.
 - in_dir (str, optional): The directory to read the toc file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the toc file.
@@ -83,6 +92,7 @@ To determine the type of the line, the following three checks are done in order:
 - If none of these is in the arguments, then an exception will be raised during construction.
 
 **Arguments:**
+
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file.
 - in_dir (str, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv list file.
@@ -92,8 +102,11 @@ To determine the type of the line, the following three checks are done in order:
 ### NumberedMatcher
 
 **Description:**
+
 Matches a regular chapter/volume, with an index and/or a title.
+
 **Arguments:**
+
 - type (str): Specifies the type for this matcher.
 - regex (str): The regex to match for. It will contain two groups: the first group is the index, the second (optional) is the title.
 - index_group (int, optional, default=0): The group index for the title's order/index (starting from 0).
@@ -113,6 +126,7 @@ the list. It is done to avoid collision with regular titles in validators. Addit
 attached to the object.
 
 **Arguments:**
+
 - type (str): Specifies the type for this matcher.
 - affixes (list[str]): List of special names to match for.
 - regex (str): The regex to match for. It will contain an "affixes" format, that will be replaced with the list of affixes. Example: ^{affixes}$ will match lines with any of the affixes.
@@ -129,6 +143,7 @@ file is better human-readable, it contains less information than csv files and w
 a csv file does.
 
 **Arguments:**
+
 - toc_filename (str, optional, default=toc.txt): Filename of the toc file. This file should be generated from `TocWriter`.
 - in_dir (str, optional): The directory to read the toc file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the toc file.
@@ -144,6 +159,7 @@ a csv file does.
 Validates whether the title indices are continuous, i.e., whether there exist duplicate of missing chapter indices.
 
 **Arguments:**
+
 - overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one, and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored in the 'corrected_index' field. In either case, a field called 'error' will be created if a validation error occurs.
 - tag (str, optional, default=None): Only validate on the given tag. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
 - begin_index (int, optional, default=1): The starting index to validate against.
@@ -158,9 +174,6 @@ Assigns an order to the data. This could be useful for file writers, since the f
 order of reading. For example, one can append this order before all volume and chapter filenames to maintain
 ordering.
 
-**Arguments:**
-
-
 ### PatternTransformer
 
 **Description:**
@@ -169,6 +182,7 @@ Alters the content of the data by changing some patterns (usually in chapter con
 punctuation symbols in the novel, or change from custom dividers to Markdown-style ones.
 
 **Arguments:**
+
 - units (list[{filter: dict[str, str], subs: list[{pattern: str, new: str}]}]): The list of processing units. `filter` is a dictionary with the fields as the key, and `subs` lists the operations to be performed if the data is not filtered. `pattern` is a regex describing the pattern, and `new` is the string to replace the pattern.
 
 ### TitleTransformer
@@ -186,14 +200,14 @@ Be careful if you want to use this on non-title data, for most writers use 'form
 is a title.
 
 **Arguments:**
+
 - units (list[{filter: dict[str, str], format: str | dict[str, str]}]): The list of processing units. `filter` is a dictionary with the fields as the key, and `format` can be either a string or a dict containing the format strings for each custom field. Please put the units with the most specific filters first, and leave the most generic last, to avoid short-circuiting.
 
 ### TypeTransformer
 
 **Description:**
-Determines the true type for all data with UNRECOGNIZED type.
-**Arguments:**
 
+Determines the true type for all data with UNRECOGNIZED type.
 
 ## Writers
 
@@ -205,40 +219,10 @@ Generates a volume/chapter list as a csv file.
 It is assumed that the title data has been passed from a TitleTransformer and has the 'formatted' field filled.
 
 **Arguments:**
+
 - csv_filename (str, optional, default=list.csv): Filename of the output csv file.
 - out_dir (str): The directory to write the csv file to.
 - additional_fields (list[str], optional, default=[]): Specifies additional fields to be included to the csv file.
-
-### DirectoryWriter
-
-**Description:**
-
-Generates volume directories and chapter files. If there is no volume, a default volume will be created.
-It is assumed that the title data has been passed from a TitleTransformer and has the 'formatted' field filled. One
-can also use the same transformer to attach a 'filename' field, and the writer will prioritize this field.
-
-**Arguments:**
-- out_dir (str): The working directory.
-- debug (bool, optional, default=False): If set to True, will print the error message to the terminal.
-- default_volume (str, optional, default=default): If the volume does not have volumes, specify the directory name to place the chapter files.
-- intro_filename (str, optional, default=_intro.txt): The filename of the book/volume introduction file(s).
-- write_newline (bool, optional, default=False): If set to True, will insert a newline after a non-blank line. This will avoid contents on consecutive lines being treated as the same paragraph.
-
-### MarkdownWriter
-
-**Description:**
-
-Writes the entire novel to a Markdown file.
-If a title field has been passed from a TitleTransformer and has the 'formatted' field filled, then the field will
-be prioritized.
-
-**Arguments:**
-- md_filename (str, optional, default=text.md): Filename of the output Markdown file, if `use_title` is False.
-- out_dir (str): The directory to write the markdown file to.
-- use_title (bool): If set to True, will use the book title (if specified) as the Markdown filename.
-- levels (dict[str, int], optional, default={'book_title': 1, 'volume_title': 2, 'chapter_title': 3}): Specifies what level the header should be for each type.
-- write_newline (bool, optional, default=False): If set to True, will insert a newline after a non-blank line. This will avoid contents on consecutive lines being treated as the same paragraph.
-- debug (bool, optional, default=False): If set to True, will print the error message to the terminal.
 
 ### TocWriter
 
@@ -249,6 +233,7 @@ If out_dir is empty, the table will be printed to the terminal.
 It is assumed that the title data has been passed from a TitleTransformer and has the 'formatted' field filled.
 
 **Arguments:**
+
 - toc_filename (str, optional, default=toc.txt): Filename of the output toc file.
 - out_dir (str): The directory to write the toc file to.
 - debug (bool, optional, default=False): If set to True, will write error information to the table of contents.
