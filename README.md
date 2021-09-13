@@ -10,19 +10,25 @@ However, websites like Qidian would censor some/all chapters of a novel, which c
 
 - No support for custom/irregular volume/chapter titles;
 
-Some novels might use unorthodox titles, like "Songs of the North, Part 1".
+  - Some novels might use unorthodox titles, like "Songs of the North, Part 1".
 
 - Potential duplicate or missing chapter indices;
 
-The author might make a mistake and accidentally put two Chapter 10's, or they may skip Chapter 11 and advance to Chapter 12 after Chapter 10.
+  - The author might make a mistake and accidentally put two Chapter 10's, or they may skip Chapter 11 and advance to Chapter 12 after Chapter 10.
 
 - Varying formats of titles.
 
-The author might mix "Chapter 1: The Uprising" and "Chapter 1. The Uprising".
+  - The author might mix "Chapter 1: The Uprising" and "Chapter 1. The Uprising".
 
 This would result in a table of content that is incomplete and full of errors -- also not good to the reading experience. This toolkit tries to solve this problem by providing a unified framework to analyze novel files, generate a better table of contents, and reformat the novel. All novels have their unique problems, and it is unlikely that a universal script would suit every need. However, at the very least, one can generate an initial novel structure, and manually correct it if needed.
 
-There are plans to create a GUI version of this toolkit, and/or a [Calibre](https://calibre-ebook.com/) plugin, but there is no timeline.
+## Future plans
+
+I don't have a timeline for implementing these features, as I am pretty satisfied with the current set of features.
+
+- [ ] Create a GUI using [PyQt](https://wiki.python.org/moin/PyQt).
+- [ ] Implement an `EpubWriter` using [ebooklib](http://docs.sourcefabric.org/projects/ebooklib/en/latest/) and [Python Markdown](https://python-markdown.github.io/). While Calibre's built-in Markdown-epub conversion works quite nicely, it has trouble converting larger files, and it's hard to customize your own styles, or add illustrations with a single Markdown file. A custom-built Writer would make it more flexible to create a better-looking epub file.
+- [ ] Create a [Calibre Plugin](https://manual.calibre-ebook.com/creating_plugins.html). It might not be able to parse and format the source file (what `analyze` does), since one would need to manually check for errors and correct the source file. However, it should be able to provide more functionalities than simply calling `calibredb`.
 
 ## Installation
 

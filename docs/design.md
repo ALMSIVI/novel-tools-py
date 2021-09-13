@@ -16,7 +16,7 @@ We define the data format [here](/common/data.py). It contains all the data type
 
 ## Matchers
 
-When we are analyzing the novel, the most important step is to figure out the volume and chapter titles. After we determine the location of these titles, it would be much easier to deduce what the other parts of the novel are. So we will do just that at the very first step. A Matcher, as its name suggests, matches the current data against some predefined title format. Apart from deciding whether the data is a title or not, a Matcher will also assign the index and content (if any) to the title.
+When we are analyzing the novel, the most important step is to figure out the location of volume and chapter titles. After we determine where these titles are, it would be much easier to deduce the types for the rest of the novel. So we will do just that at the very first step. A Matcher, as its name suggests, matches the current data against some predefined title format. Apart from deciding whether the data is a title or not, a Matcher will also parse the title and extract the index, content, and/or affix.
 
 Matchers are different from the other two types of processors, in the sense that the data can only have one type. Therefore, an internal [Aggregate Matcher](/processors/matchers/__aggregate_matcher__.py) is created to short-circuit the matchers if there is a successful match.
 
@@ -33,7 +33,7 @@ After we get the titles, we need to verify if the indices are correct, i.e., the
 
 Validators only work on regular titles; special titles do not have indices, so they will always be skipped. Validators are also able to handle different sets of indices by "tagging". You can assign tags to specific titles in the Matchers, and set up separate Validators for these tags.
 
-For volume titles, this is pretty straightforward. Chapter titles are a little different. Some books would reset chapter indices when starting a new volume. In this case, the first chapter in every volume is always Chapter 1. Other books will not reset; the first chapter in Volume 2 will be the index of the last chapter in Volume 1 plus 1. So for [Chapter Validator](/processors/validators/chapter_validator.py), there is an additional `discard_chapters` option, compared with [Volume Validator](/processors/validators/volume_validator.py).
+For volume titles, this is pretty straightforward. Chapter titles are a little different. Some books would reset chapter indices when starting a new volume. In this case, the first chapter in every volume is always Chapter 1. Other books will not reset; the first chapter in Volume 2 will be the index of the last chapter in Volume 1 plus 1. So for [Chapter Validator](/processors/validators/chapter_validator.py), there is an additional `discard_chapters` option, compared to [Volume Validator](/processors/validators/volume_validator.py).
 
 ## Transformers
 
@@ -46,13 +46,13 @@ For the first process we have [Type Transformer](/processors/transformers/type_t
 
 For the second process we have [Title Transformer](/processors/transformers/title_transformer.py). It will filter out the data based on type and tag, and then uses a format string to format the data.
 
-Additionally, if you want to follow the second workflow, i.e., splitting the novel into individual files, you will notice that special titles will lose their original order in the novel, and when you try to generate the structure file, the order of the titles will be incorrect. If you want to avoid this, you can try adding an [Order Transformer](/processors/transformers/order_transformer.py) in between. It will keep the order that is passed in, and append that order to the data. You can then use that order as part of the filename.
+Additionally, if you want to follow the second workflow, i.e., splitting the novel into individual files, you will notice that special titles will lose their original order in the novel, and when you try to generate the structure file, the order of the titles will be incorrect. If you want to avoid this, you can try adding an [Order Transformer](/processors/transformers/order_transformer.py) in between. It will keep the order that is passed in, and append that order to the data. You can then use the order as part of the filename.
 
 If you want to do some batch processing, you can do so with [Pattern Transformer](/processors/transformers/pattern_transformer.py). It will replace patterns in the content with user-defined ones. It could be useful if the author does not use regular punctuation marks, or uses a different format for the divider line.
 
 ## Output structures
 
-There are currently two support "structure files": a csv list and a Table of Contents (toc). TOC is more human-readable, but lacks a lot of information about the data itself, so it is advised to use csv lists when you do the processing.
+There are currently two supported "structure files": a csv list and a Table of Contents (toc). TOC is more human-readable, but lacks a lot of information about the data itself, so it is advised to use csv lists when you do the processing.
 
 ## Initializing the units
 
