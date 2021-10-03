@@ -1,6 +1,5 @@
 import os
 from common import FieldMetadata
-
 from .__structure_writer__ import StructureWriter, Structure
 
 

@@ -73,7 +73,6 @@ def test_contents(read: Iterator[NovelData], mocker: MockerFixture):
 
     mocker.patch('builtins.open', mocker.mock_open(read_data='Chapter 2\n'))
     assert next(read) == NovelData('Chapter 2', Type.CHAPTER_TITLE, 2, source='Chapter 2.txt')
-    assert next(read) == NovelData('', Type.CHAPTER_CONTENT, None)
 
     with raises(StopIteration):
         next(read)

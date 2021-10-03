@@ -54,7 +54,7 @@ class Validator(Processor, ACC):
             new_data.set(error=self.duplicate_message(data, corrected_index))
 
         # Missing detection
-        if self.curr_index != 0 and self.curr_index + 1 != corrected_index:
+        if self.curr_index + 1 != corrected_index:
             corrected_index = self.curr_index + 1
 
             new_data.set(error=self.missing_message(data, corrected_index))

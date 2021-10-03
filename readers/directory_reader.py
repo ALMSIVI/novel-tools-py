@@ -79,4 +79,5 @@ class DirectoryReader(Reader, ACC):
                 with open(os.path.join(volume_path, chapter), 'rt', encoding=self.encoding) as f:
                     yield NovelData(f.readline().strip(), Type.CHAPTER_TITLE, chapter_index, source=chapter)
                     if self.read_contents:
-                        yield NovelData(f.read(), Type.CHAPTER_CONTENT)
+                        while content := f.readline():
+                            yield NovelData(content.strip(), Type.CHAPTER_CONTENT)
