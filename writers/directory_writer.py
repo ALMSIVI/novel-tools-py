@@ -1,6 +1,7 @@
 import os
-from common import FieldMetadata
+from common import FieldMetadata, NovelData, Type
 from .__structure_writer__ import StructureWriter, Structure
+from utils import purify_name
 
 
 class DirectoryWriter(StructureWriter):
@@ -32,7 +33,7 @@ class DirectoryWriter(StructureWriter):
         # Write intro
         if len(self.structure.contents) > 0:
             with open(os.path.join(self.out_dir, self.intro_filename), 'wt') as f:
-                f.write(self.structure.contents[0])
+                f.write(self.structure.contents[0].content)
 
         # Write volume
         if self.has_volumes:
@@ -40,22 +41,26 @@ class DirectoryWriter(StructureWriter):
                 self.write_volume(volume)
         else:
             default_volume = Structure()
-            default_volume.filename = self.default_volume
+            default_volume.title = NovelData('', Type.VOLUME_TITLE, filename=self.default_volume)
             default_volume.children = self.structure.children
             self.write_volume(default_volume)
 
     def write_volume(self, volume: Structure):
-        volume_dir = os.path.join(self.out_dir, volume.filename)
+        title = volume.title
+        filename = purify_name(self.get_filename(title))
+        volume_dir = os.path.join(self.out_dir, filename)
         if not os.path.isdir(volume_dir):
             os.mkdir(volume_dir)
 
         if len(volume.contents) > 0:
             with open(os.path.join(volume_dir, self.intro_filename), 'wt') as f:
-                f.write(volume.contents[0])
+                f.write(volume.contents[0].content)
 
         # Write chapter
         for chapter in volume.children:
-            chapter_filename = os.path.join(volume_dir, chapter.filename + '.txt')
+            title = chapter.title
+            filename = purify_name(self.get_filename(title))
+            chapter_filename = os.path.join(volume_dir, filename + '.txt')
             with open(chapter_filename, 'wt') as f:
-                f.write(chapter.title + '\n\n')
-                f.write(chapter.contents[0])
+                f.write(self.get_content(title) + '\n\n')
+                f.write(chapter.contents[0].content)

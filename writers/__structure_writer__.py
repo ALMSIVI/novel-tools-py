@@ -1,21 +1,16 @@
 from abc import ABC
+from typing import Optional
 from framework import Writer
 from common import NovelData, Type, ACC, FieldMetadata
-from utils import purify_name
 
 
 class Structure:
     """Recursive definition of a novel structure."""
 
     def __init__(self):
-        self.title: str = ''
-        self.filename: str = ''
-        self.contents: list[str] = []
+        self.title: Optional[NovelData] = None
+        self.contents: list[NovelData] = []
         self.children: list[Structure] = []
-
-
-def join_content(contents: list[str]) -> str:
-    return ''.join(contents).strip()
 
 
 class StructureWriter(Writer, ACC, ABC):
@@ -52,49 +47,58 @@ class StructureWriter(Writer, ACC, ABC):
             print(data.get('error'))
 
         if data.type == Type.BOOK_TITLE:
-            self.structure.title = data.get('formatted', data.content)
-            self.structure.filename = data.get('filename', data.get('formatted', data.content))
+            self.structure.title = data
         elif data.type == Type.BOOK_INTRO:
-            self.append_content(self.structure.contents, data.content)
+            self.structure.contents.append(data)
         elif data.type == Type.VOLUME_TITLE:
             self.has_volumes = True
             self.curr_volume = Structure()
-            self.curr_volume.title = data.get('formatted', data.content)
-            self.curr_volume.filename = purify_name(data.get('filename', data.get('formatted', data.content)))
+            self.curr_volume.title = data
             self.structure.children.append(self.curr_volume)
         elif data.type == Type.VOLUME_INTRO:
-            self.append_content(self.curr_volume.contents, data.content)
+            self.curr_volume.contents.append(data)
         elif data.type == Type.CHAPTER_TITLE:
             self.curr_chapter = Structure()
-            self.curr_chapter.title = data.get('formatted', data.content)
-            self.curr_chapter.filename = purify_name(data.get('filename', data.get('formatted', data.content)))
+            self.curr_chapter.title = data
             if self.has_volumes:
                 self.curr_volume.children.append(self.curr_chapter)
             else:
                 self.structure.children.append(self.curr_chapter)
         elif data.type == Type.CHAPTER_CONTENT:
-            self.append_content(self.curr_chapter.contents, data.content)
+            self.curr_chapter.contents.append(data)
         else:
             print(f'Unrecognized data type: {data.type}')
 
-    def append_content(self, contents: list[str], content: str):
-        contents.append(content + '\n')
-        if content != '' and self.write_newline:
-            contents.append('\n')
+    def join_content(self, contents: list[NovelData]) -> str:
+        contents_str = []
+        for content in contents:
+            contents_str.append(content.content + '\n')
+            if self.write_newline:
+                contents_str.append('\n')
+
+        return ''.join(contents_str).strip()
 
     def cleanup(self):
-        intro = join_content(self.structure.contents)
-        self.structure.contents = [] if intro == '' else [intro]
+        intro = self.join_content(self.structure.contents)
+        self.structure.contents = [] if intro == '' else [NovelData(intro, Type.BOOK_INTRO)]
 
         if self.has_volumes:
             for volume in self.structure.children:
-                intro = join_content(volume.contents)
-                volume.contents = [] if intro == '' else [intro]
+                intro = self.join_content(volume.contents)
+                volume.contents = [] if intro == '' else [NovelData(intro, Type.VOLUME_INTRO)]
 
                 for chapter in volume.children:
-                    content = join_content(chapter.contents)
-                    chapter.contents = [content]
+                    content = self.join_content(chapter.contents)
+                    chapter.contents = [NovelData(content, Type.CHAPTER_CONTENT)]
         else:
             for chapter in self.structure.children:
-                content = join_content(chapter.contents)
-                chapter.contents = [content]
+                content = self.join_content(chapter.contents)
+                chapter.contents = [NovelData(content, Type.CHAPTER_CONTENT)]
+
+    @staticmethod
+    def get_content(data: NovelData):
+        return data.get('formatted', data.content)
+
+    @classmethod
+    def get_filename(cls, data: NovelData):
+        return data.get('filename', cls.get_content(data))

@@ -1,6 +1,7 @@
 import os
 from common import Type, FieldMetadata
 from .__structure_writer__ import StructureWriter, Structure
+from utils import purify_name
 
 
 class MarkdownWriter(StructureWriter):
@@ -32,14 +33,16 @@ class MarkdownWriter(StructureWriter):
     def write(self) -> None:
         self.cleanup()
 
-        filename = self.structure.filename + '.md' if self.use_title else self.filename
+        title = self.structure.title
+        title_text = self.get_content(title) if title else ''
+        filename = purify_name(self.get_filename(title) + '.md' if self.use_title else self.filename)
         with open(os.path.join(self.out_dir, filename), 'wt') as f:
-            if self.structure.title != '':
-                f.write(self.levels.get(Type.BOOK_TITLE, '') + self.structure.title + '\n\n')
+            if title:
+                f.write(self.levels.get(Type.BOOK_TITLE, '') + title_text + '\n\n')
 
             # Write intro
             if len(self.structure.contents) > 0:
-                f.write(self.structure.contents[0])
+                f.write(self.structure.contents[0].content)
                 f.write('\n\n')
 
             # Write volume
@@ -54,16 +57,17 @@ class MarkdownWriter(StructureWriter):
                 self.write_volume(default_volume, f)
 
     def write_volume(self, volume: Structure, f):
-        if volume.title != '':
-            f.write(self.levels.get(Type.VOLUME_TITLE, '') + volume.title + '\n\n')
+        if title := volume.title:
+            f.write(self.levels.get(Type.VOLUME_TITLE, '') + self.get_content(title) + '\n\n')
 
         if len(volume.contents) > 0:
-            f.write(volume.contents[0])
+            f.write(volume.contents[0].content)
             f.write('\n\n')
 
         for i in range(len(volume.children)):
             chapter = volume.children[i]
-            f.write(self.levels.get(Type.CHAPTER_TITLE, '') + chapter.title + '\n\n')
-            f.write(chapter.contents[0])
+            title = chapter.title
+            f.write(self.levels.get(Type.CHAPTER_TITLE, '') + self.get_content(title) + '\n\n')
+            f.write(chapter.contents[0].content)
             if i != len(volume.children) - 1:
                 f.write('\n\n')
