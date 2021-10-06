@@ -17,6 +17,9 @@ packages = [
 [tool.poetry.dependencies]
 python = '^3.9'
 natsort = '^7.1.1'
+Markdown = "^3.3.4"
+EbookLib = "^0.17.1"
+bs4 = "^0.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = '^6.2.4'
