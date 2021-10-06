@@ -62,12 +62,8 @@ class CsvMatcher(Processor, ACC):
 
         # First, check for `source` (if it exists). This is usually populated if we use a DirectoryWriter or multiple
         # TextReaders. If we only have one TextReader, there is only one file, so source is not necessary, and we can
-        # simply omit this field when we write the results using a CsvWriter.
-        # If `source` exist and match, compare `line_num`. This will always work because:
-        # - if we used multiple TextReaders, `line_num` will be properly populated;
-        # - if we used a DirectoryWriter previously, there will be no `line_num`, as we are getting titles from the
-        #   directory names and the first line of each file. In this case, if `source` match we are done, and
-        #   `get('line_num')` will always give us None, so the comparison will always be True.
+        # simply omit this field when we write the results using a CsvWriter. If `source` exist and match, compare
+        # `line_num`.
         if next_title.has('source') and data.has('source'):
             if next_title.get('source') != data.get('source') or next_title.get('line_num') != data.get('line_num'):
                 return data

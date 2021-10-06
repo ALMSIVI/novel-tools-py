@@ -59,10 +59,11 @@
     "writers": [
       {
         "class": "CsvWriter",
-        "additional_fields": ["source"]
+        "additional_fields": ["source", "line_num"]
       },
       {
         "class": "TocWriter",
+        "write_line_num": false,
         "debug": false
       }
     ]

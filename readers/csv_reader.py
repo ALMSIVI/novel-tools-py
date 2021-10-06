@@ -44,7 +44,7 @@ class CsvReader(Reader, ACC):
 
     def read(self) -> Iterator[NovelData]:
         for i in range(len(self.list)):
-            data = self.list[i]
+            data: dict = self.list[i]
             content = data.pop('content')
             data_type = Type[data.pop('type', 'unrecognized').upper()]
             index = data.pop('index', None)
@@ -55,9 +55,12 @@ class CsvReader(Reader, ACC):
                 if name not in data:
                     continue
 
-                if field_type == 'int':
-                    data[name] = int(data[name])
-                if field_type == 'bool':
-                    data[name] = bool(data[name])
+                try:
+                    if field_type == 'int':
+                        data[name] = int(data[name])
+                    if field_type == 'bool':
+                        data[name] = bool(data[name])
+                except ValueError:
+                    data[name] = None
 
             yield NovelData(content, data_type, index, **data)

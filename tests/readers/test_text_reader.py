@@ -26,3 +26,15 @@ def test_verbose(read: Iterator[NovelData]):
     assert next(read) == NovelData('', Type.UNRECOGNIZED, source='text.txt', line_num=2, raw='')
     with raises(StopIteration):
         next(read)
+
+
+@mark.data('line 1\n\nline 2\n\n\nline 3\n\n\n\nline 4', {'merge_newlines': True})
+def test_merge_newlines(read: Iterator[NovelData]):
+    assert next(read) == NovelData('line 1', Type.UNRECOGNIZED)
+    assert next(read) == NovelData('line 2', Type.UNRECOGNIZED)
+    assert next(read) == NovelData('', Type.UNRECOGNIZED)
+    assert next(read) == NovelData('line 3', Type.UNRECOGNIZED)
+    assert next(read) == NovelData('', Type.UNRECOGNIZED)
+    assert next(read) == NovelData('line 4', Type.UNRECOGNIZED)
+    with raises(StopIteration):
+        next(read)

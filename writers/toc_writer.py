@@ -18,6 +18,8 @@ class TocWriter(Writer, ACC):
                           description='Filename of the output toc file.'),
             FieldMetadata('out_dir', 'str',
                           description='The directory to write the toc file to.'),
+            FieldMetadata('write_line_num', 'bool', default=True,
+                          description='If set to True, will write line number to the toc.'),
             FieldMetadata('debug', 'bool', default=False,
                           description='If set to True, will write error information to the table of contents.'),
         ]
@@ -25,6 +27,7 @@ class TocWriter(Writer, ACC):
     def __init__(self, args):
         args = self.extract_fields(args)
         self.filename = os.path.join(args['out_dir'], purify_name(args['toc_filename']))
+        self.write_line_num = args['write_line_num']
         self.debug = args['debug']
 
         self.list = []
@@ -47,7 +50,7 @@ class TocWriter(Writer, ACC):
 
                 line += data.get('formatted')
 
-                if data.has('line_num'):
+                if self.write_line_num and data.has('line_num'):
                     line += '\t' + str(data.get('line_num'))
 
                 if self.debug and data.has('error'):

@@ -3,6 +3,7 @@ from typing import Iterator
 from natsort import os_sorted
 from common import NovelData, Type, ACC, FieldMetadata
 from framework import Reader
+from .text_reader import TextReader
 
 supported_extensions = ['.txt', '.md']
 
@@ -28,7 +29,11 @@ class DirectoryReader(Reader, ACC):
             FieldMetadata('intro_filename', 'str', default='_intro.txt',
                           description='The filename of the book/volume introduction file(s).'),
             FieldMetadata('encoding', 'str', default='utf-8',
-                          description='Encoding of the chapter file(s).')
+                          description='Encoding of the chapter file(s).'),
+            FieldMetadata('merge_newlines', 'bool', default=False,
+                          description='If set to True, will merge two newline characters into one. Sometimes newline '
+                                      'characters carry meanings, and we do not want decorative newlines to mix with '
+                                      'those meaningful ones.')
         ]
 
     def __init__(self, args):
@@ -39,6 +44,7 @@ class DirectoryReader(Reader, ACC):
         self.default_volume = args['default_volume']
         self.encoding = args['encoding']
         self.intro_filename = args['intro_filename']
+        self.merge_newlines = args['merge_newlines']
 
         # Create the list of volumes/directories to look for
         self.volumes = [dir_name for dir_name in os_sorted(os.listdir(self.in_dir)) if
@@ -50,8 +56,10 @@ class DirectoryReader(Reader, ACC):
         # Read intro file
         intro_filename = os.path.join(self.in_dir, self.intro_filename)
         if self.read_contents and os.path.isfile(intro_filename):
-            with open(intro_filename, 'rt', encoding=self.encoding) as f:
-                yield NovelData(f.read(), Type.BOOK_INTRO)
+            text_reader = self.get_text_reader(intro_filename)
+            for data in text_reader.read():
+                data.type = Type.BOOK_INTRO
+                yield data
 
         volume_index = 0
         chapter_index = 0
@@ -71,13 +79,29 @@ class DirectoryReader(Reader, ACC):
             if self.intro_filename in chapters:
                 chapters.remove(self.intro_filename)
                 if self.read_contents:
-                    with open(os.path.join(volume_path, self.intro_filename), 'rt', encoding=self.encoding) as f:
-                        yield NovelData(f.read(), Type.VOLUME_INTRO)
+                    text_reader = self.get_text_reader(os.path.join(volume_path, self.intro_filename))
+                    for data in text_reader.read():
+                        data.type = Type.VOLUME_INTRO
+                        yield data
 
             for chapter in chapters:
                 chapter_index += 1
-                with open(os.path.join(volume_path, chapter), 'rt', encoding=self.encoding) as f:
-                    yield NovelData(f.readline().strip(), Type.CHAPTER_TITLE, chapter_index, source=chapter)
-                    if self.read_contents:
-                        while content := f.readline():
-                            yield NovelData(content.strip(), Type.CHAPTER_CONTENT)
+                text_reader = self.get_text_reader(os.path.join(volume_path, chapter))
+                read = text_reader.read()
+                data = next(read)  # Title
+                data.type = Type.CHAPTER_TITLE
+                data.index = chapter_index
+                yield data
+                if self.read_contents:
+                    for data in read:
+                        data.type = Type.CHAPTER_CONTENT
+                        yield data
+
+    def get_text_reader(self, filename: str) -> TextReader:
+        return TextReader({
+            'text_filename': filename,
+            'in_dir': self.in_dir,
+            'encoding': self.encoding,
+            'verbose': True,
+            'merge_newlines': self.merge_newlines
+        })
