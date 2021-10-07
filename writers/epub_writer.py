@@ -1,5 +1,4 @@
 import os
-import ebooklib
 from datetime import datetime
 from typing import Optional
 from bs4 import BeautifulSoup
@@ -12,18 +11,19 @@ from utils import purify_name
 
 class EpubWriter(StructureWriter):
     """
-    Generates a epub book for the book. An epub is essentially a zip file consisting of html files, stylesheets, and
-    multimedia. Compared to plaintext files (txt/md), it allows custom styles and illustrations.
+    Generates a epub file for the book. An epub is essentially a zip file consisting of html files, stylesheets, and
+    multimedia (including images). Compared to plaintext files (txt/md), it allows custom styles and illustrations
+    bundled together.
 
-    The epub specification requires title, language and identifier metadata, a BOOK_TITLE must be included with language
-    and id in its `others` field. You can do that with MetadataReader.
+    The epub specification requires title, language and identifier metadata. Therefore, a BOOK_TITLE must be included
+    with language and id in its `others` field. You can do that with MetadataReader.
 
     The created epub will contain a cover page (if a cover is specified), and a metadata page that contains all the
     metadata plus the book introduction. It will also contain one page for each volume and chapter. You can customize
-    the metadata and volume/chapter pages.
+    the page layouts by specifying the html template.
 
-    For better style customization, the type and tags for each NovelData will be used as html classes. Please ensure you
-    use a `CsvWriter` to store the structure and have the `tags` in `additional_fields`.
+    For better style customization, the tag for each NovelData will be used as html classes. Please ensure you
+    use a `CsvWriter` to store the structure and have `tag` in `additional_fields`.
 
     In the generated html, the titles (book/volume/chapter) will surrounded with the <h1> tag. The metadata will
     be surrounded with the <span> tag, and will use its name as id. The introductions (book/volume) and the chapter
@@ -38,6 +38,8 @@ class EpubWriter(StructureWriter):
         # fields = [field for field in StructureWriter.required_fields() if field.name != 'write_newline']
         fields = StructureWriter.required_fields()
         return fields + [
+            FieldMetadata('write_newline', 'bool', default=False,
+                          description='If set to true, will treat double p.'),
             FieldMetadata('in_dir', 'str',
                           description='The directory that stores all the files except for the novel data, including '
                                       'stylesheets and/or images.'),
@@ -171,7 +173,7 @@ class EpubWriter(StructureWriter):
             for author in book_title.get('authors'):
                 book.add_author(author)
 
-        for tag in book_title.get('tag'):
+        for tag in book_title.get('tags'):
             book.add_metadata('DC', 'subject', tag)
 
         if publisher := book_title.get('publisher'):
@@ -290,10 +292,8 @@ class EpubWriter(StructureWriter):
         soup = BeautifulSoup()
         title = soup.new_tag('h1')
         title.string = self.get_content(data)
-        tags = [str(data.type)]
         if data.has('tag'):
-            tags.append(data.get('tag'))
-        title['class'] = tags
+            title['class'] = data.get('tag')
         soup.append(title)
         return str(soup)
 
@@ -307,11 +307,9 @@ class EpubWriter(StructureWriter):
             html = markdown(content)
             soup = BeautifulSoup(html, 'html.parser')
 
-        tags = [str(data.type)]
         if data.has('tag'):
-            tags.append(data.get('tag'))
-        for child in soup.children:
-            child['class'] = tags
+            for child in soup.children:
+                child['class'] = data.get('tag')
 
         # TODO: illustration
         return str(soup)
