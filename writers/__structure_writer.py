@@ -26,16 +26,12 @@ class StructureWriter(Writer, ACC, ABC):
                           description='The working directory.'),
             FieldMetadata('debug', 'bool', default=False,
                           description='If set to True, will print the error message to the terminal.'),
-            FieldMetadata('write_newline', 'bool', default=False,
-                          description='If set to True, will insert a newline after a non-blank line. This will avoid '
-                                      'contents on consecutive lines being treated as the same paragraph.'),
         ]
 
     def __init__(self, args):
         args = self.extract_fields(args)
         self.out_dir = args['out_dir']
         self.debug = args['debug']
-        self.write_newline = args['write_newline']
 
         self.structure = Structure()
         self.curr_volume = None
@@ -69,30 +65,28 @@ class StructureWriter(Writer, ACC, ABC):
         else:
             print(f'Unrecognized data type: {data.type}')
 
-    def __join_content(self, contents: list[NovelData]) -> str:
+    def _join_content(self, contents: list[NovelData]) -> str:
         contents_str = []
         for content in contents:
             contents_str.append(content.content + '\n')
-            if self.write_newline:
-                contents_str.append('\n')
 
         return ''.join(contents_str).strip()
 
     def _cleanup(self):
-        intro = self.__join_content(self.structure.contents)
+        intro = self._join_content(self.structure.contents)
         self.structure.contents = [] if intro == '' else [NovelData(intro, Type.BOOK_INTRO)]
 
         if self.has_volumes:
             for volume in self.structure.children:
-                intro = self.__join_content(volume.contents)
+                intro = self._join_content(volume.contents)
                 volume.contents = [] if intro == '' else [NovelData(intro, Type.VOLUME_INTRO)]
 
                 for chapter in volume.children:
-                    content = self.__join_content(chapter.contents)
+                    content = self._join_content(chapter.contents)
                     chapter.contents = [NovelData(content, Type.CHAPTER_CONTENT)]
         else:
             for chapter in self.structure.children:
-                content = self.__join_content(chapter.contents)
+                content = self._join_content(chapter.contents)
                 chapter.contents = [NovelData(content, Type.CHAPTER_CONTENT)]
 
     @staticmethod

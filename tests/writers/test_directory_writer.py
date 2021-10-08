@@ -145,28 +145,3 @@ def test_debug(directory_writer: DirectoryWriter, mocker: MockerFixture):
 
     directory_writer.write()
     mp.assert_called_once_with('Error')
-
-
-@mark.args({'write_newline': True})
-def test_newline(directory_writer: DirectoryWriter, mocker: MockerFixture):
-    mocker.patch('os.mkdir')
-    mo = mocker.patch('builtins.open', mocker.mock_open())
-    handle = mo().write
-
-    data = NovelData('Title', Type.CHAPTER_TITLE)
-    directory_writer.accept(data)
-
-    data = NovelData('Content 1', Type.CHAPTER_CONTENT)
-    directory_writer.accept(data)
-
-    data = NovelData('Content 2', Type.CHAPTER_CONTENT)
-    directory_writer.accept(data)
-
-    directory_writer.write()
-    handle.assert_has_calls([
-        mocker.call('Title\n\n'),
-        mocker.call(format_text('''
-            Content 1
-            
-            Content 2
-        '''))])

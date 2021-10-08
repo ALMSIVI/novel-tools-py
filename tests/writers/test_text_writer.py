@@ -72,30 +72,6 @@ def test_levels(text_writer: TextWriter, mocker: MockerFixture):
 
 
 @mark.args({
-    'use_title': False,
-    'write_newline': True
-})
-def test_newline(text_writer: TextWriter, mocker: MockerFixture):
-    m = mocker.patch('builtins.open', mocker.mock_open())
-    handle = m().write
-
-    data = NovelData('Title', Type.CHAPTER_TITLE)
-    text_writer.accept(data)
-
-    data = NovelData('Test', Type.CHAPTER_CONTENT)
-    text_writer.accept(data)
-
-    data = NovelData('Test 2', Type.CHAPTER_CONTENT)
-    text_writer.accept(data)
-
-    text_writer.write()
-    handle.assert_has_calls([
-        mocker.call('Title\n\n'),
-        mocker.call('Test\n\nTest 2')
-    ])
-
-
-@mark.args({
     'use_title': True,
 })
 def test_use_title(text_writer: TextWriter, mocker: MockerFixture):

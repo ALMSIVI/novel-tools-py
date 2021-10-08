@@ -1,6 +1,6 @@
 import os
-from common import Type, FieldMetadata
-from .__structure_writer__ import StructureWriter, Structure
+from common import Type, NovelData, FieldMetadata
+from .__structure_writer import StructureWriter, Structure
 from utils import purify_name
 
 
@@ -21,6 +21,9 @@ class MarkdownWriter(StructureWriter):
                           description='Filename of the output Markdown file, if `use_title` is False.'),
             FieldMetadata('levels', 'dict[str, int]', default={'book_title': 1, 'volume_title': 2, 'chapter_title': 3},
                           description='Specifies what level the header should be for each type.'),
+            FieldMetadata('write_newline', 'bool', default=False,
+                          description='If set to True, will insert a newline after a non-blank line. This will avoid '
+                                      'contents on consecutive lines being treated as the same paragraph.'),
         ]
 
     def __init__(self, args):
@@ -29,6 +32,7 @@ class MarkdownWriter(StructureWriter):
         self.use_title = args['use_title']
         self.filename = args['md_filename']
         self.levels = {Type[key.upper()]: '#' * value + ' ' for key, value in args['levels'].items()}
+        self.write_newline = args['write_newline']
 
     def write(self) -> None:
         self._cleanup()
@@ -55,6 +59,15 @@ class MarkdownWriter(StructureWriter):
                 default_volume = Structure()
                 default_volume.children = self.structure.children
                 self.__write_volume(default_volume, f)
+
+    def _join_content(self, contents: list[NovelData]) -> str:
+        contents_str = []
+        for content in contents:
+            contents_str.append(content.content + '\n')
+            if self.write_newline:
+                contents_str.append('\n')
+
+        return ''.join(contents_str).strip()
 
     def __write_volume(self, volume: Structure, f):
         if title := volume.title:

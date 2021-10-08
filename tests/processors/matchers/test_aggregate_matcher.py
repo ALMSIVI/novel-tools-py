@@ -2,7 +2,7 @@ from pytest import fixture
 from common import NovelData, Type
 from processors.matchers.numbered_matcher import NumberedMatcher
 from processors.matchers.special_matcher import SpecialMatcher
-from processors.matchers.__aggregate_matcher__ import AggregateMatcher
+from processors.matchers.__aggregate_matcher import AggregateMatcher
 
 
 @fixture

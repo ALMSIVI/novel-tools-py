@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from ebooklib import epub
 from markdown import markdown
 from common import FieldMetadata, NovelData
-from .__structure_writer__ import StructureWriter, Structure
+from .__structure_writer import StructureWriter, Structure
 from utils import purify_name
 
 
@@ -34,10 +34,7 @@ class EpubWriter(StructureWriter):
 
     @staticmethod
     def required_fields() -> list[FieldMetadata]:
-        # `write_newline` does not make sense in the context of html files
-        # fields = [field for field in StructureWriter.required_fields() if field.name != 'write_newline']
-        fields = StructureWriter.required_fields()
-        return fields + [
+        return StructureWriter.required_fields() + [
             FieldMetadata('write_newline', 'bool', default=False,
                           description='If set to true, will treat double p.'),
             FieldMetadata('in_dir', 'str',
