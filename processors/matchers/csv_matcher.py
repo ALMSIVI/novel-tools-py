@@ -67,21 +67,21 @@ class CsvMatcher(Processor, ACC):
         if next_title.has('source') and data.has('source'):
             if next_title.get('source') != data.get('source') or next_title.get('line_num') != data.get('line_num'):
                 return data
-            return self.merge(next_title, data)
+            return self.__merge(next_title, data)
 
         # If we only have one TextReader and don't have `source` in the csv, we simply compare line_num.
         if next_title.has('line_num') and data.has('line_num'):
             if next_title.get('line_num') != data.get('line_num'):
                 return data
-            return self.merge(next_title, data)
+            return self.__merge(next_title, data)
 
         # If the csv is not created from a CsvWriter and doesn't have `line_num`, we will use raw and/or content.
         if next_title.get('raw', next_title.content) == data.get('raw', data.content):
-            return self.merge(next_title, data)
+            return self.__merge(next_title, data)
 
         return data
 
-    def merge(self, title: NovelData, data: NovelData) -> NovelData:
+    def __merge(self, title: NovelData, data: NovelData) -> NovelData:
         self.list_index += 1
         # The original csv file may not have an `index` column. If it doesn't exist, an index will be auto
         # generated.

@@ -7,10 +7,10 @@ class StubValidator(Validator):
     def check(self, data: NovelData) -> bool:
         return True
 
-    def duplicate_message(self, data: NovelData, corrected_index: int) -> str:
+    def _duplicate_message(self, data: NovelData, corrected_index: int) -> str:
         return f'Duplicate - expected: {corrected_index}, actual: {data.index}'
 
-    def missing_message(self, data: NovelData, corrected_index: int) -> str:
+    def _missing_message(self, data: NovelData, corrected_index: int) -> str:
         return f'Missing - expected: {corrected_index}, actual: {data.index}'
 
 

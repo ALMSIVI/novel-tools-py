@@ -69,7 +69,7 @@ class StructureWriter(Writer, ACC, ABC):
         else:
             print(f'Unrecognized data type: {data.type}')
 
-    def join_content(self, contents: list[NovelData]) -> str:
+    def __join_content(self, contents: list[NovelData]) -> str:
         contents_str = []
         for content in contents:
             contents_str.append(content.content + '\n')
@@ -78,27 +78,27 @@ class StructureWriter(Writer, ACC, ABC):
 
         return ''.join(contents_str).strip()
 
-    def cleanup(self):
-        intro = self.join_content(self.structure.contents)
+    def _cleanup(self):
+        intro = self.__join_content(self.structure.contents)
         self.structure.contents = [] if intro == '' else [NovelData(intro, Type.BOOK_INTRO)]
 
         if self.has_volumes:
             for volume in self.structure.children:
-                intro = self.join_content(volume.contents)
+                intro = self.__join_content(volume.contents)
                 volume.contents = [] if intro == '' else [NovelData(intro, Type.VOLUME_INTRO)]
 
                 for chapter in volume.children:
-                    content = self.join_content(chapter.contents)
+                    content = self.__join_content(chapter.contents)
                     chapter.contents = [NovelData(content, Type.CHAPTER_CONTENT)]
         else:
             for chapter in self.structure.children:
-                content = self.join_content(chapter.contents)
+                content = self.__join_content(chapter.contents)
                 chapter.contents = [NovelData(content, Type.CHAPTER_CONTENT)]
 
     @staticmethod
-    def get_content(data: NovelData):
+    def _get_content(data: NovelData):
         return data.get('formatted', data.content)
 
     @classmethod
-    def get_filename(cls, data: NovelData):
-        return data.get('filename', cls.get_content(data))
+    def _get_filename(cls, data: NovelData):
+        return data.get('filename', cls._get_content(data))

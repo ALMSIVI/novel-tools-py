@@ -51,20 +51,20 @@ class Validator(Processor, ACC):
             while corrected_index in self.indices:
                 corrected_index += 1
 
-            new_data.set(error=self.duplicate_message(data, corrected_index))
+            new_data.set(error=self._duplicate_message(data, corrected_index))
 
         # Missing detection
         if self.curr_index + 1 != corrected_index:
             corrected_index = self.curr_index + 1
 
-            new_data.set(error=self.missing_message(data, corrected_index))
+            new_data.set(error=self._missing_message(data, corrected_index))
 
         self.indices.add(corrected_index)
         self.curr_index = corrected_index
-        self.set_index(new_data, corrected_index)
+        self.__set_index(new_data, corrected_index)
         return new_data
 
-    def set_index(self, data: NovelData, corrected_index: int):
+    def __set_index(self, data: NovelData, corrected_index: int):
         if self.overwrite:
             original_index = data.index
             data.index = corrected_index
@@ -73,7 +73,7 @@ class Validator(Processor, ACC):
             data.set(corrected_index=corrected_index)
 
     @staticmethod
-    def format(result: NovelData) -> str:
+    def _format(result: NovelData) -> str:
         return result.format('index = {index}, content = {content}')
 
     @abstractmethod
@@ -82,9 +82,9 @@ class Validator(Processor, ACC):
         pass
 
     @abstractmethod
-    def duplicate_message(self, data: NovelData, corrected_index: int) -> str:
+    def _duplicate_message(self, data: NovelData, corrected_index: int) -> str:
         pass
 
     @abstractmethod
-    def missing_message(self, data: NovelData, corrected_index: int) -> str:
+    def _missing_message(self, data: NovelData, corrected_index: int) -> str:
         pass

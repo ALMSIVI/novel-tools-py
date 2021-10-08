@@ -108,14 +108,14 @@ class EpubWriter(StructureWriter):
 
     def write(self) -> None:
         book = epub.EpubBook()
-        self.write_metadata(book)
-        cover_page = self.create_cover_page(book)
+        self.__write_metadata(book)
+        cover_page = self.__create_cover_page(book)
         book.add_item(cover_page)
 
-        css = self.create_stylesheet()
+        css = self.__create_stylesheet()
         book.add_item(css)
 
-        metadata_page = self.create_metadata_page()
+        metadata_page = self.__create_metadata_page()
         book.add_item(metadata_page)
 
         toc = [cover_page, metadata_page]
@@ -123,7 +123,7 @@ class EpubWriter(StructureWriter):
 
         if self.has_volumes:
             for volume in self.structure.children:
-                volume_page, chapter_pages = self.create_volume_page(volume)
+                volume_page, chapter_pages = self.__create_volume_page(volume)
                 book.add_item(volume_page)
                 spine.append(volume_page)
                 toc.append((epub.Section(volume_page.title, href=volume_page.file_name), chapter_pages))
@@ -132,7 +132,7 @@ class EpubWriter(StructureWriter):
                     spine.append(chapter_page)
         else:
             for chapter in self.structure.children:
-                chapter_page = self.create_chapter_page(chapter)
+                chapter_page = self.__create_chapter_page(chapter)
                 book.add_item(chapter_page)
                 toc.append(chapter_page)
                 spine.append(chapter_page)
@@ -141,16 +141,16 @@ class EpubWriter(StructureWriter):
         book.add_item(epub.EpubNav())
         book.toc = toc
         book.spine = spine
-        filename = os.path.join(self.out_dir, purify_name(self.get_filename(self.structure.title)) + '.epub')
+        filename = os.path.join(self.out_dir, purify_name(self._get_filename(self.structure.title)) + '.epub')
         epub.write_epub(filename, book)
 
-    def write_metadata(self, book: epub.EpubBook):
+    def __write_metadata(self, book: epub.EpubBook):
         """Writes metadata into the epub book. You can look up supported metadata in `config/sample_metadata.json`."""
 
         book_title = self.structure.title
 
         # Required
-        if title := self.get_content(book_title):
+        if title := self._get_content(book_title):
             book.set_title(title)
         else:
             raise ValueError('Book must contain a title.')
@@ -182,13 +182,13 @@ class EpubWriter(StructureWriter):
         if date := book_title.get('date'):
             book.add_metadata('DC', 'date', datetime.fromisoformat(date).isoformat())
 
-    def create_stylesheet(self) -> epub.EpubItem:
+    def __create_stylesheet(self) -> epub.EpubItem:
         css = epub.EpubItem(uid='style', file_name='Styles/stylesheet.css', media_type='text/css')
         with open(self.stylesheet, 'rt', encoding=self.encoding) as f:
             css.set_content(f.read())
         return css
 
-    def create_cover_page(self, book: epub.EpubBook) -> Optional[epub.EpubHtml]:
+    def __create_cover_page(self, book: epub.EpubBook) -> Optional[epub.EpubHtml]:
         """
         We will not be using `EpubBook.set_cover()` here, because it will set the cover page to `linear="no"` in the
         spine. This means the page will not be ordered correctly.
@@ -212,7 +212,7 @@ class EpubWriter(StructureWriter):
 
             return page
 
-    def create_metadata_page(self) -> epub.EpubHtml:
+    def __create_metadata_page(self) -> epub.EpubHtml:
         """
         Writes the metadata page to the book.
 
@@ -225,21 +225,20 @@ class EpubWriter(StructureWriter):
         page = epub.EpubHtml(uid='metadata', title=self.metadata_title, file_name='Text/metadata.xhtml')
         book_title = self.structure.title
         with open(self.metadata_template, 'rt', encoding=self.encoding) as f:
-            content = f.read().format(title=self.format_title(book_title),
-                                      identifier=self.format_metadata('id', book_title.get('id')),
-                                      authors=self.format_metadata('authors', self.author_separator.join(
+            content = f.read().format(title=self.__format_title(book_title),
+                                      identifier=self.__format_metadata('id', book_title.get('id')),
+                                      authors=self.__format_metadata('authors', self.author_separator.join(
                                           book_title.get('authors'))),
-                                      publisher=self.format_metadata('publisher', book_title.get('publisher')),
-                                      date=self.format_metadata('date',
-                                                                datetime.fromisoformat(book_title.get('date')).strftime(
-                                                                    self.date_format)),
+                                      publisher=self.__format_metadata('publisher', book_title.get('publisher')),
+                                      date=self.__format_metadata('date', datetime.fromisoformat(
+                                          book_title.get('date')).strftime(self.date_format)),
                                       introduction='\n'.join(
-                                          [self.format_content(intro) for intro in self.structure.contents]))
+                                          [self.__format_content(intro) for intro in self.structure.contents]))
         page.set_content(content)
-        self.add_stylesheet(page, False)
+        self.__add_stylesheet(page, False)
         return page
 
-    def create_volume_page(self, volume: Structure) -> tuple[epub.EpubHtml, list[epub.EpubHtml]]:
+    def __create_volume_page(self, volume: Structure) -> tuple[epub.EpubHtml, list[epub.EpubHtml]]:
         """
         Writes a single volume, together with its chapters, to the book.
 
@@ -248,39 +247,39 @@ class EpubWriter(StructureWriter):
         """
         # Write volume page
         title = volume.title
-        volume_filename = purify_name(self.get_filename(title))
+        volume_filename = purify_name(self._get_filename(title))
         filename_text = f'Text/{volume_filename}/_intro.html'
-        page = epub.EpubHtml(title=self.get_content(title), file_name=filename_text)
-        content = self.volume_template.format(title=self.format_title(title),
+        page = epub.EpubHtml(title=self._get_content(title), file_name=filename_text)
+        content = self.volume_template.format(title=self.__format_title(title),
                                               introduction='\n'.join(
-                                                  [self.format_content(intro) for intro in volume.contents]))
+                                                  [self.__format_content(intro) for intro in volume.contents]))
         page.set_content(content)
-        self.add_stylesheet(page, True)
+        self.__add_stylesheet(page, True)
 
-        chapters = [self.create_chapter_page(chapter, volume_filename) for chapter in volume.children]
+        chapters = [self.__create_chapter_page(chapter, volume_filename) for chapter in volume.children]
         return page, chapters
 
-    def create_chapter_page(self, chapter: Structure, volume_filename: Optional[str] = None) -> epub.EpubHtml:
+    def __create_chapter_page(self, chapter: Structure, volume_filename: Optional[str] = None) -> epub.EpubHtml:
         title = chapter.title
-        chapter_filename = purify_name(self.get_filename(title))
+        chapter_filename = purify_name(self._get_filename(title))
         filename_text = f'Text/{volume_filename}/{chapter_filename}.html' \
             if volume_filename else f'Text/{chapter_filename}.html'
-        page = epub.EpubHtml(title=self.get_content(title), file_name=filename_text)
-        content = self.chapter_template.format(title=self.format_title(title),
+        page = epub.EpubHtml(title=self._get_content(title), file_name=filename_text)
+        content = self.chapter_template.format(title=self.__format_title(title),
                                                contents='\n'.join(
-                                                   [self.format_content(content) for content in chapter.contents]))
+                                                   [self.__format_content(content) for content in chapter.contents]))
         page.set_content(content)
-        self.add_stylesheet(page, volume_filename is not None)
+        self.__add_stylesheet(page, volume_filename is not None)
         return page
 
     @staticmethod
-    def add_stylesheet(page: epub.EpubHtml, in_volume: bool):
+    def __add_stylesheet(page: epub.EpubHtml, in_volume: bool):
         filename = '../../Styles/stylesheet.css' if in_volume else '../Styles/stylesheet.css'
         css = epub.EpubItem(file_name=filename, media_type='text/css')
         page.add_item(css)
 
     @staticmethod
-    def format_metadata(name: str, content: str) -> str:
+    def __format_metadata(name: str, content: str) -> str:
         soup = BeautifulSoup()
         metadata = soup.new_tag('span')
         metadata['id'] = name
@@ -288,17 +287,17 @@ class EpubWriter(StructureWriter):
         soup.append(metadata)
         return str(soup)
 
-    def format_title(self, data: NovelData) -> str:
+    def __format_title(self, data: NovelData) -> str:
         soup = BeautifulSoup()
         title = soup.new_tag('h1')
-        title.string = self.get_content(data)
+        title.string = self._get_content(data)
         if data.has('tag'):
             title['class'] = data.get('tag')
         soup.append(title)
         return str(soup)
 
     @staticmethod
-    def format_content(data: NovelData) -> str:
+    def __format_content(data: NovelData) -> str:
         content = data.content
         if not content:
             soup = BeautifulSoup()

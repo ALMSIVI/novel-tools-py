@@ -28,7 +28,7 @@ class DirectoryWriter(StructureWriter):
         self.intro_filename = args['intro_filename']
 
     def write(self) -> None:
-        self.cleanup()
+        self._cleanup()
 
         # Write intro
         if len(self.structure.contents) > 0:
@@ -38,16 +38,16 @@ class DirectoryWriter(StructureWriter):
         # Write volume
         if self.has_volumes:
             for volume in self.structure.children:
-                self.write_volume(volume)
+                self.__write_volume(volume)
         else:
             default_volume = Structure()
             default_volume.title = NovelData('', Type.VOLUME_TITLE, filename=self.default_volume)
             default_volume.children = self.structure.children
-            self.write_volume(default_volume)
+            self.__write_volume(default_volume)
 
-    def write_volume(self, volume: Structure):
+    def __write_volume(self, volume: Structure):
         title = volume.title
-        filename = purify_name(self.get_filename(title))
+        filename = purify_name(self._get_filename(title))
         volume_dir = os.path.join(self.out_dir, filename)
         if not os.path.isdir(volume_dir):
             os.mkdir(volume_dir)
@@ -59,8 +59,8 @@ class DirectoryWriter(StructureWriter):
         # Write chapter
         for chapter in volume.children:
             title = chapter.title
-            filename = purify_name(self.get_filename(title))
+            filename = purify_name(self._get_filename(title))
             chapter_filename = os.path.join(volume_dir, filename + '.txt')
             with open(chapter_filename, 'wt') as f:
-                f.write(self.get_content(title) + '\n\n')
+                f.write(self._get_content(title) + '\n\n')
                 f.write(chapter.contents[0].content)

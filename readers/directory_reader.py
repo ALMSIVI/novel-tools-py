@@ -56,7 +56,7 @@ class DirectoryReader(Reader, ACC):
         # Read intro file
         intro_filename = os.path.join(self.in_dir, self.intro_filename)
         if self.read_contents and os.path.isfile(intro_filename):
-            text_reader = self.get_text_reader(intro_filename)
+            text_reader = self.__get_text_reader(intro_filename)
             for data in text_reader.read():
                 data.type = Type.BOOK_INTRO
                 yield data
@@ -79,14 +79,14 @@ class DirectoryReader(Reader, ACC):
             if self.intro_filename in chapters:
                 chapters.remove(self.intro_filename)
                 if self.read_contents:
-                    text_reader = self.get_text_reader(os.path.join(volume_path, self.intro_filename))
+                    text_reader = self.__get_text_reader(os.path.join(volume_path, self.intro_filename))
                     for data in text_reader.read():
                         data.type = Type.VOLUME_INTRO
                         yield data
 
             for chapter in chapters:
                 chapter_index += 1
-                text_reader = self.get_text_reader(os.path.join(volume_path, chapter))
+                text_reader = self.__get_text_reader(os.path.join(volume_path, chapter))
                 read = text_reader.read()
                 data = next(read)  # Title
                 data.type = Type.CHAPTER_TITLE
@@ -97,7 +97,7 @@ class DirectoryReader(Reader, ACC):
                         data.type = Type.CHAPTER_CONTENT
                         yield data
 
-    def get_text_reader(self, filename: str) -> TextReader:
+    def __get_text_reader(self, filename: str) -> TextReader:
         return TextReader({
             'text_filename': filename,
             'in_dir': self.in_dir,
