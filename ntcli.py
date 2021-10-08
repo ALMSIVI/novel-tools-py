@@ -1,6 +1,6 @@
 import argparse
 import os
-from toolkit import analyze, add, convert, docgen
+from toolkit import analyze, docgen
 from utils import get_config
 
 
@@ -30,18 +30,6 @@ def start():
                                      ' TextReader, and it must contain the full path.')
     analyze_parser.add_argument('-o', '--output', default=None, help='Output directory name.')
     analyze_parser.set_defaults(func=do_analyze)
-
-    # Other functions #
-    # add_to_calibre
-    add_parser = subparsers.add_parser('add', description='Add a book file to Calibre database.')
-    add_parser.add_argument('-d', '--dir', help='Directory for book and metadata files.')
-    add_parser.set_defaults(func=lambda a: add(a.dir))
-
-    # calibre_convert
-    convert_parser = subparsers.add_parser('convert',
-                                           description='Convert a file to epub using calibre\'s built-in tool.')
-    convert_parser.add_argument('-d', '--dir', help='Directory for book and metadata files.')
-    convert_parser.set_defaults(func=lambda a: convert(a.dir))
 
     # generate_docs
     doc_parser = subparsers.add_parser('docgen', description='Generates documentation for framework classes.')
