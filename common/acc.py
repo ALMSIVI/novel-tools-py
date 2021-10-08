@@ -9,19 +9,25 @@ class Null:
 
 class FieldMetadata:
     def __init__(self, name: str, field_type: str, *, optional: bool = False, default: Any = Null(),
-                 options: list = None, description: str):
+                 options: list[Any] = None, description: str, properties: list['FieldMetadata'] = None):
         self.name = name
         self.type = field_type
         self.optional = True if type(default) is not Null else optional
         self.default = default
         self.options = options
         self.description = description
+        self.properties = properties
 
-    @property
-    def docstring(self):
+    def docstring(self, indent: int = 2):
+        """indent refers to the indentation of object properties."""
         optional = ', optional' if self.optional else ''
         default = f', default={self.default}' if type(self.default) is not Null else ''
-        return f'{self.name} ({self.type + optional + default}): {self.description}'
+        options = f', options={self.options}' if self.options is not None else ''
+        properties = '\n' + ' ' * indent + 'Properties:\n' + '\n'.join(
+            [' ' * indent + '- ' + prop.docstring(indent + 2) for prop in self.properties]) \
+            if self.properties is not None else ''
+
+        return f'{self.name} ({self.type + optional + default + options}): {self.description}{properties}'
 
 
 class ACC(ABC):
@@ -46,11 +52,21 @@ class ACC(ABC):
 
     @classmethod
     def extract_fields(cls, args: dict) -> dict:
-        metadata_dict = {metadata.name: metadata for metadata in cls.required_fields()}
+        return cls.__extract_fields(args, cls.required_fields())
+
+    @classmethod
+    def __extract_fields(cls, args: dict, required_fields: list[FieldMetadata]):
+        metadata_dict: dict[str, FieldMetadata] = {metadata.name: metadata for metadata in required_fields}
         fields = {}
         for key, val in args.items():
             if key in metadata_dict:
-                metadata_dict.pop(key)
+                metadata = metadata_dict.pop(key)
+                if metadata.options is not None and val not in metadata.options:
+                    raise ValueError(f'argument {key} is {val} but the options are {metadata.optionns}')
+
+                if metadata.properties is not None:
+                    val = cls.__extract_fields(val, metadata.properties)
+
                 fields[key] = val
 
         for key, val in metadata_dict.items():
@@ -64,4 +80,4 @@ class ACC(ABC):
     @classmethod
     def docstring(cls) -> str:
         metadata_list = cls.required_fields()
-        return '\n'.join(['- ' + metadata.docstring for metadata in metadata_list])
+        return '\n'.join(['- ' + metadata.docstring() for metadata in metadata_list])
