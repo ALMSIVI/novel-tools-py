@@ -1,5 +1,4 @@
 import csv
-import os
 from common import NovelData, ACC, FieldMetadata
 from framework import Writer
 from utils import purify_name
@@ -16,7 +15,7 @@ class CsvWriter(Writer, ACC):
         return [
             FieldMetadata('csv_filename', 'str', default='list.csv',
                           description='Filename of the output csv file.'),
-            FieldMetadata('out_dir', 'str',
+            FieldMetadata('out_dir', 'Path',
                           description='The directory to write the csv file to.'),
             FieldMetadata('additional_fields', 'list[str]', default=[],
                           description='Specifies additional fields to be included to the csv file.')
@@ -24,7 +23,7 @@ class CsvWriter(Writer, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        self.filename = os.path.join(args['out_dir'], purify_name(args['csv_filename']))
+        self.csv_path = args['out_dir'] / purify_name(args['csv_filename'])
         self.field_names = ['type', 'index', 'content', 'formatted'] + args['additional_fields']
 
         self.list = []
@@ -36,7 +35,7 @@ class CsvWriter(Writer, ACC):
         self.list.append(data)
 
     def write(self) -> None:
-        with open(self.filename, 'wt', newline='') as f:
+        with self.csv_path.open('wt', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.field_names)
             writer.writeheader()
             for data in self.list:

@@ -1,4 +1,5 @@
 from abc import ABC
+from pathlib import Path
 from typing import Optional
 from framework import Writer
 from common import NovelData, Type, ACC, FieldMetadata
@@ -22,7 +23,7 @@ class StructureWriter(Writer, ACC, ABC):
     @staticmethod
     def required_fields() -> list[FieldMetadata]:
         return [
-            FieldMetadata('out_dir', 'str',
+            FieldMetadata('out_dir', 'Path',
                           description='The working directory.'),
             FieldMetadata('debug', 'bool', default=False,
                           description='If set to True, will print the error message to the terminal.'),
@@ -30,7 +31,7 @@ class StructureWriter(Writer, ACC, ABC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        self.out_dir = args['out_dir']
+        self.out_dir: Path = args['out_dir']
         self.debug = args['debug']
 
         self.structure = Structure()

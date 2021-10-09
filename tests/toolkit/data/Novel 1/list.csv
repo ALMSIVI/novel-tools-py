@@ -1,9 +1,9 @@
 type,index,content,formatted,source,line_num
 VOLUME_TITLE,1,First Volume,Volume 1 First Volume,(1) Volume 1 First Volume,
-CHAPTER_TITLE,-1,Intro,Introduction Intro,(1) Introduction Intro.txt,1
-CHAPTER_TITLE,1,First Chapter,Chapter 1 First Chapter,(2) Chapter 1 First Chapter.txt,1
-CHAPTER_TITLE,2,Second Chapter,Chapter 2 Second Chapter,(3) Chapter 2 Second Chapter.txt,1
+CHAPTER_TITLE,-1,Intro,Introduction Intro,(1) Volume 1 First Volume/(1) Introduction Intro.txt,1
+CHAPTER_TITLE,1,First Chapter,Chapter 1 First Chapter,(1) Volume 1 First Volume/(2) Chapter 1 First Chapter.txt,1
+CHAPTER_TITLE,2,Second Chapter,Chapter 2 Second Chapter,(1) Volume 1 First Volume/(3) Chapter 2 Second Chapter.txt,1
 VOLUME_TITLE,2,Second Volume,Volume 2 Second Volume,(2) Volume 2 Second Volume,
-CHAPTER_TITLE,3,Third Chapter,Chapter 3 Third Chapter,(4) Chapter 3 Third Chapter.txt,1
+CHAPTER_TITLE,3,Third Chapter,Chapter 3 Third Chapter,(2) Volume 2 Second Volume/(4) Chapter 3 Third Chapter.txt,1
 VOLUME_TITLE,-1,Extra Volume,Easter Egg Extra Volume,(3) Easter Egg Extra Volume,
-CHAPTER_TITLE,4,Fourth Chapter,Chapter 4 Fourth Chapter,(5) Chapter 4 Fourth Chapter.txt,1
+CHAPTER_TITLE,4,Fourth Chapter,Chapter 4 Fourth Chapter,(3) Easter Egg Extra Volume/(5) Chapter 4 Fourth Chapter.txt,1

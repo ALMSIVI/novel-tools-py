@@ -15,7 +15,7 @@ class TocMatcher(Processor, ACC):
         return [
             FieldMetadata('toc_filename', 'str', default='toc.txt',
                           description='Filename of the toc file. This file should be generated from `TocWriter`.'),
-            FieldMetadata('in_dir', 'str', optional=True,
+            FieldMetadata('in_dir', 'Path', optional=True,
                           description='The directory to read the toc file from. Required if the filename does not '
                                       'contain the path.'),
             FieldMetadata('encoding', 'str', default='utf-8',

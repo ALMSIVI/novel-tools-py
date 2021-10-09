@@ -1,4 +1,3 @@
-import os
 from common import Type, NovelData, FieldMetadata
 from .__structure_writer import StructureWriter, Structure
 from utils import purify_name
@@ -40,7 +39,7 @@ class MarkdownWriter(StructureWriter):
         title = self.structure.title
         title_text = self._get_content(title) if title else ''
         filename = purify_name(self._get_filename(title) + '.md' if self.use_title else self.filename)
-        with open(os.path.join(self.out_dir, filename), 'wt') as f:
+        with (self.out_dir / filename).open('wt') as f:
             if title:
                 f.write(self.levels.get(Type.BOOK_TITLE, '') + title_text + '\n\n')
 

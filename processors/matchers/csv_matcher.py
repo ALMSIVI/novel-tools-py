@@ -26,14 +26,15 @@ class CsvMatcher(Processor, ACC):
         return [
             FieldMetadata('csv_filename', 'str', default='list.csv',
                           description='Filename of the csv list file.'),
-            FieldMetadata('in_dir', 'str', optional=True,
+            FieldMetadata('in_dir', 'Path', optional=True,
                           description='The directory to read the csv file from. Required if the filename does not '
                                       'contain the path.'),
             FieldMetadata('encoding', 'str', default='utf-8',
                           description='Encoding of the csv list file.'),
-            FieldMetadata('types', 'dict', default={'line_num': 'int'},
-                          description='Type of each additional field to be fetched. Currently, str, int and bool are '
-                                      'supported.'),
+            FieldMetadata('types', 'dict', default={'line_num': 'int', 'source': 'Path'},
+                          description='Type of each additional field to be fetched. See CsvReader for more details.'),
+            FieldMetadata('join_dir', 'list[str]', default=['source'],
+                          description='Specifies fields names that need dir joining. See CsvReader for more details.'),
             FieldMetadata('data_type', 'str', optional=True,
                           description='If present, specifies the type of all the titles.'),
         ]

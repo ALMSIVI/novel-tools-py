@@ -1,4 +1,3 @@
-import os
 from common import FieldMetadata
 from .__structure_writer import StructureWriter, Structure
 from utils import purify_name
@@ -32,7 +31,7 @@ class TextWriter(StructureWriter):
         title = self.structure.title
         title_text = self._get_content(title) if title else ''
         filename = purify_name(self._get_filename(title) + '.txt' if self.use_title else self.filename)
-        with open(os.path.join(self.out_dir, filename), 'wt') as f:
+        with (self.out_dir / filename).open('wt') as f:
             if title:
                 f.write(title_text + '\n\n')
 

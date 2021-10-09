@@ -1,4 +1,3 @@
-import os
 from framework import Writer
 from common import NovelData, Type, ACC, FieldMetadata
 from utils import purify_name
@@ -16,7 +15,7 @@ class TocWriter(Writer, ACC):
         return [
             FieldMetadata('toc_filename', 'str', default='toc.txt',
                           description='Filename of the output toc file.'),
-            FieldMetadata('out_dir', 'str',
+            FieldMetadata('out_dir', 'Path',
                           description='The directory to write the toc file to.'),
             FieldMetadata('write_line_num', 'bool', default=True,
                           description='If set to True, will write line number to the toc.'),
@@ -26,7 +25,7 @@ class TocWriter(Writer, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        self.filename = os.path.join(args['out_dir'], purify_name(args['toc_filename']))
+        self.csv_path = args['out_dir'] / purify_name(args['toc_filename'])
         self.write_line_num = args['write_line_num']
         self.debug = args['debug']
 
@@ -42,7 +41,7 @@ class TocWriter(Writer, ACC):
         self.list.append(data)
 
     def write(self) -> None:
-        with open(self.filename, 'wt') as f:
+        with self.csv_path.open('wt') as f:
             for data in self.list:
                 line = ''
                 if data.type == Type.CHAPTER_TITLE and self.has_volume:

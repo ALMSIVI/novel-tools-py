@@ -1,16 +1,16 @@
-import os
+from pathlib import Path
 from typing import Optional
 from framework import Worker
 from processors.matchers.__aggregate_matcher import AggregateMatcher
 from utils import generate_objects, default_packages
 
 
-def analyze(config: dict, *, filename: Optional[str] = None, in_dir: Optional[str] = None,
-            out_dir: Optional[str] = None):
+def analyze(config: dict, *, filename: Optional[Path] = None, in_dir: Optional[Path] = None,
+            out_dir: Optional[Path] = None):
     """
-    Invokes a Worker instance to analyze the file.
+    Invokes a Worker instance to analyze the novel.
 
-    A typical workflow to process a novel file may include:
+    A typical workflow to process a novel may include:
 
     1. Generate a structure file from the novel text. You can use `struct_config.json` as a template.
     2. Examine the structure file and scan for any errors or inconsistencies. Correct the structure and/or the novel
@@ -45,7 +45,7 @@ def analyze(config: dict, *, filename: Optional[str] = None, in_dir: Optional[st
         raise ValueError('Either filename or in_dir needs to be specified.')
 
     if in_dir is None:
-        in_dir = os.path.dirname(filename)
+        in_dir = filename.parent
 
     additional_args = {
         'in_dir': in_dir,

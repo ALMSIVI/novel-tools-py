@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Iterator
 from framework import Reader
 from common import NovelData, Type, ACC, FieldMetadata
@@ -12,7 +12,7 @@ class TocReader(Reader, ACC):
         return [
             FieldMetadata('toc_filename', 'str', default='toc.txt',
                           description='Filename of the toc file. This file should be generated from `TocWriter`.'),
-            FieldMetadata('in_dir', 'str', optional=True,
+            FieldMetadata('in_dir', 'Path', optional=True,
                           description='The directory to read the toc file from. Required if the filename does not '
                                       'contain the path.'),
             FieldMetadata('encoding', 'str', default='utf-8',
@@ -27,13 +27,13 @@ class TocReader(Reader, ACC):
         args = self.extract_fields(args)
         self.has_volume = args['has_volume']
         self.discard_chapters = args['discard_chapters']
-        self.filename = args['toc_filename']
+        self.filename = Path(args['toc_filename'])
         self.in_dir = args['in_dir']
         self.encoding = args['encoding']
 
     def read(self) -> Iterator[NovelData]:
-        full_filename = self.filename if os.path.isfile(self.filename) else os.path.join(self.in_dir, self.filename)
-        with open(full_filename, 'rt', encoding=self.encoding) as f:
+        toc_path = self.filename if self.filename.is_file() else self.in_dir / self.filename
+        with toc_path.open('rt', encoding=self.encoding) as f:
             indices = {Type.VOLUME_TITLE: 0, Type.CHAPTER_TITLE: 0}
             for line in f:
                 elements = line.split('\t')

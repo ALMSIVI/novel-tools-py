@@ -1,3 +1,4 @@
+from pathlib import Path
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from common import NovelData, Type
@@ -9,8 +10,8 @@ from utils import format_text
 def csv_matcher(mocker: MockerFixture, request: FixtureRequest):
     csv, args = request.node.get_closest_marker('data').args
     csv = format_text(csv)
-    mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
-    return CsvMatcher(args | {'in_dir': ''})
+    mocker.patch('pathlib.Path.open', mocker.mock_open(read_data=csv))
+    return CsvMatcher(args | {'in_dir': Path()})
 
 
 @mark.data('''
@@ -53,18 +54,18 @@ def test_list_type(csv_matcher: CsvMatcher):
     Ipsum,test2.txt,10
 ''', {'data_type': 'chapter_title'})
 def test_source_line_num(csv_matcher: CsvMatcher):
-    before = NovelData('Chapter One Lorem', source='test1.txt', line_num=1)
+    before = NovelData('Chapter One Lorem', source=Path('test1.txt'), line_num=1)
     after = csv_matcher.process(before)
-    assert after == NovelData('Lorem', Type.CHAPTER_TITLE, 1, source='test1.txt', line_num=1, list_index=1,
+    assert after == NovelData('Lorem', Type.CHAPTER_TITLE, 1, source=Path('test1.txt'), line_num=1, list_index=1,
                               matched=True)
 
-    before = NovelData('Chapter Two Ipsum', source='test2.txt', line_num=1)
+    before = NovelData('Chapter Two Ipsum', source=Path('test2.txt'), line_num=1)
     after = csv_matcher.process(before)
-    assert after == NovelData('Chapter Two Ipsum', source='test2.txt', line_num=1)
+    assert after == NovelData('Chapter Two Ipsum', source=Path('test2.txt'), line_num=1)
 
-    before = NovelData('Chapter Two Ipsum', source='test2.txt', line_num=10)
+    before = NovelData('Chapter Two Ipsum', source=Path('test2.txt'), line_num=10)
     after = csv_matcher.process(before)
-    assert after == NovelData('Ipsum', Type.CHAPTER_TITLE, 2, source='test2.txt', line_num=10, list_index=2,
+    assert after == NovelData('Ipsum', Type.CHAPTER_TITLE, 2, source=Path('test2.txt'), line_num=10, list_index=2,
                               matched=True)
 
 
@@ -123,6 +124,6 @@ def test_invalid(mocker: MockerFixture):
             Chapter 1 Lorem
             Chapter 2 Ipsum
         ''')
-    mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
+    mocker.patch('pathlib.Path.open', mocker.mock_open(read_data=csv))
     with raises(ValueError, match='Type of title is not specified in file or arguments.'):
-        CsvMatcher({'in_dir': ''})
+        CsvMatcher({'in_dir': Path()})

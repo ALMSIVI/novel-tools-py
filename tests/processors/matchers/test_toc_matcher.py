@@ -1,3 +1,4 @@
+from pathlib import Path
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
 from common import NovelData, Type
@@ -9,8 +10,8 @@ from utils import format_text
 def toc_matcher(mocker: MockerFixture, request: FixtureRequest):
     toc, args = request.node.get_closest_marker('data').args
     toc = format_text(toc)
-    mocker.patch('builtins.open', mocker.mock_open(read_data=toc))
-    return TocMatcher(args | {'in_dir': ''})
+    mocker.patch('pathlib.Path.open', mocker.mock_open(read_data=toc))
+    return TocMatcher(args | {'in_dir': Path()})
 
 
 @mark.data('''

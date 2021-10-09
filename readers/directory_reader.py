@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Iterator
 from natsort import os_sorted
 from common import NovelData, Type, ACC, FieldMetadata
@@ -17,7 +17,7 @@ class DirectoryReader(Reader, ACC):
     @staticmethod
     def required_fields() -> list[FieldMetadata]:
         return [
-            FieldMetadata('in_dir', 'str',
+            FieldMetadata('in_dir', 'Path',
                           description='The working directory.'),
             FieldMetadata('read_contents', 'bool',
                           description='If set to True, will open the files to read the contents.'),
@@ -38,25 +38,24 @@ class DirectoryReader(Reader, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        self.in_dir = args['in_dir']
+        self.in_dir: Path = args['in_dir']
         self.read_contents = args['read_contents']
         self.discard_chapters = args['discard_chapters']
-        self.default_volume = args['default_volume']
+        self.default_volume = self.in_dir / args['default_volume'] if args['default_volume'] else None
         self.encoding = args['encoding']
         self.intro_filename = args['intro_filename']
         self.merge_newlines = args['merge_newlines']
 
         # Create the list of volumes/directories to look for
-        self.volumes = [dir_name for dir_name in os_sorted(os.listdir(self.in_dir)) if
-                        os.path.isdir(os.path.join(self.in_dir, dir_name))]
+        self.volumes: list[Path] = [dir_path for dir_path in os_sorted(self.in_dir.iterdir()) if dir_path.is_dir()]
         if self.default_volume in self.volumes:
             self.volumes = [self.default_volume]
 
     def read(self) -> Iterator[NovelData]:
         # Read intro file
-        intro_filename = os.path.join(self.in_dir, self.intro_filename)
-        if self.read_contents and os.path.isfile(intro_filename):
-            text_reader = self.__get_text_reader(intro_filename)
+        intro_path = self.in_dir / self.intro_filename
+        if self.read_contents and intro_path.is_file():
+            text_reader = self.__get_text_reader(intro_path)
             for data in text_reader.read():
                 data.type = Type.BOOK_INTRO
                 yield data
@@ -69,24 +68,23 @@ class DirectoryReader(Reader, ACC):
                 chapter_index = 0
 
             if volume != self.default_volume:
-                yield NovelData(volume, Type.VOLUME_TITLE, volume_index, source=volume)
+                yield NovelData(volume.stem, Type.VOLUME_TITLE, volume_index, source=volume)
 
-            volume_path = os.path.join(self.in_dir, volume)
-            chapters = [chapter for chapter in os_sorted(os.listdir(volume_path))
-                        if os.path.isfile(os.path.join(volume_path, chapter))
-                        and os.path.splitext(chapter)[1] in supported_extensions]
+            chapters = [chapter for chapter in os_sorted(volume.iterdir()) if chapter.is_file()
+                        and chapter.suffix in supported_extensions]
             # Read intro file
-            if self.intro_filename in chapters:
-                chapters.remove(self.intro_filename)
+            intro_path = Path(volume, self.intro_filename)
+            if intro_path in chapters:
+                chapters.remove(intro_path)
                 if self.read_contents:
-                    text_reader = self.__get_text_reader(os.path.join(volume_path, self.intro_filename))
+                    text_reader = self.__get_text_reader(intro_path)
                     for data in text_reader.read():
                         data.type = Type.VOLUME_INTRO
                         yield data
 
             for chapter in chapters:
                 chapter_index += 1
-                text_reader = self.__get_text_reader(os.path.join(volume_path, chapter))
+                text_reader = self.__get_text_reader(chapter)
                 read = text_reader.read()
                 data = next(read)  # Title
                 data.type = Type.CHAPTER_TITLE
@@ -97,7 +95,7 @@ class DirectoryReader(Reader, ACC):
                         data.type = Type.CHAPTER_CONTENT
                         yield data
 
-    def __get_text_reader(self, filename: str) -> TextReader:
+    def __get_text_reader(self, filename: Path) -> TextReader:
         return TextReader({
             'text_filename': filename,
             'in_dir': self.in_dir,

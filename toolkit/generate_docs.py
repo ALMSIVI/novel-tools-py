@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Optional
 from common import ACC
 from utils import get_config, class_packages, generate_classes, format_text
@@ -13,14 +13,13 @@ def docgen(config_filename: Optional[str], doc_filename: Optional[str] = None):
         doc_filename: The output doc filename. Default is 'docs.md' under the config's directory if config_filename is
                       specified, or the current directory if not.
     """
-    config = get_config(config_filename, os.curdir) if config_filename is not None else {}
+    config = get_config(config_filename, Path()) if config_filename is not None else {}
     class_dict = generate_classes(config, class_packages)
 
     if doc_filename is None:
-        doc_filename = os.path.join(os.path.dirname(config_filename) if config_filename is not None else os.curdir,
-                                    'docs.md')
+        doc_filename = (Path(config_filename).parent if config_filename is not None else Path()) / 'docs.md'
 
-    with open(doc_filename, 'wt') as f:
+    with doc_filename.open('wt') as f:
         for package_name, classes in class_dict.items():
             f.write(f'## {package_name}\n\n')
             for name, cls in classes.items():

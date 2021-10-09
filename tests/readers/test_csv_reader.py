@@ -1,3 +1,4 @@
+from pathlib import Path
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from typing import Iterator
@@ -10,8 +11,8 @@ from utils import format_text
 def read(mocker: MockerFixture, request: FixtureRequest):
     csv = request.node.get_closest_marker('data').args[0]
     csv = format_text(csv)
-    mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
-    return CsvReader({'in_dir': ''}).read()
+    mocker.patch('pathlib.Path.open', mocker.mock_open(read_data=csv))
+    return CsvReader({'in_dir': Path()}).read()
 
 
 @mark.data('''
@@ -31,6 +32,6 @@ def test_invalid(mocker: MockerFixture):
     type
     volume_title
     ''')
-    mocker.patch('builtins.open', mocker.mock_open(read_data=csv))
+    mocker.patch('pathlib.Path.open', mocker.mock_open(read_data=csv))
     with raises(ValueError, match='csv does not contain valid columns.'):
-        CsvReader({'in_dir': ''})
+        CsvReader({'in_dir': Path()})

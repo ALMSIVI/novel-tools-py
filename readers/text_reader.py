@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Iterator
 from framework import Reader
 from common import NovelData, ACC, FieldMetadata
@@ -12,7 +12,7 @@ class TextReader(Reader, ACC):
         return [
             FieldMetadata('text_filename', 'str', default='text.txt',
                           description='The filename of the text.'),
-            FieldMetadata('in_dir', 'str', optional=True,
+            FieldMetadata('in_dir', 'Path', optional=True,
                           description='The directory to read the text file from. Required if the filename does not '
                                       'contain the path.'),
             FieldMetadata('encoding', 'str', default='utf-8',
@@ -28,16 +28,15 @@ class TextReader(Reader, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        self.filename = args['text_filename']
+        self.filename = Path(args['text_filename'])
         self.in_dir = args['in_dir']
         self.encoding = args['encoding']
         self.verbose = args['verbose']
         self.merge_newlines = args['merge_newlines']
 
     def read(self) -> Iterator[NovelData]:
-        full_filename = self.filename if os.path.isfile(self.filename) else os.path.join(self.in_dir, self.filename)
-        source = os.path.basename(self.filename)
-        with open(full_filename, 'rt', encoding=self.encoding) as f:
+        text_path = self.filename if self.filename.is_file() else self.in_dir / self.filename
+        with text_path.open('rt', encoding=self.encoding) as f:
             line_num = 0
             prev_newline = False
             for line in f:
@@ -50,5 +49,5 @@ class TextReader(Reader, ACC):
                 else:
                     prev_newline = False
 
-                args = {'source': source, 'line_num': line_num, 'raw': line.rstrip()} if self.verbose else {}
+                args = {'source': text_path, 'line_num': line_num, 'raw': line.rstrip()} if self.verbose else {}
                 yield NovelData(content, **args)

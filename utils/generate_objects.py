@@ -1,6 +1,6 @@
-import os
 import json
 from importlib import import_module
+from pathlib import Path
 from typing import Optional
 
 
@@ -36,14 +36,15 @@ class_packages = [
 ]
 
 
-def get_config(config_filename: str, in_dir: Optional[str] = None):
-    filename = config_filename
-    if not os.path.isfile(filename):
-        filename = os.path.join(in_dir, config_filename)
-    if not os.path.isfile(filename):
-        filename = os.path.join(os.curdir, 'config', config_filename)
+def get_config(config_filename: str, in_dir: Optional[Path] = None):
+    path = Path(config_filename)
 
-    with open(filename, 'rt') as f:
+    if not path.is_file():
+        path = in_dir / config_filename
+    if not path.is_file():
+        path = Path('config', config_filename)
+
+    with path.open('rt') as f:
         config = json.load(f)
 
     return config
@@ -60,8 +61,8 @@ class ClassFactory:
             self.add_package(package['base'], package['ending'])
 
     def add_package(self, base: str, ending: str):
-        module_dir = os.path.join(os.curdir, *base.split('.'))
-        module_names = [filename[:-3] for filename in os.listdir(module_dir) if filename.endswith(f'{ending}.py')]
+        module_dir = Path(*base.split('.'))
+        module_names = [path.stem for path in module_dir.iterdir() if str(path).endswith(f'{ending}.py')]
         for module in module_names:
             name = snake_to_pascal(module)
             self.classes[name] = import_class(module, base)

@@ -54,6 +54,10 @@
             "format": "Chapter {index} {content}"
           }
         ]
+      },
+      {
+        "class": "PathTransformer",
+        "fields": ["source"]
       }
     ],
     "writers": [

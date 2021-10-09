@@ -1,3 +1,4 @@
+from pathlib import Path
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from typing import Iterator
@@ -8,8 +9,8 @@ from readers.markdown_reader import MarkdownReader
 @fixture
 def read(mocker: MockerFixture, request: FixtureRequest):
     text, args = request.node.get_closest_marker('data').args
-    mocker.patch('builtins.open', mocker.mock_open(read_data=text))
-    return MarkdownReader(args | {'filename': 'text.md', 'in_dir': ''}).read()
+    mocker.patch('pathlib.Path.open', mocker.mock_open(read_data=text))
+    return MarkdownReader(args | {'filename': 'text.md', 'in_dir': Path()}).read()
 
 
 @mark.data('# Title\n\nText 1\n\n## Volume\n\nText 2\n\n### Chapter\n\nText 3\n\n ', {})
@@ -27,8 +28,8 @@ def test_read(read: Iterator[NovelData]):
 
 @mark.data('line\n\n ', {'verbose': True})
 def test_verbose(read: Iterator[NovelData]):
-    assert next(read) == NovelData('line', Type.UNRECOGNIZED, source='text.md', line_num=1, raw='line')
-    assert next(read) == NovelData('', Type.UNRECOGNIZED, source='text.md', line_num=3, raw='')
+    assert next(read) == NovelData('line', Type.UNRECOGNIZED, source=Path('text.md'), line_num=1, raw='line')
+    assert next(read) == NovelData('', Type.UNRECOGNIZED, source=Path('text.md'), line_num=3, raw='')
     with raises(StopIteration):
         next(read)
 

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Iterator
 from framework import Reader
 from common import NovelData, Type, ACC, FieldMetadata
@@ -16,7 +16,7 @@ class MarkdownReader(Reader, ACC):
         return [
             FieldMetadata('md_filename', 'str', default='text.md',
                           description='The filename of the markdown file.'),
-            FieldMetadata('in_dir', 'str', optional=True,
+            FieldMetadata('in_dir', 'Path', optional=True,
                           description='The directory to read the text file from. Required if the filename does not '
                                       'contain the path.'),
             FieldMetadata('encoding', 'str', default='utf-8',
@@ -30,16 +30,15 @@ class MarkdownReader(Reader, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        self.filename = args['md_filename']
+        self.md_path = Path(args['md_filename'])
         self.in_dir = args['in_dir']
         self.encoding = args['encoding']
         self.verbose = args['verbose']
         self.levels = {int(key): Type[value.upper()] for key, value in args['levels'].items()}
 
     def read(self) -> Iterator[NovelData]:
-        full_filename = self.filename if os.path.isfile(self.filename) else os.path.join(self.in_dir, self.filename)
-        source = os.path.basename(self.filename)
-        with open(full_filename, 'rt', encoding=self.encoding) as f:
+        md_path = self.md_path if self.md_path.is_file() else self.in_dir / self.md_path
+        with md_path.open('rt', encoding=self.encoding) as f:
             line_num = 0
             prev_newline = False
             for line in f:
@@ -61,5 +60,5 @@ class MarkdownReader(Reader, ACC):
                         data_type = self.levels[index]
                         content = content[index + 1:]
 
-                args = {'source': source, 'line_num': line_num, 'raw': line.rstrip()} if self.verbose else {}
+                args = {'source': md_path, 'line_num': line_num, 'raw': line.rstrip()} if self.verbose else {}
                 yield NovelData(content, data_type, **args)

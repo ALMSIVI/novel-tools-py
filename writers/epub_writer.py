@@ -1,5 +1,5 @@
-import os
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 from bs4 import BeautifulSoup
 from ebooklib import epub
@@ -35,10 +35,8 @@ class EpubWriter(StructureWriter):
     @staticmethod
     def required_fields() -> list[FieldMetadata]:
         return StructureWriter.required_fields() + [
-            FieldMetadata('write_newline', 'bool', default=False,
-                          description='If set to true, will treat double p.'),
-            FieldMetadata('in_dir', 'str',
-                          description='The directory that stores all the files except for the novel data, including '
+            FieldMetadata('in_dir', 'Path',
+                          description='The directory that stores all the additional data, including '
                                       'stylesheets and/or images.'),
             FieldMetadata('encoding', 'str', default='utf-8',
                           description='Encoding of the metadata template file.'),
@@ -72,7 +70,7 @@ class EpubWriter(StructureWriter):
     def __init__(self, args):
         args = self.extract_fields(args)
         super().__init__(args)
-        self.in_dir = args['in_dir']
+        self.in_dir: Path = args['in_dir']
         self.encoding = args['encoding']
         self.include_nav = args['include_nav']
         self.cover = args['cover']
@@ -82,25 +80,21 @@ class EpubWriter(StructureWriter):
         self.date_format = args['date_format']
 
         # Stylesheet and metadata templates will only be used once, so we don't store them inside the class
-        self.stylesheet = os.path.join(self.in_dir, args['stylesheet']) \
-            if 'stylesheet' in args \
-            else os.path.join(os.curdir, 'config', 'epub', 'stylesheet.css')
+        self.stylesheet = self.in_dir / args['stylesheet'] if 'stylesheet' in args \
+            else Path('config', 'epub', 'stylesheet.css')
 
-        self.metadata_template = os.path.join(self.in_dir, args['metadata_template']) \
-            if 'metadata_template' in args \
-            else os.path.join(os.curdir, 'config', 'epub', 'metadata_page.html')
+        self.metadata_template = self.in_dir / args['metadata_template'] if 'metadata_template' in args \
+            else Path('config', 'epub', 'metadata_page.html')
 
         # Volume and chapter templates will be reused, so we store them to save I/O operations.
-        volume_template = os.path.join(self.in_dir, args['volume_template']) \
-            if 'volume_template' in args \
-            else os.path.join(os.curdir, 'config', 'epub', 'volume_page.html')
-        with open(volume_template, 'rt', encoding=self.encoding) as f:
+        volume_template = self.in_dir / args['volume_template'] if 'volume_template' in args \
+            else Path('config', 'epub', 'volume_page.html')
+        with volume_template.open('rt', encoding=self.encoding) as f:
             self.volume_template = f.read()
 
-        chapter_template = os.path.join(self.in_dir, args['chapter_template']) \
-            if 'chapter_template' in args \
-            else os.path.join(os.curdir, 'config', 'epub', 'chapter_page.html')
-        with open(chapter_template, 'rt', encoding=self.encoding) as f:
+        chapter_template = self.in_dir / args['chapter_template'] if 'chapter_template' in args \
+            else Path('config', 'epub', 'chapter_page.html')
+        with chapter_template.open('rt', encoding=self.encoding) as f:
             self.chapter_template = f.read()
 
     def write(self) -> None:
@@ -138,8 +132,8 @@ class EpubWriter(StructureWriter):
         book.add_item(epub.EpubNav())
         book.toc = toc
         book.spine = spine
-        filename = os.path.join(self.out_dir, purify_name(self._get_filename(self.structure.title)) + '.epub')
-        epub.write_epub(filename, book)
+        path = self.out_dir / purify_name(self._get_filename(self.structure.title) + '.epub')
+        epub.write_epub(path, book)
 
     def __write_metadata(self, book: epub.EpubBook):
         """Writes metadata into the epub book. You can look up supported metadata in `config/sample_metadata.json`."""
@@ -181,7 +175,7 @@ class EpubWriter(StructureWriter):
 
     def __create_stylesheet(self) -> epub.EpubItem:
         css = epub.EpubItem(uid='style', file_name='Styles/stylesheet.css', media_type='text/css')
-        with open(self.stylesheet, 'rt', encoding=self.encoding) as f:
+        with self.stylesheet.open('rt', encoding=self.encoding) as f:
             css.set_content(f.read())
         return css
 
@@ -190,21 +184,21 @@ class EpubWriter(StructureWriter):
         We will not be using `EpubBook.set_cover()` here, because it will set the cover page to `linear="no"` in the
         spine. This means the page will not be ordered correctly.
         """
-        cover_filename = os.path.join(self.in_dir, self.cover)
-        if os.path.isfile(cover_filename):
+        cover_path = self.in_dir / self.cover
+        if cover_path.is_file():
             cover_image = epub.EpubCover(file_name=f'Images/{self.cover}')
             book.add_item(cover_image)
 
-            with open(cover_filename, 'rb') as f:
+            with cover_path.open('rb') as f:
                 cover_image.set_content(f.read())
 
             page = epub.EpubHtml(uid='cover', file_name='cover.xhtml', title=self.cover_title)
-            with open(os.path.join(os.curdir, 'config', 'epub', 'cover_stylesheet.css'), 'rt') as f:
+            with Path('config', 'epub', 'cover_stylesheet.css').open('rt') as f:
                 css = epub.EpubItem(uid='cover-style', file_name='Styles/cover-style.css', media_type='text/css',
                                     content=f.read())
                 book.add_item(css)
                 page.add_item(css)
-            with open(os.path.join(os.curdir, 'config', 'epub', 'cover_page.html'), 'rt') as f:
+            with Path('config', 'epub', 'cover_page.html').open('rt') as f:
                 page.set_content(f.read().format(cover=self.cover))
 
             return page
@@ -221,7 +215,7 @@ class EpubWriter(StructureWriter):
         """
         page = epub.EpubHtml(uid='metadata', title=self.metadata_title, file_name='Text/metadata.xhtml')
         book_title = self.structure.title
-        with open(self.metadata_template, 'rt', encoding=self.encoding) as f:
+        with self.metadata_template.open('rt', encoding=self.encoding) as f:
             content = f.read().format(title=self.__format_title(book_title),
                                       identifier=self.__format_metadata('id', book_title.get('id')),
                                       authors=self.__format_metadata('authors', self.author_separator.join(

@@ -63,6 +63,10 @@
             "format": "第{index}章 {content}"
           }
         ]
+      },
+      {
+        "class": "PathTransformer",
+        "fields": ["source"]
       }
     ],
     "writers": [

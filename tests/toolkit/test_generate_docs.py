@@ -34,7 +34,7 @@ docstring = '''
 
 def test_generate_docs(mocker: MockerFixture):
     mocker.patch('toolkit.generate_docs.generate_classes', return_value={'Default': {'StubACC': StubACC}})
-    m = mocker.patch('builtins.open', mocker.mock_open())
+    m = mocker.patch('pathlib.Path.open', mocker.mock_open())
     handle = m().write
 
     docgen(None)

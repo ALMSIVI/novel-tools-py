@@ -1,5 +1,5 @@
 import json
-import os
+from pathlib import Path
 from typing import Iterator
 from framework import Reader
 from common import NovelData, Type, ACC, FieldMetadata
@@ -17,7 +17,7 @@ class MetadataJsonReader(Reader, ACC):
             FieldMetadata('metadata_filename', 'str', default='metadata.json',
                           description='Filename of the metadata json file. The metadata MUST contain a \'title\' '
                                       'field.'),
-            FieldMetadata('in_dir', 'str', optional=True,
+            FieldMetadata('in_dir', 'Path', optional=True,
                           description='The directory to read the metadata file from. Required if the filename does '
                                       'not contain the path.'),
             FieldMetadata('encoding', 'str', default='utf-8',
@@ -26,9 +26,9 @@ class MetadataJsonReader(Reader, ACC):
 
     def __init__(self, args):
         args = self.extract_fields(args)
-        filename = args['metadata_filename']
-        filename = filename if os.path.isfile(filename) else os.path.join(args['in_dir'], filename)
-        with open(filename, 'rt', encoding=args['encoding']) as f:
+        json_path = Path(args['metadata_filename'])
+        json_path = json_path if json_path.is_file() else args['in_dir'] / json_path
+        with json_path.open('rt', encoding=args['encoding']) as f:
             self.metadata = json.load(f)
 
         if 'title' not in self.metadata:

@@ -8,7 +8,7 @@ def order_transformer():
     return OrderTransformer({})
 
 
-def test_process(order_transformer):
+def test_process(order_transformer: OrderTransformer):
     before = NovelData('Chapter 1', Type.CHAPTER_TITLE)
     after = order_transformer.process(before)
     assert after.get('order') == 1
