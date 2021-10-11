@@ -22,24 +22,22 @@ However, websites like Qidian would censor some/all chapters of a novel, which c
 
 This would result in a table of content that is incomplete and full of errors -- also not good to the reading experience. This toolkit tries to solve this problem by providing a unified framework to analyze novel files, generate a better table of contents, and reformat the novel. All novels have their unique problems, and it is unlikely that a universal script would suit every need. However, at the very least, one can generate an initial novel structure, and manually correct it if needed.
 
-## Future plans
-
-I don't have a timeline for implementing these features, as I am pretty satisfied with the current set of features.
-
-- [ ] Create a GUI using [PyQt](https://wiki.python.org/moin/PyQt).
-- [ ] Implement an `EpubWriter` using [ebooklib](http://docs.sourcefabric.org/projects/ebooklib/en/latest/) and [Python Markdown](https://python-markdown.github.io/). While Calibre's built-in Markdown-epub conversion works quite nicely, it has trouble converting larger files, and it's hard to customize your own styles, or add illustrations with a single Markdown file. A custom-built Writer would make it more flexible to create a better-looking epub file.
-- [ ] Create a [Calibre Plugin](https://manual.calibre-ebook.com/creating_plugins.html). It might not be able to parse and format the source file (what `analyze` does), since one would need to manually check for errors and correct the source file. However, it should be able to provide more functionalities than simply calling `calibredb`.
-
 ## Installation
 
 This project is managed by [Poetry](https://python-poetry.org/), and is built on Python 3.9. After installing Poetry, run `poetry install` to install all dependencies. Run `poetry run pytest` to run all the tests.
 
 If you simply want to use the toolkit without writing your extensions, you can use `poetry install --no-dev` if you have Poetry installed.
 
-If you don't have Poetry, you will need to install the dependencies manually. Currently, the single required package is `natsort`, which is used to sort the numbers in natural order (1, 2, ... 10, 11 instead of 1, 10, 11, ... 2). You can install it using pip:
+If you don't have Poetry, you will need to install the dependencies manually. If you would like to use `DirectoryReader` or `DirectoryWriter`, you would need `natsort`, which is used to sort the numbers in natural order (1, 2, ... 10, 11 instead of 1, 10, 11, ... 2):
 
 ```shell
 pip3 install natsort
+```
+
+If you would like to use `EpubWriter`, you would need `markdown`, `ebooklib` and `bs4`:
+
+```shell
+pip3 install markdown ebooklib bs4
 ```
 
 ## Basic Concepts

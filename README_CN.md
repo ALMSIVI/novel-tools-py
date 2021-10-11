@@ -22,24 +22,22 @@
 
 如果小说中存在这些问题，生成的目录并不完整且错误百出，也会影响阅读体验。这套工具试图用一套统一的框架来分析小说，生成更好的目录，并对小说进行排版。虽然每个小说的问题各不相同，不太可能会存在一套通用的脚本来处理所有的小说，但是我们至少可以用这套工具生成一个简单的结构文件，再根据需要手动修改。
 
-## 未来计划
-
-因为这套工具提供的功能目前对我来说已经够用，以下列举的功能并没有具体实现日期。
-
-- [ ] 使用[PyQt](https://wiki.python.org/moin/PyQt)创建GUI。
-- [ ] 利用[ebooklib](http://docs.sourcefabric.org/projects/ebooklib/en/latest/)以及[Python Markdown](https://python-markdown.github.io/)实现`EpubWriter`。Caliber自带的转换功能很好用，但它转换较大文件时非常吃力。因为只有一个Markdown文件，用户很难自定义样式，或者添加插图。因此，我们需要自行搭建一个Writer以创造一个更好看、更多样的epub文件。
-- [ ] 创建一个[Calibre插件](https://manual.calibre-ebook.com/creating_plugins.html)。因为用户需要手动检查错误、更正源文件，这个插件应该无法实现`analyze`中的功能。但是它应该可以提供比`calibredb`更为丰富的功能。
-
 ## 安装
 
 这个项目使用[Poetry](https://python-poetry.org/)进行管理，基于Python 3.9。再安装完Poetry之后，使用`poetry install`命令安装所有依赖，使用`poetry run pytest`运行全部测试。
 
 如果你只想使用这套工具，而不想进行开发，你可以使用`poetry install --no-dev`。
 
-如果你没有Poetry，你需要手动安装依赖。目前，唯一需要的库是`natsort`，用来对数字进行自然排序（1, 2, ..., 10, 11而非1, 10, 11, ..., 2）。你可以使用pip来安装：
+如果你没有Poetry，你需要手动安装依赖。如果你想使用`DirectoryReader`或`DirectoryWriter`，你需要安装`natsort`，用来对数字进行自然排序（1, 2, ..., 10, 11而非1, 10, 11, ..., 2）：
 
 ```shell
 pip3 install natsort
+```
+
+如果你想使用`EpubWriter`，你需要`markdown`，`ebooklib`以及`bs4`:
+
+```shell
+pip3 install markdown ebooklib bs4
 ```
 
 ## 基本概念
