@@ -104,16 +104,14 @@ class EpubWriter(StructureWriter):
     def write(self) -> None:
         book = epub.EpubBook()
         self.__write_metadata(book)
-        self.__add_cover(book)
-
+        cover_page = self.__create_cover(book)
         css = self.__create_stylesheet()
         book.add_item(css)
-
         metadata_page = self.__create_metadata_page(book)
         book.add_item(metadata_page)
 
-        toc = ['cover', metadata_page]
-        spine = ['cover', 'nav', metadata_page] if self.include_nav else ['cover', metadata_page]
+        toc = [cover_page, metadata_page]
+        spine = [cover_page, 'nav', metadata_page] if self.include_nav else [cover_page, metadata_page]
 
         if self.has_volumes:
             for volume in self.structure.children:
@@ -182,7 +180,7 @@ class EpubWriter(StructureWriter):
             css.set_content(f.read())
         return css
 
-    def __add_cover(self, book: epub.EpubBook) -> Optional[epub.EpubHtml]:
+    def __create_cover(self, book: epub.EpubBook) -> Optional[epub.EpubHtml]:
         """
         We will not be using `EpubBook.set_cover()` here, because it will set the cover page to `linear="no"` in the
         spine. This means the page will not be ordered correctly.
@@ -195,6 +193,12 @@ class EpubWriter(StructureWriter):
             page: epub.EpubCoverHtml = book.get_item_with_id('cover')
             page.is_linear = True
             page.title = self.cover_title
+
+            with Path('config', 'epub', 'cover_stylesheet.css').open('rt') as f:
+                css = epub.EpubItem(uid='cover-style', file_name='Styles/cover-style.css', media_type='text/css',
+                                    content=f.read())
+                book.add_item(css)
+                page.add_item(css)
 
             return page
 
@@ -251,8 +255,7 @@ class EpubWriter(StructureWriter):
         title = chapter.title
         chapter_order = title.get('order')
         in_volume = volume_order is not None
-        filename_text = f'Text/{volume_order}_{chapter_order}.html' \
-            if in_volume else f'Text/{chapter_order}.html'
+        filename_text = f'Text/{volume_order}_{chapter_order}.html' if in_volume else f'Text/{chapter_order}.html'
         page = epub.EpubHtml(title=self._get_content(title), file_name=filename_text)
         content = self.chapter_template.format(title=self.__format_title(title),
                                                contents='\n'.join(
