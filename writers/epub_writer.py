@@ -18,6 +18,9 @@ class EpubWriter(StructureWriter):
     The epub specification requires title, language and identifier metadata. Therefore, a BOOK_TITLE must be included
     with language and id in its `others` field. You can do that with MetadataReader.
 
+    Since volume/chapter names might contain invalid characters, their order will be used as filenames. You can include
+    this order by plugging in an `OrderTransformer`.
+
     The created epub will contain a cover page (if a cover is specified), and a metadata page that contains all the
     metadata plus the book introduction. It will also contain one page for each volume and chapter. You can customize
     the page layouts by specifying the html template.
@@ -101,8 +104,7 @@ class EpubWriter(StructureWriter):
     def write(self) -> None:
         book = epub.EpubBook()
         self.__write_metadata(book)
-        cover_page = self.__create_cover_page(book)
-        book.add_item(cover_page)
+        self.__add_cover(book)
 
         css = self.__create_stylesheet()
         book.add_item(css)
@@ -110,8 +112,8 @@ class EpubWriter(StructureWriter):
         metadata_page = self.__create_metadata_page(book)
         book.add_item(metadata_page)
 
-        toc = [cover_page, metadata_page]
-        spine = [cover_page, 'nav', metadata_page] if self.include_nav else [cover_page, metadata_page]
+        toc = ['cover', metadata_page]
+        spine = ['cover', 'nav', metadata_page] if self.include_nav else ['cover', metadata_page]
 
         if self.has_volumes:
             for volume in self.structure.children:
@@ -180,27 +182,19 @@ class EpubWriter(StructureWriter):
             css.set_content(f.read())
         return css
 
-    def __create_cover_page(self, book: epub.EpubBook) -> Optional[epub.EpubHtml]:
+    def __add_cover(self, book: epub.EpubBook) -> Optional[epub.EpubHtml]:
         """
         We will not be using `EpubBook.set_cover()` here, because it will set the cover page to `linear="no"` in the
         spine. This means the page will not be ordered correctly.
         """
         cover_path = self.in_dir / self.cover
         if cover_path.is_file():
-            cover_image = epub.EpubCover(file_name=f'Images/{self.cover}')
-            book.add_item(cover_image)
-
             with cover_path.open('rb') as f:
-                cover_image.set_content(f.read())
+                book.set_cover(f'Images/{self.cover}', f.read())
 
-            page = epub.EpubHtml(uid='cover', file_name='cover.xhtml', title=self.cover_title)
-            with Path('config', 'epub', 'cover_stylesheet.css').open('rt') as f:
-                css = epub.EpubItem(uid='cover-style', file_name='Styles/cover-style.css', media_type='text/css',
-                                    content=f.read())
-                book.add_item(css)
-                page.add_item(css)
-            with Path('config', 'epub', 'cover_page.html').open('rt') as f:
-                page.set_content(f.read().format(cover=self.cover))
+            page: epub.EpubCoverHtml = book.get_item_with_id('cover')
+            page.is_linear = True
+            page.title = self.cover_title
 
             return page
 
@@ -239,8 +233,8 @@ class EpubWriter(StructureWriter):
         """
         # Write volume page
         title = volume.title
-        volume_filename = purify_name(self._get_filename(title))
-        filename_text = f'Text/{volume_filename}/_intro.html'
+        volume_order = title.get('order')
+        filename_text = f'Text/{volume_order}_intro.html'
         page = epub.EpubHtml(title=self._get_content(title), file_name=filename_text)
         content = self.volume_template.format(title=self.__format_title(title),
                                               introduction='\n'.join(
@@ -249,16 +243,16 @@ class EpubWriter(StructureWriter):
         page.set_content(content)
         self.__add_stylesheet(page, True)
 
-        chapters = [self.__create_chapter_page(book, chapter, volume_filename) for chapter in volume.children]
+        chapters = [self.__create_chapter_page(book, chapter, volume_order) for chapter in volume.children]
         return page, chapters
 
     def __create_chapter_page(self, book: epub.EpubBook, chapter: Structure,
-                              volume_filename: Optional[str] = None) -> epub.EpubHtml:
+                              volume_order: Optional[str] = None) -> epub.EpubHtml:
         title = chapter.title
-        chapter_filename = purify_name(self._get_filename(title))
-        in_volume = volume_filename is not None
-        filename_text = f'Text/{volume_filename}/{chapter_filename}.html' \
-            if in_volume else f'Text/{chapter_filename}.html'
+        chapter_order = title.get('order')
+        in_volume = volume_order is not None
+        filename_text = f'Text/{volume_order}_{chapter_order}.html' \
+            if in_volume else f'Text/{chapter_order}.html'
         page = epub.EpubHtml(title=self._get_content(title), file_name=filename_text)
         content = self.chapter_template.format(title=self.__format_title(title),
                                                contents='\n'.join(

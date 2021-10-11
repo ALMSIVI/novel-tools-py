@@ -6,14 +6,15 @@ from utils import get_config
 
 def do_analyze(args):
     config_filename = args.toolkit + '_config.json'
-    path = Path(args.input)
-    if path.is_file():
-        in_dir = path.parent
+    input_path = Path(args.input)
+    output_path = Path(args.output) if args.output is not None else None
+    if input_path.is_file():
+        in_dir = input_path.parent
         config = get_config(config_filename, in_dir)
-        analyze(config, filename=Path(args.input), out_dir=Path(args.output))
+        analyze(config, filename=input_path, out_dir=output_path)
     else:
-        config = get_config(config_filename, args.input)
-        analyze(config, in_dir=Path(args.input), out_dir=Path(args.output))
+        config = get_config(config_filename, input_path)
+        analyze(config, in_dir=input_path, out_dir=output_path)
 
 
 def start():

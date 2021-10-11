@@ -307,6 +307,9 @@ bundled together.
 The epub specification requires title, language and identifier metadata. Therefore, a BOOK_TITLE must be included
 with language and id in its `others` field. You can do that with MetadataReader.
 
+Since volume/chapter names might contain invalid characters, their order will be used as filenames. You can include
+this order by plugging in an `OrderTransformer`.
+
 The created epub will contain a cover page (if a cover is specified), and a metadata page that contains all the
 metadata plus the book introduction. It will also contain one page for each volume and chapter. You can customize
 the page layouts by specifying the html template.
