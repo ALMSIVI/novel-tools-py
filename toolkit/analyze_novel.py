@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 from framework import Worker
-from processors.matchers.__aggregate_matcher import AggregateMatcher
+from processors.matchers.__aggregate_matcher__ import AggregateMatcher
 from utils import generate_objects, default_packages
 
 

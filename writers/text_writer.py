@@ -1,5 +1,5 @@
 from common import FieldMetadata
-from .__structure_writer import StructureWriter, Structure
+from .__structure_writer__ import StructureWriter, Structure
 from utils import purify_name
 
 

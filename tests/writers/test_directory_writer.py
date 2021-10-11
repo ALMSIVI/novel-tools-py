@@ -4,7 +4,6 @@ from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
 from common import NovelData, Type
 from writers.directory_writer import DirectoryWriter
-from utils import format_text
 
 
 def assert_directory(writer_directory: Path, expected: dict[Union[str, dict[str, str]]]):

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from ebooklib import epub
 from markdown import markdown
 from common import FieldMetadata, NovelData
-from .__structure_writer import StructureWriter, Structure
+from .__structure_writer__ import StructureWriter, Structure
 from utils import purify_name
 
 
@@ -29,7 +29,8 @@ class EpubWriter(StructureWriter):
     be surrounded with the <span> tag, and will use its name as id. The introductions (book/volume) and the chapter
     contents will be converted into html as markdown, and then the classes will be inserted accordingly.
 
-    TODO add illustration support
+    You can include illustrations in the epub. Since the source is treated as a markdown, just use the `![]()` notation,
+    and the writer will locate the images and add them to the epub.
     """
 
     @staticmethod
@@ -106,7 +107,7 @@ class EpubWriter(StructureWriter):
         css = self.__create_stylesheet()
         book.add_item(css)
 
-        metadata_page = self.__create_metadata_page()
+        metadata_page = self.__create_metadata_page(book)
         book.add_item(metadata_page)
 
         toc = [cover_page, metadata_page]
@@ -114,7 +115,7 @@ class EpubWriter(StructureWriter):
 
         if self.has_volumes:
             for volume in self.structure.children:
-                volume_page, chapter_pages = self.__create_volume_page(volume)
+                volume_page, chapter_pages = self.__create_volume_page(book, volume)
                 book.add_item(volume_page)
                 spine.append(volume_page)
                 toc.append((epub.Section(volume_page.title, href=volume_page.file_name), chapter_pages))
@@ -123,7 +124,7 @@ class EpubWriter(StructureWriter):
                     spine.append(chapter_page)
         else:
             for chapter in self.structure.children:
-                chapter_page = self.__create_chapter_page(chapter)
+                chapter_page = self.__create_chapter_page(book, chapter)
                 book.add_item(chapter_page)
                 toc.append(chapter_page)
                 spine.append(chapter_page)
@@ -203,7 +204,7 @@ class EpubWriter(StructureWriter):
 
             return page
 
-    def __create_metadata_page(self) -> epub.EpubHtml:
+    def __create_metadata_page(self, book: epub.EpubBook) -> epub.EpubHtml:
         """
         Writes the metadata page to the book.
 
@@ -223,13 +224,13 @@ class EpubWriter(StructureWriter):
                                       publisher=self.__format_metadata('publisher', book_title.get('publisher')),
                                       date=self.__format_metadata('date', datetime.fromisoformat(
                                           book_title.get('date')).strftime(self.date_format)),
-                                      introduction='\n'.join(
-                                          [self.__format_content(intro) for intro in self.structure.contents]))
+                                      introduction='\n'.join([self.__format_content(book, intro, False) for intro in
+                                                              self.structure.contents]))
         page.set_content(content)
         self.__add_stylesheet(page, False)
         return page
 
-    def __create_volume_page(self, volume: Structure) -> tuple[epub.EpubHtml, list[epub.EpubHtml]]:
+    def __create_volume_page(self, book: epub.EpubBook, volume: Structure) -> tuple[epub.EpubHtml, list[epub.EpubHtml]]:
         """
         Writes a single volume, together with its chapters, to the book.
 
@@ -243,24 +244,28 @@ class EpubWriter(StructureWriter):
         page = epub.EpubHtml(title=self._get_content(title), file_name=filename_text)
         content = self.volume_template.format(title=self.__format_title(title),
                                               introduction='\n'.join(
-                                                  [self.__format_content(intro) for intro in volume.contents]))
+                                                  [self.__format_content(book, intro, True) for intro in
+                                                   volume.contents]))
         page.set_content(content)
         self.__add_stylesheet(page, True)
 
-        chapters = [self.__create_chapter_page(chapter, volume_filename) for chapter in volume.children]
+        chapters = [self.__create_chapter_page(book, chapter, volume_filename) for chapter in volume.children]
         return page, chapters
 
-    def __create_chapter_page(self, chapter: Structure, volume_filename: Optional[str] = None) -> epub.EpubHtml:
+    def __create_chapter_page(self, book: epub.EpubBook, chapter: Structure,
+                              volume_filename: Optional[str] = None) -> epub.EpubHtml:
         title = chapter.title
         chapter_filename = purify_name(self._get_filename(title))
+        in_volume = volume_filename is not None
         filename_text = f'Text/{volume_filename}/{chapter_filename}.html' \
-            if volume_filename else f'Text/{chapter_filename}.html'
+            if in_volume else f'Text/{chapter_filename}.html'
         page = epub.EpubHtml(title=self._get_content(title), file_name=filename_text)
         content = self.chapter_template.format(title=self.__format_title(title),
                                                contents='\n'.join(
-                                                   [self.__format_content(content) for content in chapter.contents]))
+                                                   [self.__format_content(book, content, in_volume) for content in
+                                                    chapter.contents]))
         page.set_content(content)
-        self.__add_stylesheet(page, volume_filename is not None)
+        self.__add_stylesheet(page, in_volume)
         return page
 
     @staticmethod
@@ -287,8 +292,7 @@ class EpubWriter(StructureWriter):
         soup.append(title)
         return str(soup)
 
-    @staticmethod
-    def __format_content(data: NovelData) -> str:
+    def __format_content(self, book: epub.EpubBook, data: NovelData, in_volume: bool) -> str:
         content = data.content
         if not content:
             soup = BeautifulSoup()
@@ -301,5 +305,16 @@ class EpubWriter(StructureWriter):
             for child in soup.children:
                 child['class'] = data.get('tag')
 
-        # TODO: illustration
+        for img in soup.find_all('img'):
+            src = img['src']
+            image_path = Path(src)
+            if not image_path.is_file():
+                image_path = self.in_dir / image_path
+                img['src'] = f'../../Images/{image_path.name}' if in_volume else f'../Images/{image_path.name}'
+                epub_image = epub.EpubImage()
+                epub_image.file_name = f'Images/{image_path.name}'
+                with image_path.open('rb') as f:
+                    epub_image.set_content(f.read())
+                book.add_item(epub_image)
+
         return str(soup)

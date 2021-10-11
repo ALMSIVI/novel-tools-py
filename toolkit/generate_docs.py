@@ -18,12 +18,14 @@ def docgen(config_filename: Optional[str], doc_filename: Optional[str] = None):
 
     if doc_filename is None:
         doc_filename = (Path(config_filename).parent if config_filename is not None else Path()) / 'docs.md'
+    else:
+        doc_filename = Path(doc_filename)
 
     with doc_filename.open('wt') as f:
         for package_name, classes in class_dict.items():
             f.write(f'## {package_name}\n\n')
             for name, cls in classes.items():
-                if ACC in cls.__bases__:
+                if ACC in cls.__mro__:
                     f.write(f'### {name}\n\n')
                     f.write('**Description:**\n\n')
                     if cls.__doc__ is not None:
