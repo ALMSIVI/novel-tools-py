@@ -15,11 +15,11 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = '^3.9'
+python = '^3.10'
 natsort = '^7.1.1'
 Markdown = "^3.3.4"
-EbookLib = "^0.17.1"
 bs4 = "^0.0.1"
+ebooklib = {git = "https://github.com/ALMSIVI/ebooklib"}
 
 [tool.poetry.dev-dependencies]
 pytest = '^6.2.4'
