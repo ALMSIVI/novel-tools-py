@@ -2,6 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from ebooklib import epub
 from markdown import markdown
 from novel_tools.common import FieldMetadata, NovelData
@@ -11,12 +12,12 @@ from novel_tools.utils import purify_name
 
 class EpubWriter(StructureWriter):
     """
-    Generates a epub file for the book. An epub is essentially a zip file consisting of html files, stylesheets, and
+    Generates an epub file for the book. An epub is essentially a zip file consisting of html files, stylesheets, and
     multimedia (including images). Compared to plaintext files (txt/md), it allows custom styles and illustrations
     bundled together.
 
-    The epub specification requires title, language and identifier metadata. Therefore, a BOOK_TITLE must be included
-    with language and id in its `others` field. You can do that with MetadataReader.
+    The epub specification requires title, language and identifier metadata. Therefore, a NovelData with type BOOK_TITLE
+    must be included with language and id in its `others` field. You can do that with MetadataReader.
 
     Since volume/chapter names might contain invalid characters, their order will be used as filenames. You can include
     this order by plugging in an `OrderTransformer`.
@@ -28,8 +29,8 @@ class EpubWriter(StructureWriter):
     For better style customization, the tag for each NovelData will be used as html classes. Please ensure you
     use a `CsvWriter` to store the structure and have `tag` in `additional_fields`.
 
-    In the generated html, the titles (book/volume/chapter) will surrounded with the <h1> tag. The metadata will
-    be surrounded with the <span> tag, and will use its name as id. The introductions (book/volume) and the chapter
+    In the generated html, the titles (book/volume/chapter) will be surrounded with the `<h1>` tag. The metadata will
+    be surrounded with the `<span>` tag, and will use its name as id. The introductions (book/volume) and the chapter
     contents will be converted into html as markdown, and then the classes will be inserted accordingly.
 
     You can include illustrations in the epub. Since the source is treated as a markdown, just use the `![]()` notation,
@@ -267,7 +268,7 @@ class EpubWriter(StructureWriter):
 
     @staticmethod
     def __add_stylesheet(page: epub.EpubHtml, in_volume: bool):
-        filename = 'novel_tools./novel_tools./Styles/stylesheet.css' if in_volume else 'novel_tools./Styles/stylesheet.css'
+        filename = 'Styles/stylesheet.css' if in_volume else 'Styles/stylesheet.css'
         css = epub.EpubItem(file_name=filename, media_type='text/css')
         page.add_item(css)
 
@@ -299,6 +300,7 @@ class EpubWriter(StructureWriter):
             soup = BeautifulSoup(html, 'html.parser')
 
         if data.has('tag'):
+            child: Tag  # The document should only contain <p> elements (tags), but not NavigableStrings
             for child in soup.children:
                 child['class'] = data.get('tag')
 
@@ -307,7 +309,7 @@ class EpubWriter(StructureWriter):
             image_path = Path(src)
             if not image_path.is_file():
                 image_path = self.in_dir / image_path
-                img['src'] = f'novel_tools./novel_tools./Images/{image_path.name}' if in_volume else f'novel_tools./Images/{image_path.name}'
+                img['src'] = f'Images/{image_path.name}' if in_volume else f'Images/{image_path.name}'
                 epub_image = epub.EpubImage()
                 epub_image.file_name = f'Images/{image_path.name}'
                 with image_path.open('rb') as f:

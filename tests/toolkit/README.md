@@ -9,7 +9,7 @@ These integration tests demonstrate what kinds of input it can handle and what o
 
 For each novel, 
 
-- Start from the `.txt` file. This is the source file that is unformatted and may contain errors in the title. 
+- Start from the `.txt` file. This is the source file that is not formatted and may contain errors in the title. 
 - Then, take a look at the config `json` files to understand what each config means. Refer to [built-in class references](/docs/references.md) if you are confused about some particular setting. 
 - After that, read through the structure files, either `list.csv` or `toc.txt`, to see if they make sense and if they match your expectations.
 - Finally, take a look at the resulting `.md` file. This is a formatted Markdown file that marks all titles. These markdown files can be added directly to [Calibre](https://calibre-ebook.com/) and converted into epub.

@@ -23,7 +23,7 @@ def analyze(config: dict, *, filename: Optional[Path] = None, in_dir: Optional[P
     1. Split the original txt into individual files, and/or structure files. You can use `split_config.json` as a
        template.
     2. Examine the individual files and proofread them. Correct the structure and/or the novel text if necessary.
-    3. If you have not generate the structure files at step 1, you can generate the updated structure file based on the
+    3. If you have not generated the structure files at step 1, you can generate the updated structure file based on the
        directory. This can also be useful if you changed so many titles that the original structure file may no longer
        work. You can use `struct_dir_config.json` as a template.
     4. Examine the new structure file and scan for any errors or inconsistencies. Since directories and filenames do not
@@ -37,8 +37,8 @@ def analyze(config: dict, *, filename: Optional[Path] = None, in_dir: Optional[P
         config: The configuration for the Worker instance.
         filename: The novel's filename. If in_dir is not specified, it needs to include the full path. Required if using
                   a Reader that involves reading from a text file.
-        in_dir: The input directory holding the novel and/or structure files. If it is not specified, it will use
-                filename's directory.
+        in_dir: The input directory holding the novel and/or structure files. If it is not specified, it will use the
+                directory of the input file.
         out_dir: The output directory. Defaults to in_dir.
     """
     if filename is None and in_dir is None:

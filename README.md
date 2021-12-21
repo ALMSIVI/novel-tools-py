@@ -49,9 +49,9 @@ pip3 install markdown ebooklib bs4
 - **Regular titles** contain an **index** and a **content**.  Sometimes they may not have content at all, but an index is always necessary. For example, *Volume 1: The Escape* has the index *1* and content *The Escape*.
 - There might be several sets of indices within a same book. For example, there might be some *Interlude* chapters scattered across normal chapters. These interludes are indexed independently of the others.
 - **Special titles** do not contain an index. Like regular titles, they may or may not have content, but they may contain certain **affixes** that make them easy to recognize. Examples include *Introduction*, *Foreword*, and *Conclusion*.
-- **Metadata** are data about the book that are not part of the content itself, including the book author, id, languages, and tags. They are useful for organizing books in a e-book management software, including [Calibre](https://calibre-ebook.com/). A template metadata can be found [here](config/sample_metadata.json).
+- **Metadata** are data about the book that are not part of the content itself, including the book author, id, languages, and tags. They are useful for organizing books in an e-book management software, including [Calibre](https://calibre-ebook.com/). A template metadata can be found [here](config/sample_metadata.json).
 
-The toolkit's job is to extract the different elements within a novel file, correct them of any errors (if any), and reformat them to be more regular and nicer.
+The job of this toolkit is to extract the different elements within a novel file, correct them of any errors (if any), and reformat them to be more regular and nicer.
 
 ## Usage
 

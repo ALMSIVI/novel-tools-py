@@ -7,7 +7,7 @@ from novel_tools.common import NovelData, Type, ACC, FieldMetadata
 
 class MetadataJsonReader(Reader, ACC):
     """
-    Reads a json that contains the metadata of the book file. Will only generate a BOOK_TITLE, with the others field
+    Reads a json that contains the metadata of the book file. Will only generate a BOOK_TITLE, with the `others` field
     populated with the other metadata.
     """
 

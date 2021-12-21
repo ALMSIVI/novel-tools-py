@@ -52,7 +52,7 @@ they will be treated as several paragraphs instead of one.
 
 **Description:**
 
-Reads a json that contains the metadata of the book file. Will only generate a BOOK_TITLE, with the others field
+Reads a json that contains the metadata of the book file. Will only generate a BOOK_TITLE, with the `others` field
 populated with the other metadata.
 
 **Arguments:**
@@ -300,12 +300,12 @@ can also use the same transformer to attach a 'filename' field, and the writer w
 
 **Description:**
 
-Generates a epub file for the book. An epub is essentially a zip file consisting of html files, stylesheets, and
+Generates an epub file for the book. An epub is essentially a zip file consisting of html files, stylesheets, and
 multimedia (including images). Compared to plaintext files (txt/md), it allows custom styles and illustrations
 bundled together.
 
-The epub specification requires title, language and identifier metadata. Therefore, a BOOK_TITLE must be included
-with language and id in its `others` field. You can do that with MetadataReader.
+The epub specification requires title, language and identifier metadata. Therefore, a NovelData with type BOOK_TITLE
+must be included with language and id in its `others` field. You can do that with MetadataReader.
 
 Since volume/chapter names might contain invalid characters, their order will be used as filenames. You can include
 this order by plugging in an `OrderTransformer`.
@@ -317,8 +317,8 @@ the page layouts by specifying the html template.
 For better style customization, the tag for each NovelData will be used as html classes. Please ensure you
 use a `CsvWriter` to store the structure and have `tag` in `additional_fields`.
 
-In the generated html, the titles (book/volume/chapter) will surrounded with the <h1> tag. The metadata will
-be surrounded with the <span> tag, and will use its name as id. The introductions (book/volume) and the chapter
+In the generated html, the titles (book/volume/chapter) will be surrounded with the `<h1>` tag. The metadata will
+be surrounded with the `<span>` tag, and will use its name as id. The introductions (book/volume) and the chapter
 contents will be converted into html as markdown, and then the classes will be inserted accordingly.
 
 You can include illustrations in the epub. Since the source is treated as a markdown, just use the `![]()` notation,

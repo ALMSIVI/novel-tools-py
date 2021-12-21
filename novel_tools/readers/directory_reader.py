@@ -47,6 +47,7 @@ class DirectoryReader(Reader, ACC):
         self.merge_newlines = args['merge_newlines']
 
         # Create the list of volumes/directories to look for
+        dir_path: Path  # natsort can accept a range of types, so we need to make type checker happy
         self.volumes: list[Path] = [dir_path for dir_path in os_sorted(self.in_dir.iterdir()) if dir_path.is_dir()]
         if self.default_volume in self.volumes:
             self.volumes = [self.default_volume]
@@ -70,6 +71,7 @@ class DirectoryReader(Reader, ACC):
             if volume != self.default_volume:
                 yield NovelData(volume.stem, Type.VOLUME_TITLE, volume_index, source=volume)
 
+            chapter: Path  # natsort can accept a range of types, so we need to make type checker happy
             chapters = [chapter for chapter in os_sorted(volume.iterdir()) if chapter.is_file()
                         and chapter.suffix in supported_extensions]
             # Read intro file
