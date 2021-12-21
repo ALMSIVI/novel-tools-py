@@ -2,8 +2,8 @@ from pathlib import Path
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from typing import Iterator
-from common import NovelData, Type
-from readers.metadata_json_reader import MetadataJsonReader
+from novel_tools.common import NovelData, Type
+from novel_tools.readers.metadata_json_reader import MetadataJsonReader
 
 
 @fixture

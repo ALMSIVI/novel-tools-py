@@ -2,8 +2,8 @@ from pathlib import Path
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from typing import Iterator
-from common import NovelData, Type
-from readers.text_reader import TextReader
+from novel_tools.common import NovelData, Type
+from novel_tools.readers.text_reader import TextReader
 
 
 @fixture

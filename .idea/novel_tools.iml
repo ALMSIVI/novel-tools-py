@@ -2,15 +2,8 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/common" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/framework" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/processors" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/readers" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/writers" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/config" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/toolkit" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/utils" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/novel_tools" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/.github" />
       <excludePattern pattern=".pytest_cache" />
@@ -28,9 +21,9 @@
   <component name="PyNamespacePackagesService">
     <option name="namespacePackageFolders">
       <list>
-        <option value="$MODULE_DIR$/processors" />
-        <option value="$MODULE_DIR$/readers" />
-        <option value="$MODULE_DIR$/writers" />
+        <option value="$MODULE_DIR$/novel_tools/processors" />
+        <option value="$MODULE_DIR$/novel_tools/readers" />
+        <option value="$MODULE_DIR$/novel_tools/writers" />
       </list>
     </option>
   </component>

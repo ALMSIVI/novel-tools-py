@@ -1,8 +1,8 @@
 from pathlib import Path
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import NovelData, Type
-from writers.text_writer import TextWriter
+from novel_tools.common import NovelData, Type
+from novel_tools.writers.text_writer import TextWriter
 
 
 def assert_text(text_path: Path, expected: str):

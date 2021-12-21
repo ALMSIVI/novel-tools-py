@@ -1,9 +1,9 @@
 from pathlib import Path
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import NovelData, Type
-from processors.matchers.toc_matcher import TocMatcher
-from utils import format_text
+from novel_tools.common import NovelData, Type
+from novel_tools.processors.matchers.toc_matcher import TocMatcher
+from novel_tools.utils import format_text
 
 
 @fixture

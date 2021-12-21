@@ -1,6 +1,6 @@
 from pytest import fixture
-from common import NovelData, Type
-from processors.transformers.title_transformer import TitleTransformer
+from novel_tools.common import NovelData, Type
+from novel_tools.processors.transformers.title_transformer import TitleTransformer
 
 
 @fixture

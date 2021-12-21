@@ -1,7 +1,7 @@
 from pathlib import Path
 from pytest import fixture, FixtureRequest, mark
-from common import NovelData, Type
-from writers.toc_writer import TocWriter
+from novel_tools.common import NovelData, Type
+from novel_tools.writers.toc_writer import TocWriter
 
 
 def assert_toc(toc_path: Path, expected: str):

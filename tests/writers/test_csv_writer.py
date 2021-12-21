@@ -1,7 +1,7 @@
 from pathlib import Path
 from pytest import fixture, FixtureRequest, mark
-from common import NovelData, Type
-from writers.csv_writer import CsvWriter
+from novel_tools.common import NovelData, Type
+from novel_tools.writers.csv_writer import CsvWriter
 
 
 def assert_csv(csv_path: Path, expected: list[str]):

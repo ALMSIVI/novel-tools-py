@@ -1,8 +1,8 @@
 from pathlib import Path
 from pytest import mark
 from pytest_mock import MockerFixture
-from toolkit import analyze
-from utils import get_config
+from novel_tools.toolkit import analyze
+from novel_tools.utils import get_config
 
 
 def assert_file(actual: Path, expected: Path):

@@ -1,8 +1,8 @@
 from pathlib import Path
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import NovelData, Type
-from writers.markdown_writer import MarkdownWriter
+from novel_tools.common import NovelData, Type
+from novel_tools.writers.markdown_writer import MarkdownWriter
 
 
 def assert_md(md_path: Path, expected: str):

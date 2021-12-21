@@ -1,6 +1,6 @@
 from pytest import fixture
-from common import NovelData, Type
-from processors.transformers.pattern_transformer import PatternTransformer
+from novel_tools.common import NovelData, Type
+from novel_tools.processors.transformers.pattern_transformer import PatternTransformer
 
 
 @fixture

@@ -6,4 +6,4 @@ This is necessary because it is impossible to mock `pathlib`, because `unittest.
 
 ## Epub Writer
 
-Currently, no tests for [`EpubWriter`](../../writers/epub_writer.py) will be provided. While one can verify the contents within an epub using the `zipfile` library, it is still difficult to test many of the options that the writer provides.
+Currently, no tests for [`EpubWriter`](../../novel_tools/writers/epub_writer.py) will be provided. While one can verify the contents within an epub using the `zipfile` library, it is still difficult to test many of the options that the writer provides.

@@ -1,6 +1,6 @@
 from pytest import fixture, mark, FixtureRequest
-from common import NovelData, Type
-from processors.matchers.numbered_matcher import NumberedMatcher
+from novel_tools.common import NovelData, Type
+from novel_tools.processors.matchers.numbered_matcher import NumberedMatcher
 
 
 @fixture

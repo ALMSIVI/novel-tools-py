@@ -1,6 +1,6 @@
 from pytest import fixture
-from common import NovelData, Type
-from processors.validators.validator import Validator
+from novel_tools.common import NovelData, Type
+from novel_tools.processors.validators.validator import Validator
 
 
 class StubValidator(Validator):

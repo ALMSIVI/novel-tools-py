@@ -2,8 +2,8 @@ from pathlib import Path
 from typing import Union
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from common import NovelData, Type
-from writers.directory_writer import DirectoryWriter
+from novel_tools.common import NovelData, Type
+from novel_tools.writers.directory_writer import DirectoryWriter
 
 
 def assert_directory(writer_directory: Path, expected: dict[Union[str, dict[str, str]]]):

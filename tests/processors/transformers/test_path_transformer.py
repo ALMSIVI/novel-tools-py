@@ -1,7 +1,7 @@
 from pathlib import Path
 from pytest import fixture
-from common import NovelData, Type
-from processors.transformers.path_transformer import PathTransformer
+from novel_tools.common import NovelData, Type
+from novel_tools.processors.transformers.path_transformer import PathTransformer
 
 
 @fixture

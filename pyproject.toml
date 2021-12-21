@@ -1,22 +1,16 @@
 [tool.poetry]
 name = 'novel_tools'
-version = '0.2.0'
+version = '0.3.0'
 description = 'Python tools for formatting novels.'
 authors = ['Yue Wu <wuyuejl97@gmail.com>']
 license = 'WTFPL'
 packages = [
-    { include = 'common' },
-    { include = 'framework' },
-    { include = 'processors' },
-    { include = 'readers' },
-    { include = 'toolkit' },
-    { include = 'utils' },
-    { include = 'writers' }
+    { include = 'novel_tools' },
 ]
 
 [tool.poetry.dependencies]
 python = '^3.10'
-natsort = '^7.1.1'
+natsort = '^8.0.2'
 Markdown = "^3.3.4"
 bs4 = "^0.0.1"
 ebooklib = {git = "https://github.com/ALMSIVI/ebooklib"}
@@ -24,7 +18,7 @@ ebooklib = {git = "https://github.com/ALMSIVI/ebooklib"}
 [tool.poetry.dev-dependencies]
 pytest = '^6.2.4'
 pytest-mock = '^3.6.1'
-flake8 = '^3.9.2'
+flake8 = '^4.0.1'
 
 [tool.poetry.scripts]
 cli = 'ntcli:start'

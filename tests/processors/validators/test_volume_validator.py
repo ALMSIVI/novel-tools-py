@@ -1,6 +1,6 @@
 from pytest import fixture
-from common import NovelData, Type
-from processors.validators.volume_validator import VolumeValidator
+from novel_tools.common import NovelData, Type
+from novel_tools.processors.validators.volume_validator import VolumeValidator
 
 
 @fixture

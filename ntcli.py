@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
-from toolkit import analyze, docgen
-from utils import get_config
+from novel_tools.toolkit import analyze, docgen
+from novel_tools.utils import get_config
 
 
 def do_analyze(args):

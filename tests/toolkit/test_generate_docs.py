@@ -1,6 +1,6 @@
 from pytest_mock import MockerFixture
-from common import ACC, FieldMetadata
-from toolkit import docgen
+from novel_tools.common import ACC, FieldMetadata
+from novel_tools.toolkit import docgen
 
 
 class StubACC(ACC):
@@ -33,7 +33,7 @@ docstring = '''
 
 
 def test_generate_docs(mocker: MockerFixture):
-    mocker.patch('toolkit.generate_docs.generate_classes', return_value={'Default': {'StubACC': StubACC}})
+    mocker.patch('novel_tools.toolkit.generate_docs.generate_classes', return_value={'Default': {'StubACC': StubACC}})
     m = mocker.patch('pathlib.Path.open', mocker.mock_open())
     handle = m().write
 
