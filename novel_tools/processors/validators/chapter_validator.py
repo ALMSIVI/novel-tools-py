@@ -16,10 +16,9 @@ class ChapterValidator(Validator):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
         super().__init__(args)
-        self.discard_chapters = args['discard_chapters']
-        self.volume_tag = args['volume_tag']
+        self.discard_chapters = self.args['discard_chapters']
+        self.volume_tag = self.args['volume_tag']
 
         self.curr_volume = None
         self.validate_curr_volume = True

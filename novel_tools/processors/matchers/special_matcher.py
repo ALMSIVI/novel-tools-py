@@ -36,14 +36,15 @@ class SpecialMatcher(Processor, ACC):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.type = Type[args['type'].upper()]
-        self.affixes = args['affixes']
+        self.args = self.extract_fields(args)
+
+        self.type = Type[self.args['type'].upper()]
+        self.affixes = self.args['affixes']
         affix_str = '|'.join(self.affixes)
-        self.regex = re.compile(args['regex'].format(affixes=f'({affix_str})'))
-        self.affix_group = args['affix_group'] + 1
-        self.content_group = args['content_group'] + 1
-        self.tag = args['tag']
+        self.regex = re.compile(self.args['regex'].format(affixes=f'({affix_str})'))
+        self.affix_group = self.args['affix_group'] + 1
+        self.content_group = self.args['content_group'] + 1
+        self.tag = self.args['tag']
 
     def process(self, data: NovelData) -> NovelData:
         if data.type != Type.UNRECOGNIZED and data.type != self.type:

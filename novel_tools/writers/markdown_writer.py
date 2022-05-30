@@ -26,12 +26,11 @@ class MarkdownWriter(StructureWriter):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
         super().__init__(args)
-        self.use_title = args['use_title']
-        self.filename = args['md_filename']
-        self.levels = {Type[key.upper()]: '#' * value + ' ' for key, value in args['levels'].items()}
-        self.write_newline = args['write_newline']
+        self.use_title = self.args['use_title']
+        self.filename = self.args['md_filename']
+        self.levels = {Type[key.upper()]: '#' * value + ' ' for key, value in self.args['levels'].items()}
+        self.write_newline = self.args['write_newline']
 
     def write(self) -> None:
         self._cleanup()

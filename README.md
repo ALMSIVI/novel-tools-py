@@ -24,7 +24,7 @@ This would result in a table of content that is incomplete and full of errors --
 
 ## Installation
 
-This project is managed by [Poetry](https://python-poetry.org/), and is built on Python 3.9. After installing Poetry, run `poetry install` to install all dependencies. Run `poetry run pytest` to run all the tests.
+This project is managed by [Poetry](https://python-poetry.org/), and is built on Python 3.10. After installing Poetry, run `poetry install` to install all dependencies. Run `poetry run pytest` to run all the tests.
 
 If you simply want to use the toolkit without writing your extensions, you can use `poetry install --no-dev` if you have Poetry installed.
 

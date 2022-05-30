@@ -73,31 +73,30 @@ class EpubWriter(StructureWriter):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
         super().__init__(args)
-        self.in_dir: Path = args['in_dir']
-        self.encoding = args['encoding']
-        self.include_nav = args['include_nav']
-        self.cover = args['cover']
-        self.cover_title = args['cover_title']
-        self.metadata_title = args['metadata_title']
-        self.author_separator = args['author_separator']
-        self.date_format = args['date_format']
+        self.in_dir: Path = self.args['in_dir']
+        self.encoding = self.args['encoding']
+        self.include_nav = self.args['include_nav']
+        self.cover = self.args['cover']
+        self.cover_title = self.args['cover_title']
+        self.metadata_title = self.args['metadata_title']
+        self.author_separator = self.args['author_separator']
+        self.date_format = self.args['date_format']
 
         # Stylesheet and metadata templates will only be used once, so we don't store them inside the class
-        self.stylesheet = self.in_dir / args['stylesheet'] if 'stylesheet' in args \
+        self.stylesheet = self.in_dir / self.args['stylesheet'] if 'stylesheet' in self.args \
             else Path('config', 'epub', 'stylesheet.css')
 
-        self.metadata_template = self.in_dir / args['metadata_template'] if 'metadata_template' in args \
+        self.metadata_template = self.in_dir / self.args['metadata_template'] if 'metadata_template' in self.args \
             else Path('config', 'epub', 'metadata_page.html')
 
         # Volume and chapter templates will be reused, so we store them to save I/O operations.
-        volume_template = self.in_dir / args['volume_template'] if 'volume_template' in args \
+        volume_template = self.in_dir / self.args['volume_template'] if 'volume_template' in self.args \
             else Path('config', 'epub', 'volume_page.html')
         with volume_template.open('rt', encoding=self.encoding) as f:
             self.volume_template = f.read()
 
-        chapter_template = self.in_dir / args['chapter_template'] if 'chapter_template' in args \
+        chapter_template = self.in_dir / self.args['chapter_template'] if 'chapter_template' in self.args \
             else Path('config', 'epub', 'chapter_page.html')
         with chapter_template.open('rt', encoding=self.encoding) as f:
             self.chapter_template = f.read()

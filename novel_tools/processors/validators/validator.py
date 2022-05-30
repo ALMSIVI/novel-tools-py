@@ -28,11 +28,12 @@ class Validator(Processor, ACC):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.overwrite = args['overwrite']
-        self.tag = args['tag']
+        self.args = self.extract_fields(args)
+
+        self.overwrite = self.args['overwrite']
+        self.tag = self.args['tag']
         self.indices = set()
-        self.curr_index = args['begin_index'] - 1
+        self.curr_index = self.args['begin_index'] - 1
 
     def process(self, data: NovelData) -> NovelData:
         """

@@ -30,9 +30,10 @@ class StructureWriter(Writer, ACC, ABC):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.out_dir: Path = args['out_dir']
-        self.debug = args['debug']
+        self.args = self.extract_fields(args)
+
+        self.out_dir: Path = self.args['out_dir']
+        self.debug = self.args['debug']
 
         self.structure = Structure()
         self.curr_volume = None
@@ -43,28 +44,29 @@ class StructureWriter(Writer, ACC, ABC):
         if self.debug and data.get('error', '') != '':
             print(data.get('error'))
 
-        if data.type == Type.BOOK_TITLE:
-            self.structure.title = data
-        elif data.type == Type.BOOK_INTRO:
-            self.structure.contents.append(data)
-        elif data.type == Type.VOLUME_TITLE:
-            self.has_volumes = True
-            self.curr_volume = Structure()
-            self.curr_volume.title = data
-            self.structure.children.append(self.curr_volume)
-        elif data.type == Type.VOLUME_INTRO:
-            self.curr_volume.contents.append(data)
-        elif data.type == Type.CHAPTER_TITLE:
-            self.curr_chapter = Structure()
-            self.curr_chapter.title = data
-            if self.has_volumes:
-                self.curr_volume.children.append(self.curr_chapter)
-            else:
-                self.structure.children.append(self.curr_chapter)
-        elif data.type == Type.CHAPTER_CONTENT:
-            self.curr_chapter.contents.append(data)
-        else:
-            print(f'Unrecognized data type: {data.type}')
+        match data.type:
+            case Type.BOOK_TITLE:
+                self.structure.title = data
+            case Type.BOOK_INTRO:
+                self.structure.contents.append(data)
+            case Type.VOLUME_TITLE:
+                self.has_volumes = True
+                self.curr_volume = Structure()
+                self.curr_volume.title = data
+                self.structure.children.append(self.curr_volume)
+            case Type.VOLUME_INTRO:
+                self.curr_volume.contents.append(data)
+            case Type.CHAPTER_TITLE:
+                self.curr_chapter = Structure()
+                self.curr_chapter.title = data
+                if self.has_volumes:
+                    self.curr_volume.children.append(self.curr_chapter)
+                else:
+                    self.structure.children.append(self.curr_chapter)
+            case Type.CHAPTER_CONTENT:
+                self.curr_chapter.contents.append(data)
+            case _:
+                print(f'Unrecognized data type: {data.type}')
 
     def _join_content(self, contents: list[NovelData]) -> str:
         contents_str = []

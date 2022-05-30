@@ -30,12 +30,13 @@ class NumberedMatcher(Processor, ACC):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.type = Type[args['type'].upper()]
-        self.regex = re.compile(args['regex'])
-        self.index_group = args['index_group'] + 1
-        self.content_group = args['content_group'] + 1
-        self.tag = args['tag']
+        self.args = self.extract_fields(args)
+
+        self.type = Type[self.args['type'].upper()]
+        self.regex = re.compile(self.args['regex'])
+        self.index_group = self.args['index_group'] + 1
+        self.content_group = self.args['content_group'] + 1
+        self.tag = self.args['tag']
 
     def process(self, data: NovelData) -> NovelData:
         if data.type != Type.UNRECOGNIZED and data.type != self.type:

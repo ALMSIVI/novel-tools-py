@@ -21,10 +21,9 @@ class DirectoryWriter(StructureWriter):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
         super().__init__(args)
-        self.default_volume = args['default_volume']
-        self.intro_filename = args['intro_filename']
+        self.default_volume = self.args['default_volume']
+        self.intro_filename = self.args['intro_filename']
 
     def write(self) -> None:
         self._cleanup()

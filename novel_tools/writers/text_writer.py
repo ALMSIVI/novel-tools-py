@@ -20,10 +20,9 @@ class TextWriter(StructureWriter):
         ]
 
     def __init__(self, args):
-        args = self.extract_fields(args)
         super().__init__(args)
-        self.use_title = args['use_title']
-        self.filename = args['text_filename']
+        self.use_title = self.args['use_title']
+        self.filename = self.args['text_filename']
 
     def write(self) -> None:
         self._cleanup()
