@@ -62,7 +62,7 @@ class ACC(ABC):
             if key in metadata_dict:
                 metadata = metadata_dict.pop(key)
                 if metadata.options is not None and val not in metadata.options:
-                    raise ValueError(f'argument {key} is {val} but the options are {metadata.optionns}')
+                    raise ValueError(f'argument {key} is {val} but the options are {metadata.options}')
 
                 if metadata.properties is not None:
                     val = cls.__extract_fields(val, metadata.properties)
