@@ -10,15 +10,15 @@ packages = [
 
 [tool.poetry.dependencies]
 python = '^3.10'
-natsort = '^8.0.2'
-Markdown = "^3.3.4"
-bs4 = "^0.0.1"
+natsort = '^8.4.0'
+Markdown = "^3.4.3"
+beautifulsoup4 = "^4.12.2"
 ebooklib = {git = "https://github.com/ALMSIVI/ebooklib"}
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.1.2"
-pytest-mock = '^3.6.1'
-flake8 = '^4.0.1'
+pytest = "^7.4.0"
+pytest-mock = '^3.11.1'
+ruff = '^0.0.275'
 
 [tool.poetry.scripts]
 cli = 'ntcli:start'
