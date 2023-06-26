@@ -1,11 +1,15 @@
 from novel_tools.common import NovelData, Type
-from .validator import Validator
+from .__validator__ import Validator, BaseOptions
 
 
 class VolumeValidator(Validator):
     """
     Validates a volume.
     """
+
+    def __init__(self, args):
+        options = BaseOptions(**args)
+        self.init_fields(options)
 
     def check(self, data: NovelData) -> bool:
         return data.type == Type.VOLUME_TITLE and data.index >= 0 and data.get('tag') == self.tag

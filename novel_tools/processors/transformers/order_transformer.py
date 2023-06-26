@@ -1,17 +1,13 @@
 from novel_tools.framework import Processor
-from novel_tools.common import NovelData, ACC, FieldMetadata
+from novel_tools.common import NovelData
 
 
-class OrderTransformer(Processor, ACC):
+class OrderTransformer(Processor):
     """
     Assigns an order to the data. This could be useful for file writers, since the filenames won't keep the original
     order of reading. For example, one can append this order before all volume and chapter filenames to maintain
     ordering.
     """
-
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return []
 
     # noinspection PyUnusedLocal
     def __init__(self, args):

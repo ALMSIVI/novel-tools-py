@@ -1,9 +1,25 @@
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from pydantic import BaseModel, Field
+from novel_tools.common import NovelData, Type
+from pathlib import Path
 from novel_tools.framework import Processor
 from novel_tools.readers.csv_reader import CsvReader
 
 
-class CsvMatcher(Processor, ACC):
+class Options(BaseModel):
+    csv_filename: str = Field(default='list.csv', description='Filename of the csv list file.')
+    in_dir: Path = Field(
+        description='The directory to read the csv file from. Required if the filename does not contain the path.')
+    encoding: str = Field(default='utf-8', description='Encoding of the csv file.')
+    types: dict[str, str] = Field(default={'line_num': 'int', 'source': 'Path'},
+                                  description='Type of each additional field to be fetched. See CsvReader for more '
+                                              'details.')
+    join_dir: list[str] = Field(default=['source'],
+                                description='Specifies fields names that need dir joining. See CsvReader for more '
+                                            'details.')
+    data_type: str | None = Field(description='If present, specifies the type of all the titles.')
+
+
+class CsvMatcher(Processor):
     """
     Matches data by a given csv list. This matcher can be used in cases where the titles are irregular or do not have
     an explicit index. Examples include "Volume 12.5" or "Tales of the Wind".
@@ -21,30 +37,12 @@ class CsvMatcher(Processor, ACC):
     - If none of these is in the arguments, then an exception will be raised during construction.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('csv_filename', 'str', default='list.csv',
-                          description='Filename of the csv list file.'),
-            FieldMetadata('in_dir', 'Path', optional=True,
-                          description='The directory to read the csv file from. Required if the filename does not '
-                                      'contain the path.'),
-            FieldMetadata('encoding', 'str', default='utf-8',
-                          description='Encoding of the csv list file.'),
-            FieldMetadata('types', 'dict', default={'line_num': 'int', 'source': 'Path'},
-                          description='Type of each additional field to be fetched. See CsvReader for more details.'),
-            FieldMetadata('join_dir', 'list[str]', default=['source'],
-                          description='Specifies fields names that need dir joining. See CsvReader for more details.'),
-            FieldMetadata('data_type', 'str', optional=True,
-                          description='If present, specifies the type of all the titles.'),
-        ]
-
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.list = list(CsvReader(args).read())
+        options = Options(**args)
+        self.list = list(CsvReader(options.dict()).read())
         for title in self.list:
-            if 'data_type' in args:
-                title.type = Type[args['data_type'].upper()]
+            if options.data_type is not None:
+                title.type = Type[options.data_type.upper()]
             elif title.type == Type.UNRECOGNIZED:
                 raise ValueError('Type of title is not specified in file or arguments.')
 

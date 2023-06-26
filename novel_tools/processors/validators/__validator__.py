@@ -1,39 +1,38 @@
+from pydantic import BaseModel, Field
 from abc import abstractmethod
 from novel_tools.framework import Processor
-from novel_tools.common import NovelData, ACC, FieldMetadata
+from novel_tools.common import NovelData
 
 
-class Validator(Processor, ACC):
+class BaseOptions(BaseModel):
+    overwrite: bool = Field(default=True,
+                            description='If set to True, will overwrite the old index with the corrected one, and keep '
+                                        'the original index in the \'original_index\' field. If set to False, the '
+                                        'corrected index will be stored in the \'corrected_index\' field. In either'
+                                        'case, a field called \'error\' will be created if a validation error occurs.')
+    tag: str | None = Field(description='Only validate on the given tag. Sometimes there may exist several '
+                                        'independent sets of indices within the same book; for example, there might '
+                                        'be two different Introductions by different authors before the first '
+                                        'chapter, or there might b several interludes across the volume. In such '
+                                        'case, one can attach a tag to the data, and have a special Validator that '
+                                        'only checks for that tag.')
+    begin_index: int = Field(default=1, description='The starting index to validate against.')
+
+
+class Validator(Processor):
     """
     Validates whether the title indices are continuous, i.e., whether there exist duplicate of missing chapter indices.
     """
+    overwrite: bool
+    tag: str
+    curr_index: int
+    indices: set[int]
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('overwrite', 'bool', default=True,
-                          description='If set to True, will overwrite the old index with the corrected one, and keep '
-                                      'the original index in the \'original_index\' field. If set to False, '
-                                      'the corrected index will be stored in the \'corrected_index\' field. In either '
-                                      'case, a field called \'error\' will be created if a validation error occurs.'),
-            FieldMetadata('tag', 'str', default=None,
-                          description='Only validate on the given tag. Sometimes there may exist several independent '
-                                      'sets of indices within the same book; for example, there might be two '
-                                      'different Introductions by different authors before the first chapter, '
-                                      'or there might be several interludes across the volume. In such case, '
-                                      'one can attach a tag to the data, and have a special Validator that only '
-                                      'checks for that tag.'),
-            FieldMetadata('begin_index', 'int', default=1,
-                          description='The starting index to validate against.')
-        ]
-
-    def __init__(self, args):
-        self.args = self.extract_fields(args)
-
-        self.overwrite = self.args['overwrite']
-        self.tag = self.args['tag']
+    def init_fields(self, options: BaseOptions):
+        self.overwrite = options.overwrite
+        self.tag = options.tag
+        self.curr_index = options.begin_index - 1
         self.indices = set()
-        self.curr_index = self.args['begin_index'] - 1
 
     def process(self, data: NovelData) -> NovelData:
         """

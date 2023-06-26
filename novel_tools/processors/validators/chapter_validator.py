@@ -1,24 +1,23 @@
-from novel_tools.common import NovelData, Type, FieldMetadata
-from .validator import Validator
+from pydantic import Field
+from novel_tools.common import NovelData, Type
+from .__validator__ import Validator, BaseOptions
+
+
+class Options(BaseOptions):
+    discard_chapters: bool = Field(description='If set to True, restart indexing at the beginning of each new volume.')
+    volume_tag: str | None = Field(description='Only validates if the current volume is the given tag.')
 
 
 class ChapterValidator(Validator):
     """
     Validates a chapter, potentially within a volume.
     """
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return Validator.required_fields() + [
-            FieldMetadata('discard_chapters', 'bool',
-                          description='If set to True, restart indexing at the beginning of each new volume.'),
-            FieldMetadata('volume_tag', 'str', default=None,
-                          description='Only validates if the current volume is the given tag.')
-        ]
 
     def __init__(self, args):
-        super().__init__(args)
-        self.discard_chapters = self.args['discard_chapters']
-        self.volume_tag = self.args['volume_tag']
+        options = Options(**args)
+        self.init_fields(options)
+        self.discard_chapters = options.discard_chapters
+        self.volume_tag = options.volume_tag
 
         self.curr_volume = None
         self.validate_curr_volume = True

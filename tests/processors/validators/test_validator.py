@@ -1,9 +1,13 @@
 from pytest import fixture
 from novel_tools.common import NovelData, Type
-from novel_tools.processors.validators.validator import Validator
+from novel_tools.processors.validators.__validator__ import Validator, BaseOptions
 
 
 class StubValidator(Validator):
+    def __init__(self, args):
+        options = BaseOptions(**args)
+        self.init_fields(options)
+
     def check(self, data: NovelData) -> bool:
         return True
 

@@ -1,34 +1,31 @@
+from pydantic import BaseModel, Field
+from pathlib import Path
 from novel_tools.framework import Processor
-from novel_tools.common import NovelData, ACC, FieldMetadata
+from novel_tools.common import NovelData
 from novel_tools.readers.toc_reader import TocReader
 
 
-class TocMatcher(Processor, ACC):
+class Options(BaseModel):
+    toc_filename: str = Field(default='toc.txt',
+                              description='Filename of the toc file. This file should be generated from `TocWriter`.')
+    in_dir: Path | None = Field(description='The directory to read the toc file from. Required if the filename does not'
+                                            ' contain the path.')
+    encoding: str = Field(default='utf-8', description='Encoding of the toc file.')
+    has_volume: bool = Field(description='Specifies whether the toc contains volumes.')
+    discard_chapters: bool = Field(description='If set to True, will start from chapter 1 again when entering a new '
+                                               'volume.')
+
+
+class TocMatcher(Processor):
     """
     Matches data by a given Table of Contents (TOC) file. It is not advised to use toc files as a matcher; while the
     file is better human-readable, it contains less information than csv files and will not provide as many options as
     a csv file does.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('toc_filename', 'str', default='toc.txt',
-                          description='Filename of the toc file. This file should be generated from `TocWriter`.'),
-            FieldMetadata('in_dir', 'Path', optional=True,
-                          description='The directory to read the toc file from. Required if the filename does not '
-                                      'contain the path.'),
-            FieldMetadata('encoding', 'str', default='utf-8',
-                          description='Encoding of the toc file.'),
-            FieldMetadata('has_volume', 'bool',
-                          description='Specifies whether the toc contains volumes.'),
-            FieldMetadata('discard_chapters', 'bool',
-                          description='If set to True, will start from chapter 1 again when entering a new volume.')
-        ]
-
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.list = list(TocReader(args).read())
+        options = Options(**args)
+        self.list = list(TocReader(options.dict()).read())
         self.list_index = 0
 
     def process(self, data: NovelData) -> NovelData:

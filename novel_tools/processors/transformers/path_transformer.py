@@ -1,26 +1,23 @@
+from pydantic import BaseModel, Field
 from pathlib import Path
 from novel_tools.framework import Processor
-from novel_tools.common import NovelData, ACC, FieldMetadata
+from novel_tools.common import NovelData
 
 
-class PathTransformer(Processor, ACC):
+class Options(BaseModel):
+    in_dir: Path = Field(description='The parent directory for all the novel data.')
+    fields: list[str] = Field(default=['source'], description='A list of fields of type `Path` to transform.')
+
+
+class PathTransformer(Processor):
     """
     Given `in_dir`, this transformer will replace all `Path` fields with the paths relative to its `in_dir`.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('in_dir', 'Path',
-                          description='The parent directory for all the novel data.'),
-            FieldMetadata('fields', 'list[str]', default=['source'],
-                          description='A list of fields of type `Path` to transform.')
-        ]
-
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.in_dir = args['in_dir']
-        self.fields = args['fields']
+        options = Options(**args)
+        self.in_dir = options.in_dir
+        self.fields = options.fields
 
     def process(self, data: NovelData) -> NovelData:
         for field in self.fields:

@@ -1,34 +1,31 @@
+from pydantic import BaseModel, Field
 import json
 from pathlib import Path
 from typing import Iterator
 from novel_tools.framework import Reader
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from novel_tools.common import NovelData, Type
 
 
-class MetadataJsonReader(Reader, ACC):
+class Options(BaseModel):
+    metadata_filename: str = Field(default='metadata.json',
+                                   description='Filename of the metadata json file. The metadata MUST contain a '
+                                               '\'title\' field.')
+    in_dir: Path | None = Field(description='The directory to read the metadata file from. Required if the filename '
+                                            'does not contain the path.')
+    encoding: str = Field(default='utf-8', description='Encoding of the json file.')
+
+
+class MetadataJsonReader(Reader):
     """
     Reads a json that contains the metadata of the book file. Will only generate a BOOK_TITLE, with the `others` field
     populated with the other metadata.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('metadata_filename', 'str', default='metadata.json',
-                          description='Filename of the metadata json file. The metadata MUST contain a \'title\' '
-                                      'field.'),
-            FieldMetadata('in_dir', 'Path', optional=True,
-                          description='The directory to read the metadata file from. Required if the filename does '
-                                      'not contain the path.'),
-            FieldMetadata('encoding', 'str', default='utf-8',
-                          description='Encoding of the json file.')
-        ]
-
     def __init__(self, args):
-        args = self.extract_fields(args)
-        json_path = Path(args['metadata_filename'])
-        json_path = json_path if json_path.is_file() else args['in_dir'] / json_path
-        with json_path.open('rt', encoding=args['encoding']) as f:
+        options = Options(**args)
+        json_path = Path(options.metadata_filename)
+        json_path = json_path if json_path.is_file() else options.in_dir / json_path
+        with json_path.open('rt', encoding=options.encoding) as f:
             self.metadata = json.load(f)
 
         if 'title' not in self.metadata:

@@ -1,6 +1,19 @@
-from novel_tools.common import Type, NovelData, FieldMetadata
-from .__structure_writer__ import StructureWriter, Structure
+from pydantic import Field
+from novel_tools.common import Type, NovelData
+from .__structure_writer__ import StructureWriter, Structure, BaseOptions
 from novel_tools.utils import purify_name
+
+
+class Options(BaseOptions):
+    use_title: bool = Field(description='If set to True, will use the book title (if specified) as the Markdown '
+                                        'filename.')
+    md_filename: str = Field(default='text.md',
+                             description='Filename of the output Markdown file, if `use_title` is False.')
+    levels: dict[str, int] = Field(default={'book_title': 1, 'volume_title': 2, 'chapter_title': 3},
+                                   description='Specifies what level the header should be for each type.')
+    write_newline: bool = Field(default=False,
+                                description='If set to True, will insert a newline after a non-blank line. This will '
+                                            'avoid contents on consecutive lines being treated as the same paragraph.')
 
 
 class MarkdownWriter(StructureWriter):
@@ -10,27 +23,13 @@ class MarkdownWriter(StructureWriter):
     be prioritized.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return StructureWriter.required_fields() + [
-            FieldMetadata('use_title', 'bool',
-                          description='If set to True, will use the book title (if specified) as the Markdown '
-                                      'filename.'),
-            FieldMetadata('md_filename', 'str', default='text.md',
-                          description='Filename of the output Markdown file, if `use_title` is False.'),
-            FieldMetadata('levels', 'dict[str, int]', default={'book_title': 1, 'volume_title': 2, 'chapter_title': 3},
-                          description='Specifies what level the header should be for each type.'),
-            FieldMetadata('write_newline', 'bool', default=False,
-                          description='If set to True, will insert a newline after a non-blank line. This will avoid '
-                                      'contents on consecutive lines being treated as the same paragraph.'),
-        ]
-
     def __init__(self, args):
-        super().__init__(args)
-        self.use_title = self.args['use_title']
-        self.filename = self.args['md_filename']
-        self.levels = {Type[key.upper()]: '#' * value + ' ' for key, value in self.args['levels'].items()}
-        self.write_newline = self.args['write_newline']
+        options = Options(**args)
+        self.init_fields(options)
+        self.use_title = options.use_title
+        self.filename = options.md_filename
+        self.levels = {Type[key.upper()]: '#' * value + ' ' for key, value in options.levels.items()}
+        self.write_newline = options.write_newline
 
     def write(self) -> None:
         self._cleanup()

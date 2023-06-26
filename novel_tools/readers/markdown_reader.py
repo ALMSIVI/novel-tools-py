@@ -1,40 +1,36 @@
+from pydantic import BaseModel, Field
 from pathlib import Path
 from typing import Iterator
 from novel_tools.framework import Reader
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from novel_tools.common import NovelData, Type
 
 
-class MarkdownReader(Reader, ACC):
+class Options(BaseModel):
+    md_filename: str = Field(default='text.md', description='The filename of the markdown file.')
+    in_dir: Path | None = Field(description='The directory to read the text file from. Required if the filename does '
+                                            'not contain the path.')
+    encoding: str = Field(default='utf-8', description='The encoding of the file.')
+    verbose: bool = Field(default=False,
+                          description='If set to True, additional information, including line number and raw line '
+                                      'info, will be added to the data object.')
+    levels: dict[int, str] = Field(default={1: 'book_title', 2: 'volume_title', 3: 'chapter_title'},
+                                   description='Specifies what level the header should be for each type.')
+
+
+class MarkdownReader(Reader):
     """
     Reads from a Markdown file. Only a strict subset of Markdown is supported. Namely, only titles (lines starting with
     `#`'s) will be recognized. Also, if a paragraph is split on several lines (separated by a single newline character),
     they will be treated as several paragraphs instead of one.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('md_filename', 'str', default='text.md',
-                          description='The filename of the markdown file.'),
-            FieldMetadata('in_dir', 'Path', optional=True,
-                          description='The directory to read the text file from. Required if the filename does not '
-                                      'contain the path.'),
-            FieldMetadata('encoding', 'str', default='utf-8',
-                          description='The encoding of the file.'),
-            FieldMetadata('verbose', 'bool', default=False,
-                          description='If set to True, additional information, including line number and raw line '
-                                      'info, will be added to the data object.'),
-            FieldMetadata('levels', 'dict[str, int]', default={1: 'book_title', 2: 'volume_title', 3: 'chapter_title'},
-                          description='Specifies what level the header should be for each type.'),
-        ]
-
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.md_path = Path(args['md_filename'])
-        self.in_dir = args['in_dir']
-        self.encoding = args['encoding']
-        self.verbose = args['verbose']
-        self.levels = {int(key): Type[value.upper()] for key, value in args['levels'].items()}
+        options = Options(**args)
+        self.md_path = Path(options.md_filename)
+        self.in_dir = options.in_dir
+        self.encoding = options.encoding
+        self.verbose = options.verbose
+        self.levels = {key: Type[value.upper()] for key, value in options.levels.items()}
 
     def read(self) -> Iterator[NovelData]:
         md_path = self.md_path if self.md_path.is_file() else self.in_dir / self.md_path

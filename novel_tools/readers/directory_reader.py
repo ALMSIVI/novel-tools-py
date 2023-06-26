@@ -1,53 +1,47 @@
+from pydantic import BaseModel, Field
 from pathlib import Path
 from typing import Iterator
 from natsort import os_sorted
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from novel_tools.common import NovelData, Type
 from novel_tools.framework import Reader
 from .text_reader import TextReader
 
 supported_extensions = ['.txt', '.md']
 
 
-class DirectoryReader(Reader, ACC):
+class Options(BaseModel):
+    in_dir: Path = Field(description='The working directory.')
+    read_contents: bool = Field(description='If set to True, will open the files to read the contents.')
+    discard_chapters: bool = Field(description='If set to True, will start from chapter 1 again when entering a new '
+                                               'volume.')
+    default_volume: str | None = Field(description='If the novel does not have volumes but all chapters are stored in a'
+                                                   ' directory, then the variable would store the directory name.')
+    intro_filename: str = Field(default='_intro.txt',
+                                description='The filename of the book/volume introduction file(s).')
+    encoding: str = Field(default='utf-8', description='Encoding of the chapter file(s).')
+    merge_newlines: bool = Field(default=False,
+                                 description='If set to True, will merge two newline characters into one. Sometimes '
+                                             'newline characters carry meanings, and we do not want decorative '
+                                             'newlines to mix with those meaningful ones.')
+
+
+class DirectoryReader(Reader):
     """
     Reads from a directory structure. This directory should be generated from FileWriter, as it will follow certain
     conventions, such as the first line of the chapter file being the title.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('in_dir', 'Path',
-                          description='The working directory.'),
-            FieldMetadata('read_contents', 'bool',
-                          description='If set to True, will open the files to read the contents.'),
-            FieldMetadata('discard_chapters', 'bool',
-                          description='If set to True, will start from chapter 1 again when entering a new volume.'),
-            FieldMetadata('default_volume', 'str', default=None,
-                          description='If the novel does not have volumes but all chapters are stored in a directory, '
-                                      'then the variable would store the directory name.'),
-            FieldMetadata('intro_filename', 'str', default='_intro.txt',
-                          description='The filename of the book/volume introduction file(s).'),
-            FieldMetadata('encoding', 'str', default='utf-8',
-                          description='Encoding of the chapter file(s).'),
-            FieldMetadata('merge_newlines', 'bool', default=False,
-                          description='If set to True, will merge two newline characters into one. Sometimes newline '
-                                      'characters carry meanings, and we do not want decorative newlines to mix with '
-                                      'those meaningful ones.')
-        ]
-
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.in_dir: Path = args['in_dir']
-        self.read_contents = args['read_contents']
-        self.discard_chapters = args['discard_chapters']
-        self.default_volume = self.in_dir / args['default_volume'] if args['default_volume'] else None
-        self.encoding = args['encoding']
-        self.intro_filename = args['intro_filename']
-        self.merge_newlines = args['merge_newlines']
+        options = Options(**args)
+        self.in_dir = options.in_dir
+        self.read_contents = options.read_contents
+        self.discard_chapters = options.discard_chapters
+        self.default_volume = self.in_dir / options.default_volume if options.default_volume else None
+        self.encoding = options.encoding
+        self.intro_filename = options.intro_filename
+        self.merge_newlines = options.merge_newlines
 
         # Create the list of volumes/directories to look for
-        dir_path: Path  # natsort can accept a range of types, so we need to make type checker happy
         self.volumes: list[Path] = [dir_path for dir_path in os_sorted(self.in_dir.iterdir()) if dir_path.is_dir()]
         if self.default_volume in self.volumes:
             self.volumes = [self.default_volume]
@@ -99,7 +93,7 @@ class DirectoryReader(Reader, ACC):
 
     def __get_text_reader(self, filename: Path) -> TextReader:
         return TextReader({
-            'text_filename': filename,
+            'text_filename': str(filename),
             'in_dir': self.in_dir,
             'encoding': self.encoding,
             'verbose': True,

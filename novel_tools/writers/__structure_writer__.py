@@ -1,8 +1,9 @@
+from pydantic import BaseModel, Field
 from abc import ABC
 from pathlib import Path
 from typing import Optional
 from novel_tools.framework import Writer
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from novel_tools.common import NovelData, Type
 
 
 class Structure:
@@ -14,31 +15,27 @@ class Structure:
         self.children: list[Structure] = []
 
 
-class StructureWriter(Writer, ACC, ABC):
+class BaseOptions(BaseModel):
+    out_dir: Path = Field(description='The working directory.')
+    debug: bool = Field(default=False, description='If set to True, will print the error message to the terminal.')
+
+
+class StructureWriter(Writer, ABC):
     """
     Abstract class that generates the novel hierarchy as it accepts the data. The `write()` method is left to child
     classes to implement.
     """
+    out_dir: Path
+    debug: bool
+    structure: Structure
+    curr_volume: Structure = None
+    curr_chapter: Structure = None
+    has_volumes: bool = False
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('out_dir', 'Path',
-                          description='The working directory.'),
-            FieldMetadata('debug', 'bool', default=False,
-                          description='If set to True, will print the error message to the terminal.'),
-        ]
-
-    def __init__(self, args):
-        self.args = self.extract_fields(args)
-
-        self.out_dir: Path = self.args['out_dir']
-        self.debug = self.args['debug']
-
+    def init_fields(self, options: BaseOptions):
         self.structure = Structure()
-        self.curr_volume = None
-        self.curr_chapter = None
-        self.has_volumes = False
+        self.out_dir = options.out_dir
+        self.debug = options.debug
 
     def accept(self, data: NovelData) -> None:
         if self.debug and data.get('error', '') != '':

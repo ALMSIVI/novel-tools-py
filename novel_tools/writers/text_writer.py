@@ -1,6 +1,12 @@
-from novel_tools.common import FieldMetadata
-from .__structure_writer__ import StructureWriter, Structure
+from pydantic import Field
+from .__structure_writer__ import StructureWriter, Structure, BaseOptions
 from novel_tools.utils import purify_name
+
+
+class Options(BaseOptions):
+    use_title: bool = Field(description='If set to True, will use the book title (if specified) as the text filename.')
+    text_filename: str = Field(default='text.txt', description='Filename of the output text file, if `use_title` is '
+                                                               'False.')
 
 
 class TextWriter(StructureWriter):
@@ -10,19 +16,11 @@ class TextWriter(StructureWriter):
     be prioritized.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return StructureWriter.required_fields() + [
-            FieldMetadata('use_title', 'bool',
-                          description='If set to True, will use the book title (if specified) as the text filename.'),
-            FieldMetadata('text_filename', 'str', default='text.txt',
-                          description='Filename of the output text file, if `use_title` is False.'),
-        ]
-
     def __init__(self, args):
-        super().__init__(args)
-        self.use_title = self.args['use_title']
-        self.filename = self.args['text_filename']
+        options = Options(**args)
+        self.init_fields(options)
+        self.use_title = options.use_title
+        self.filename = options.text_filename
 
     def write(self) -> None:
         self._cleanup()

@@ -1,12 +1,21 @@
-from typing import Union, Any
+from pydantic import BaseModel, Field
+from typing import Any
 from novel_tools.framework import Processor
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from novel_tools.common import NovelData, Type
 
 
-class Unit:
-    def __init__(self, title_filter: dict[str, Any], title_format: Union[str, dict[str, str]]):
-        self.title_filter = title_filter
-        self.title_format = title_format
+class Unit(BaseModel):
+    filter: dict[str, str]
+    format: str | dict[str, str]
+
+
+class UnitProcessor:
+    title_filter: dict[str, Any]
+    title_format: str | dict[str, str]
+
+    def __init__(self, unit: Unit):
+        self.title_filter = unit.filter
+        self.title_format = unit.format
         for key in self.title_filter:
             if key == 'type':
                 self.title_filter[key] = Type[self.title_filter[key].upper()]
@@ -28,7 +37,15 @@ class Unit:
         return data
 
 
-class TitleTransformer(Processor, ACC):
+class Options(BaseModel):
+    units: list[Unit] = Field(description='The list of processing units. `filter` is a dictionary with the fields as '
+                                          'the key, and `format` can be either a string or a dict containing the '
+                                          'format strings for each custom field. Please put the units with the most '
+                                          'specific filters first, and leave the most generic last, to avoid '
+                                          'short-circuiting.')
+
+
+class TitleTransformer(Processor):
     """
     Formats the title, using the necessary information in the data.
 
@@ -41,19 +58,9 @@ class TitleTransformer(Processor, ACC):
     is a title.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('units', 'list[{filter: dict[str, str], format: str | dict[str, str]}]',
-                          description='The list of processing units. `filter` is a dictionary with the fields as the '
-                                      'key, and `format` can be either a string or a dict containing the format strings'
-                                      ' for each custom field. Please put the units with the most specific filters '
-                                      'first, and leave the most generic last, to avoid short-circuiting.')
-        ]
-
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.units = [Unit(arg['filter'], arg['format']) for arg in args['units']]
+        options = Options(**args)
+        self.units = [UnitProcessor(unit) for unit in options.units]
 
     def process(self, data: NovelData) -> NovelData:
         for unit in self.units:

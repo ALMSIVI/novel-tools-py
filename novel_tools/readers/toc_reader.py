@@ -1,35 +1,31 @@
+from pydantic import BaseModel, Field
 from pathlib import Path
 from typing import Iterator
 from novel_tools.framework import Reader
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from novel_tools.common import NovelData, Type
 
 
-class TocReader(Reader, ACC):
+class Options(BaseModel):
+    toc_filename: str = Field(default='toc.txt',
+                              description='Filename of the toc file. This file should be generated from `TocWriter`.')
+    in_dir: Path | None = Field(description='The directory to read the toc file from. Required if the filename does not'
+                                            ' contain the path.')
+    encoding: str = Field(default='utf-8', description='Encoding of the toc file.')
+    has_volume: bool = Field(description='Specifies whether the toc contains volumes.')
+    discard_chapters: bool = Field(description='If set to True, will start from chapter 1 again when entering a '
+                                               'new volume.')
+
+
+class TocReader(Reader):
     """Reads from a table of contents (toc) file."""
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('toc_filename', 'str', default='toc.txt',
-                          description='Filename of the toc file. This file should be generated from `TocWriter`.'),
-            FieldMetadata('in_dir', 'Path', optional=True,
-                          description='The directory to read the toc file from. Required if the filename does not '
-                                      'contain the path.'),
-            FieldMetadata('encoding', 'str', default='utf-8',
-                          description='Encoding of the toc file.'),
-            FieldMetadata('has_volume', 'bool',
-                          description='Specifies whether the toc contains volumes.'),
-            FieldMetadata('discard_chapters', 'bool',
-                          description='If set to True, will start from chapter 1 again when entering a new volume.')
-        ]
-
     def __init__(self, args):
-        args = self.extract_fields(args)
-        self.has_volume = args['has_volume']
-        self.discard_chapters = args['discard_chapters']
-        self.filename = Path(args['toc_filename'])
-        self.in_dir = args['in_dir']
-        self.encoding = args['encoding']
+        options = Options(**args)
+        self.has_volume = options.has_volume
+        self.discard_chapters = options.discard_chapters
+        self.filename = Path(options.toc_filename)
+        self.in_dir = options.in_dir
+        self.encoding = options.encoding
 
     def read(self) -> Iterator[NovelData]:
         toc_path = self.filename if self.filename.is_file() else self.in_dir / self.filename

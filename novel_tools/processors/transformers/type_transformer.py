@@ -1,13 +1,9 @@
 from novel_tools.framework import Processor
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from novel_tools.common import NovelData, Type
 
 
-class TypeTransformer(Processor, ACC):
+class TypeTransformer(Processor):
     """Determines the true type for all data with UNRECOGNIZED type."""
-
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return []
 
     # noinspection PyUnusedLocal
     def __init__(self, args):

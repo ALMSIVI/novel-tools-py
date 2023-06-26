@@ -1,9 +1,23 @@
+from pydantic import BaseModel, Field
 import re
 from novel_tools.framework import Processor
-from novel_tools.common import NovelData, Type, ACC, FieldMetadata
+from novel_tools.common import NovelData, Type
 
 
-class SpecialMatcher(Processor, ACC):
+class Options(BaseModel):
+    type: str = Field(description='Specifies the type for this matcher.')
+    affixes: list[str] = Field(description='List of special names to match for.')
+    regex: str = Field(description='The regex to match for. It will contain an "affixes" format, that will be '
+                                   'replaced with the list of affixes. Example: ^{affixes}$ will match lines with any '
+                                   'of the affixes.')
+    affix_group: int = Field(default=0, description='The group index for the title\'s affix (starting from 0).')
+    content_group: int = Field(default=1, description='The group index for the title\'s content (starting from 0). '
+                                                      'Use -1 if there is no content.')
+    tag: str = Field(default='special', description='The tag to append to matched data. This can be used in '
+                                                    'TitleValidator for different formats.')
+
+
+class SpecialMatcher(Processor):
     """
     Matches a special title, whose affixes are in the given list. Examples of special titles include Introduction,
     Foreword, or Conclusion. It can also be used without any affixes, in which you can simply use an empty affix array
@@ -14,37 +28,16 @@ class SpecialMatcher(Processor, ACC):
     attached to the object.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('type', 'str',
-                          description='Specifies the type for this matcher.'),
-            FieldMetadata('affixes', 'list[str]',
-                          description='List of special names to match for.'),
-            FieldMetadata('regex', 'str',
-                          description='The regex to match for. It will contain an "affixes" format, that will be '
-                                      'replaced with the list of affixes. Example: ^{affixes}$ will match lines with '
-                                      'any of the affixes.'),
-            FieldMetadata('affix_group', 'int', default=0,
-                          description='The group index for the title\'s affix (starting from 0).'),
-            FieldMetadata('content_group', 'int', default=1,
-                          description='The group index for the title\'s content (starting from 0). Use -1 if there is '
-                                      'no content.'),
-            FieldMetadata('tag', 'str', default='special',
-                          description='The tag to append to matched data. This can be used in TitleValidator for '
-                                      'different formats.')
-        ]
-
     def __init__(self, args):
-        self.args = self.extract_fields(args)
+        options = Options(**args)
 
-        self.type = Type[self.args['type'].upper()]
-        self.affixes = self.args['affixes']
+        self.type = Type[options.type.upper()]
+        self.affixes = options.affixes
         affix_str = '|'.join(self.affixes)
-        self.regex = re.compile(self.args['regex'].format(affixes=f'({affix_str})'))
-        self.affix_group = self.args['affix_group'] + 1
-        self.content_group = self.args['content_group'] + 1
-        self.tag = self.args['tag']
+        self.regex = re.compile(options.regex.format(affixes=f'({affix_str})'))
+        self.affix_group = options.affix_group + 1
+        self.content_group = options.content_group + 1
+        self.tag = options.tag
 
     def process(self, data: NovelData) -> NovelData:
         if data.type != Type.UNRECOGNIZED and data.type != self.type:

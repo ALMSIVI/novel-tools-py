@@ -1,12 +1,11 @@
 from pathlib import Path
-from typing import Optional
 from novel_tools.framework import Worker
 from novel_tools.processors.matchers.__aggregate_matcher__ import AggregateMatcher
 from novel_tools.utils import generate_objects, default_packages
 
 
-def analyze(config: dict, *, filename: Optional[Path] = None, in_dir: Optional[Path] = None,
-            out_dir: Optional[Path] = None):
+def analyze(config: dict, *, filename: Path | None = None, in_dir: Path | None = None,
+            out_dir: Path | None = None):
     """
     Invokes a Worker instance to analyze the novel.
 
@@ -53,7 +52,7 @@ def analyze(config: dict, *, filename: Optional[Path] = None, in_dir: Optional[P
     }
 
     if filename:
-        additional_args['text_filename'] = filename
+        additional_args['text_filename'] = str(filename)
 
     objects = generate_objects(config, default_packages, additional_args)
     matcher = AggregateMatcher(objects.get('matchers', []))

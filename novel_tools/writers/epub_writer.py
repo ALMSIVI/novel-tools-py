@@ -1,3 +1,4 @@
+from pydantic import Field
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -5,9 +6,33 @@ from bs4 import BeautifulSoup
 from bs4.element import Tag
 from ebooklib import epub
 from markdown import markdown
-from novel_tools.common import FieldMetadata, NovelData
-from .__structure_writer__ import StructureWriter, Structure
+from novel_tools.common import NovelData
+from .__structure_writer__ import StructureWriter, Structure, BaseOptions
 from novel_tools.utils import purify_name
+
+
+class Options(BaseOptions):
+    in_dir: Path = Field(description='The directory that stores all the additional data, including stylesheets and/or '
+                                     'images.')
+    encoding: str = Field(default='utf-8', description='Encoding of the metadata template file.')
+    include_nav: bool = Field(default=False,
+                              description='Whether a TOC will be placed after the cover page.')
+    stylesheet: str | None = Field(description='The stylesheet for the book. If it is not specified, a default one '
+                                               'will be used.')
+    cover: str = Field(default='cover.jpg',
+                       description='Cover image for the book. If it exists, a cover page will be added.')
+    cover_title: str = Field(default='Cover', description='Title for the cover page. Useful for localization.')
+    metadata_template: str | None = Field(description='The template for the metadata page. If it is not specified, '
+                                                      'a default one will be used.')
+    metadata_title: str = Field(default='Metadata', description='Title for the metadata page. Useful for localization.')
+    author_separator: str = Field(default=', ', description='Separator for multiple authors on the metadata page.')
+    date_format: str = Field(default='%B %Y',
+                             description='Format for the data on the metadata page. For mor information, check the '
+                                         'documentation for datetime.')
+    volume_template: str | None = Field(description='The template for the volume page. If it is not specified, '
+                                                    'a default one will be used.')
+    chapter_template: str | None = Field(description='The template for the chapter page. If it is not specified, '
+                                                     'a default one will be used.')
 
 
 class EpubWriter(StructureWriter):
@@ -37,66 +62,32 @@ class EpubWriter(StructureWriter):
     and the writer will locate the images and add them to the epub.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return StructureWriter.required_fields() + [
-            FieldMetadata('in_dir', 'Path',
-                          description='The directory that stores all the additional data, including '
-                                      'stylesheets and/or images.'),
-            FieldMetadata('encoding', 'str', default='utf-8',
-                          description='Encoding of the metadata template file.'),
-            FieldMetadata('include_nav', 'bool', default=False,
-                          description='Whether a TOC will be placed after the cover page.'),
-            FieldMetadata('stylesheet', 'str', optional=True,
-                          description='The stylesheet for the book. If it is not specified, a default one will be '
-                                      'used.'),
-            FieldMetadata('cover', 'str', default='cover.jpg',
-                          description='Cover image for the book. If it exists, a cover page will be added.'),
-            FieldMetadata('cover_title', 'str', default='Cover',
-                          description='Title for the cover page. Useful for localization.'),
-            FieldMetadata('metadata_template', 'str', optional=True,
-                          description='The template for the metadata page. If it is not specified, a default one will '
-                                      'be used.'),
-            FieldMetadata('metadata_title', 'str', default='Metadata',
-                          description='Title for the metadata page. Useful for localization.'),
-            FieldMetadata('author_separator', 'str', default=', ',
-                          description='Separator for multiple authors on the metadata page.'),
-            FieldMetadata('date_format', 'str', default='%B %Y',
-                          description='Format for the data on the metadata page. For mor information, check the '
-                                      'documentation for datetime.'),
-            FieldMetadata('volume_template', 'str', optional=True,
-                          description='The template for the volume page. If it is not specified, a default one will be'
-                                      ' used.'),
-            FieldMetadata('chapter_template', 'str', optional=True,
-                          description='The template for the chapter page. If it is not specified, a default one will be'
-                                      ' used.')
-        ]
-
     def __init__(self, args):
-        super().__init__(args)
-        self.in_dir: Path = self.args['in_dir']
-        self.encoding = self.args['encoding']
-        self.include_nav = self.args['include_nav']
-        self.cover = self.args['cover']
-        self.cover_title = self.args['cover_title']
-        self.metadata_title = self.args['metadata_title']
-        self.author_separator = self.args['author_separator']
-        self.date_format = self.args['date_format']
+        options = Options(**args)
+        self.init_fields(options)
+        self.in_dir: Path = options.in_dir
+        self.encoding = options.encoding
+        self.include_nav = options.include_nav
+        self.cover = options.cover
+        self.cover_title = options.cover_title
+        self.metadata_title = options.metadata_title
+        self.author_separator = options.author_separator
+        self.date_format = options.date_format
 
         # Stylesheet and metadata templates will only be used once, so we don't store them inside the class
-        self.stylesheet = self.in_dir / self.args['stylesheet'] if 'stylesheet' in self.args \
+        self.stylesheet = self.in_dir / options.stylesheet if options.stylesheet is not None \
             else Path('config', 'epub', 'stylesheet.css')
 
-        self.metadata_template = self.in_dir / self.args['metadata_template'] if 'metadata_template' in self.args \
+        self.metadata_template = self.in_dir / options.metadata_template if options.metadata_template is not None \
             else Path('config', 'epub', 'metadata_page.html')
 
         # Volume and chapter templates will be reused, so we store them to save I/O operations.
-        volume_template = self.in_dir / self.args['volume_template'] if 'volume_template' in self.args \
+        volume_template = self.in_dir / options.volume_template if options.volume_template is not None \
             else Path('config', 'epub', 'volume_page.html')
         with volume_template.open('rt', encoding=self.encoding) as f:
             self.volume_template = f.read()
 
-        chapter_template = self.in_dir / self.args['chapter_template'] if 'chapter_template' in self.args \
+        chapter_template = self.in_dir / options.chapter_template if options.chapter_template is not None \
             else Path('config', 'epub', 'chapter_page.html')
         with chapter_template.open('rt', encoding=self.encoding) as f:
             self.chapter_template = f.read()

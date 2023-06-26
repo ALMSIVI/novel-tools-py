@@ -1,6 +1,15 @@
-from novel_tools.common import FieldMetadata, NovelData, Type
-from .__structure_writer__ import StructureWriter, Structure
+from pydantic import Field
+from novel_tools.common import NovelData, Type
+from .__structure_writer__ import StructureWriter, Structure, BaseOptions
 from novel_tools.utils import purify_name
+
+
+class Options(BaseOptions):
+    default_volume: str = Field(default='default',
+                                description='If the volume does not have volumes, specify the directory name to place '
+                                            'the chapter files.')
+    intro_filename: str = Field(default='_intro.txt',
+                                description='The filename of the book/volume introduction file.')
 
 
 class DirectoryWriter(StructureWriter):
@@ -10,20 +19,11 @@ class DirectoryWriter(StructureWriter):
     can also use the same transformer to attach a 'filename' field, and the writer will prioritize this field.
     """
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return StructureWriter.required_fields() + [
-            FieldMetadata('default_volume', 'str', default='default',
-                          description='If the volume does not have volumes, specify the directory name to place the '
-                                      'chapter files.'),
-            FieldMetadata('intro_filename', 'str', default='_intro.txt',
-                          description='The filename of the book/volume introduction file(s).')
-        ]
-
     def __init__(self, args):
-        super().__init__(args)
-        self.default_volume = self.args['default_volume']
-        self.intro_filename = self.args['intro_filename']
+        options = Options(**args)
+        self.init_fields(options)
+        self.default_volume = options.default_volume
+        self.intro_filename = options.intro_filename
 
     def write(self) -> None:
         self._cleanup()
