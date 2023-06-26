@@ -14,7 +14,7 @@ pydantic = '^1.10.9'
 natsort = '^8.4.0'
 Markdown = "^3.4.3"
 beautifulsoup4 = "^4.12.2"
-ebooklib = {git = "https://github.com/ALMSIVI/ebooklib"}
+ebooklib = { git = "https://github.com/ALMSIVI/ebooklib" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
@@ -28,14 +28,12 @@ cli = 'ntcli:start'
 requires = ['poetry-core>=1.0.0']
 build-backend = 'poetry.core.masonry.api'
 
-[tool.yapf]
-based_on_style = 'pep8'
-column_limit = 120
-allow_split_before_dict_value = false
-
 [tool.pytest.ini_options]
 markers = [
     'slow: marks tests as slow',
     'data: requires input data',
     'args: requires args'
 ]
+
+[tool.ruff]
+line-length = 120
