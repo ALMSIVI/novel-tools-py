@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from pathlib import Path
-from novel_tools.framework import Processor
-from novel_tools.common import NovelData
+from novel_tools.framework import NovelData, Processor
 from novel_tools.readers.toc_reader import TocReader
 
 

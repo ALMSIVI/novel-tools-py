@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 import re
-from novel_tools.framework import Processor
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type, Processor
 
 
 class Options(BaseModel):

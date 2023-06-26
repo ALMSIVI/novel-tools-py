@@ -1,5 +1,5 @@
 from pydantic import Field
-from novel_tools.common import Type, NovelData
+from novel_tools.framework import Type, NovelData
 from .__structure_writer__ import StructureWriter, Structure, BaseOptions
 from novel_tools.utils import purify_name
 

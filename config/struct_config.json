@@ -1,79 +1,95 @@
 {
-  "objects": {
-    "readers": [
-      {
-        "class": "TextReader",
-        "verbose": true
-      }
-    ],
-    "matchers": [
-      {
-        "class": "NumberedMatcher",
-        "type": "volume_title",
-        "regex": "^第(.+?)卷(.*)$"
-      },
-      {
-        "class": "SpecialMatcher",
-        "type": "volume_title",
-        "affixes": ["前传", "最终卷", "后记", "番外篇"],
-        "regex": "^{affixes}(.*)$"
-      },
-      {
-        "class": "NumberedMatcher",
-        "type": "chapter_title",
-        "regex": "^第(.+?)章(.*)$"
-      },
-      {
-        "class": "SpecialMatcher",
-        "type": "chapter_title",
-        "affixes": ["序章", "楔子", "终章", "番外"],
-        "regex": "^{affixes}(.*)$"
-      }
-    ],
-    "validators": [
-      {
-        "class": "VolumeValidator"
-      },
-      {
-        "class": "ChapterValidator",
-        "discard_chapters": false
-      }
-    ],
-    "transformers": [
-      { "class": "TypeTransformer" },
-      {
-        "class": "TitleTransformer",
-        "units": [
-          {
-            "filter": {
-              "tag": "special"
-            },
-            "format": "{affix} {content}"
+  "readers": [
+    {
+      "class": "TextReader",
+      "verbose": true
+    }
+  ],
+  "matchers": [
+    {
+      "class": "NumberedMatcher",
+      "type": "volume_title",
+      "regex": "^第(.+?)卷(.*)$"
+    },
+    {
+      "class": "SpecialMatcher",
+      "type": "volume_title",
+      "affixes": [
+        "前传",
+        "最终卷",
+        "后记",
+        "番外篇"
+      ],
+      "regex": "^{affixes}(.*)$"
+    },
+    {
+      "class": "NumberedMatcher",
+      "type": "chapter_title",
+      "regex": "^第(.+?)章(.*)$"
+    },
+    {
+      "class": "SpecialMatcher",
+      "type": "chapter_title",
+      "affixes": [
+        "序章",
+        "楔子",
+        "终章",
+        "番外"
+      ],
+      "regex": "^{affixes}(.*)$"
+    }
+  ],
+  "validators": [
+    {
+      "class": "VolumeValidator"
+    },
+    {
+      "class": "ChapterValidator",
+      "discard_chapters": false
+    }
+  ],
+  "transformers": [
+    {
+      "class": "TypeTransformer"
+    },
+    {
+      "class": "TitleTransformer",
+      "units": [
+        {
+          "filter": {
+            "tag": "special"
           },
-          {
-            "filter": {
-              "type": "volume_title"
-            },
-            "format": "第{index}卷 {content}"
+          "format": "{affix} {content}"
+        },
+        {
+          "filter": {
+            "type": "volume_title"
           },
-          {
-            "filter": {
-              "type": "chapter_title"
-            },
-            "format": "第{index}章 {content}"
-          }
-        ]
-      },
-      {
-        "class": "PathTransformer",
-        "fields": ["source"]
-      }
-    ],
-    "writers": [
-      {
-        "class": "CsvWriter",
-        "additional_fields": ["line_num", "raw", "error"]
-      }
-    ]
-  }
+          "format": "第{index}卷 {content}"
+        },
+        {
+          "filter": {
+            "type": "chapter_title"
+          },
+          "format": "第{index}章 {content}"
+        }
+      ]
+    },
+    {
+      "class": "PathTransformer",
+      "fields": [
+        "source"
+      ]
+    }
+  ],
+  "writers": [
+    {
+      "class": "CsvWriter",
+      "additional_fields": [
+        "line_num",
+        "raw",
+        "error"
+      ]
+    }
+  ]
 }

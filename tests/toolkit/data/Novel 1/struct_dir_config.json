@@ -1,75 +1,83 @@
 {
-  "objects": {
-    "readers": [
-      {
-        "class": "DirectoryReader",
-        "read_contents": false,
-        "discard_chapters": false
-      }
-    ],
-    "matchers": [
-      {
-        "class": "NumberedMatcher",
-        "type": "volume_title",
-        "regex": "^\\(\\d+\\) Volume (\\d+) (.*)$"
-      },
-      {
-        "class": "SpecialMatcher",
-        "type": "volume_title",
-        "affixes": ["Easter Egg"],
-        "regex": "^\\(\\d+\\) {affixes} (.*)$"
-      },
-      {
-        "class": "NumberedMatcher",
-        "type": "chapter_title",
-        "regex": "^Chapter (\\d+) (.*)$"
-      },
-      {
-        "class": "SpecialMatcher",
-        "type": "chapter_title",
-        "affixes": ["Introduction"],
-        "regex": "^{affixes} (.*)$"
-      }
-    ],
-    "transformers": [
-      {
-        "class": "TitleTransformer",
-        "units": [
-          {
-            "filter": {
-              "tag": "special"
-            },
-            "format": "{affix} {content}"
+  "readers": [
+    {
+      "class": "DirectoryReader",
+      "read_contents": false,
+      "discard_chapters": false
+    }
+  ],
+  "matchers": [
+    {
+      "class": "NumberedMatcher",
+      "type": "volume_title",
+      "regex": "^\\(\\d+\\) Volume (\\d+) (.*)$"
+    },
+    {
+      "class": "SpecialMatcher",
+      "type": "volume_title",
+      "affixes": [
+        "Easter Egg"
+      ],
+      "regex": "^\\(\\d+\\) {affixes} (.*)$"
+    },
+    {
+      "class": "NumberedMatcher",
+      "type": "chapter_title",
+      "regex": "^Chapter (\\d+) (.*)$"
+    },
+    {
+      "class": "SpecialMatcher",
+      "type": "chapter_title",
+      "affixes": [
+        "Introduction"
+      ],
+      "regex": "^{affixes} (.*)$"
+    }
+  ],
+  "transformers": [
+    {
+      "class": "TitleTransformer",
+      "units": [
+        {
+          "filter": {
+            "tag": "special"
           },
-          {
-            "filter": {
-              "type": "volume_title"
-            },
-            "format": "Volume {index} {content}"
+          "format": "{affix} {content}"
+        },
+        {
+          "filter": {
+            "type": "volume_title"
           },
-          {
-            "filter": {
-              "type": "chapter_title"
-            },
-            "format": "Chapter {index} {content}"
-          }
-        ]
-      },
-      {
-        "class": "PathTransformer",
-        "fields": ["source"]
-      }
-    ],
-    "writers": [
-      {
-        "class": "CsvWriter",
-        "additional_fields": ["source", "line_num"]
-      },
-      {
-        "class": "TocWriter",
-        "write_line_num": false,
-        "debug": false
-      }
-    ]
-  }
+          "format": "Volume {index} {content}"
+        },
+        {
+          "filter": {
+            "type": "chapter_title"
+          },
+          "format": "Chapter {index} {content}"
+        }
+      ]
+    },
+    {
+      "class": "PathTransformer",
+      "fields": [
+        "source"
+      ]
+    }
+  ],
+  "writers": [
+    {
+      "class": "CsvWriter",
+      "additional_fields": [
+        "source",
+        "line_num"
+      ]
+    },
+    {
+      "class": "TocWriter",
+      "write_line_num": false,
+      "debug": false
+    }
+  ]
 }
+

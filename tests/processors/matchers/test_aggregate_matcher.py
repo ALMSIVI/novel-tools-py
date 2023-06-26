@@ -1,5 +1,5 @@
 from pytest import fixture
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type
 from novel_tools.processors.matchers.numbered_matcher import NumberedMatcher
 from novel_tools.processors.matchers.special_matcher import SpecialMatcher
 from novel_tools.processors.matchers.__aggregate_matcher__ import AggregateMatcher

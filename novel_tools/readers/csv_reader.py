@@ -2,8 +2,7 @@ import csv
 from pydantic import BaseModel, Field
 from pathlib import Path
 from typing import Iterator
-from novel_tools.framework import Reader
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type, Reader
 
 
 class Options(BaseModel):
@@ -11,8 +10,8 @@ class Options(BaseModel):
                               description='Filename of the csv list file. This file should be generated from '
                                           '`CsvWriter`, i.e., it must contain at least type, index and content.')
 
-    in_dir: Path = Field(description='The directory to read the csv file from. Required if the filename does not '
-                                     'contain the path.')
+    in_dir: Path | None = Field(description='The directory to read the csv file from. Required if the filename does not'
+                                            ' contain the path.')
     encoding: str = Field(default='utf-8', description='Encoding of the csv file.')
     types: dict[str, str] = Field(default={'line_num': 'int', 'source': 'Path'},
                                   description='Type of each additional field to be fetched. Currently, int, bool and '

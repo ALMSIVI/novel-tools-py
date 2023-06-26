@@ -1,4 +1,4 @@
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type
 from .__validator__ import Validator, BaseOptions
 
 

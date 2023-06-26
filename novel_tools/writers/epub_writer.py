@@ -1,12 +1,11 @@
 from pydantic import Field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from ebooklib import epub
 from markdown import markdown
-from novel_tools.common import NovelData
+from novel_tools.framework import NovelData
 from .__structure_writer__ import StructureWriter, Structure, BaseOptions
 from novel_tools.utils import purify_name
 
@@ -171,7 +170,7 @@ class EpubWriter(StructureWriter):
             css.set_content(f.read())
         return css
 
-    def __create_cover(self, book: epub.EpubBook) -> Optional[epub.EpubHtml]:
+    def __create_cover(self, book: epub.EpubBook) -> epub.EpubHtml | None:
         """
         We will not be using `EpubBook.set_cover()` here, because it will set the cover page to `linear="no"` in the
         spine. This means the page will not be ordered correctly.
@@ -242,7 +241,7 @@ class EpubWriter(StructureWriter):
         return page, chapters
 
     def __create_chapter_page(self, book: epub.EpubBook, chapter: Structure,
-                              volume_order: Optional[str] = None) -> epub.EpubHtml:
+                              volume_order: str | None = None) -> epub.EpubHtml:
         title = chapter.title
         chapter_order = title.get('order')
         in_volume = volume_order is not None

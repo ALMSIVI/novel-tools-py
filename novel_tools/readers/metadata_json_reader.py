@@ -2,8 +2,7 @@ from pydantic import BaseModel, Field
 import json
 from pathlib import Path
 from typing import Iterator
-from novel_tools.framework import Reader
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type, Reader
 
 
 class Options(BaseModel):

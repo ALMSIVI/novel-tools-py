@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Union
 from pytest import fixture, FixtureRequest, mark
 from pytest_mock import MockerFixture
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type
 from novel_tools.writers.directory_writer import DirectoryWriter
 
 

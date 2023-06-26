@@ -1,26 +1,28 @@
 {
-  "objects": {
-    "readers": [
-      {
-        "class": "MetadataJsonReader"
-      },
-      {
-        "class": "TextReader",
-        "verbose": true
-      }
-    ],
-    "matchers": [
-      { "class": "CsvMatcher" }
-    ],
-    "transformers": [
-      { "class": "TypeTransformer" }
-    ],
-    "writers": [
-      {
-        "class": "MarkdownWriter",
-        "use_title": true,
-        "write_newline": true
-      }
-    ]
-  }
+  "readers": [
+    {
+      "class": "MetadataJsonReader"
+    },
+    {
+      "class": "TextReader",
+      "verbose": true
+    }
+  ],
+  "matchers": [
+    {
+      "class": "CsvMatcher"
+    }
+  ],
+  "transformers": [
+    {
+      "class": "TypeTransformer"
+    }
+  ],
+  "writers": [
+    {
+      "class": "MarkdownWriter",
+      "use_title": true,
+      "write_newline": true
+    }
+  ]
 }

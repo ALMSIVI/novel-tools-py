@@ -1,26 +1,26 @@
 {
-  "objects": {
-    "readers": [
-      {
-        "class": "TextReader",
-        "verbose": true
-      }
-    ],
-    "matchers": [
-      {
-        "class": "TocMatcher",
-        "has_volume": true,
-        "discard_chapters": false
-      }
-    ],
-    "transformers": [
-      { "class": "TypeTransformer" }
-    ],
-    "writers": [
-      {
-        "class": "MarkdownWriter",
-        "use_title": false
-      }
-    ]
-  }
+  "readers": [
+    {
+      "class": "TextReader",
+      "verbose": true
+    }
+  ],
+  "matchers": [
+    {
+      "class": "TocMatcher",
+      "has_volume": true,
+      "discard_chapters": false
+    }
+  ],
+  "transformers": [
+    {
+      "class": "TypeTransformer"
+    }
+  ],
+  "writers": [
+    {
+      "class": "MarkdownWriter",
+      "use_title": false
+    }
+  ]
 }

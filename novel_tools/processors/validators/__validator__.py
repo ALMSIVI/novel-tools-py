@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from abc import abstractmethod
-from novel_tools.framework import Processor
-from novel_tools.common import NovelData
+from novel_tools.framework import NovelData, Processor
 
 
 class BaseOptions(BaseModel):

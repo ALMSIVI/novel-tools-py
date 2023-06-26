@@ -1,13 +1,12 @@
 from pydantic import BaseModel, Field
-from novel_tools.common import NovelData, Type
 from pathlib import Path
-from novel_tools.framework import Processor
+from novel_tools.framework import NovelData, Type, Processor
 from novel_tools.readers.csv_reader import CsvReader
 
 
 class Options(BaseModel):
     csv_filename: str = Field(default='list.csv', description='Filename of the csv list file.')
-    in_dir: Path = Field(
+    in_dir: Path | None = Field(
         description='The directory to read the csv file from. Required if the filename does not contain the path.')
     encoding: str = Field(default='utf-8', description='Encoding of the csv file.')
     types: dict[str, str] = Field(default={'line_num': 'int', 'source': 'Path'},

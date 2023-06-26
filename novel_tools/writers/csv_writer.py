@@ -1,8 +1,7 @@
 from pydantic import BaseModel, Field
 from pathlib import Path
 import csv
-from novel_tools.common import NovelData
-from novel_tools.framework import Writer
+from novel_tools.framework import NovelData, Writer
 from novel_tools.utils import purify_name
 
 

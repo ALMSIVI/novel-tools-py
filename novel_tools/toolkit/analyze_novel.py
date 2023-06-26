@@ -1,11 +1,10 @@
 from pathlib import Path
 from novel_tools.framework import Worker
 from novel_tools.processors.matchers.__aggregate_matcher__ import AggregateMatcher
-from novel_tools.utils import generate_objects, default_packages
+from novel_tools.utils import create_workflow, Stage
 
 
-def analyze(config: dict, *, filename: Path | None = None, in_dir: Path | None = None,
-            out_dir: Path | None = None):
+def analyze(config: dict, *, filename: Path | None = None, in_dir: Path | None = None, out_dir: Path | None = None):
     """
     Invokes a Worker instance to analyze the novel.
 
@@ -54,8 +53,8 @@ def analyze(config: dict, *, filename: Path | None = None, in_dir: Path | None =
     if filename:
         additional_args['text_filename'] = str(filename)
 
-    objects = generate_objects(config, default_packages, additional_args)
-    matcher = AggregateMatcher(objects.get('matchers', []))
-    processors = [matcher] + objects.get('validators', []) + objects.get('transformers', [])
-    worker = Worker(objects['readers'], processors, objects['writers'])
-    worker.work()
+    workflow = create_workflow(config, additional_args)
+    matcher = AggregateMatcher(workflow.get(Stage.matchers) or [])
+    processors = [matcher] + (workflow.get(Stage.validators) or []) + (workflow.get(Stage.transformers) or [])
+    worker = Worker(workflow.get(Stage.readers), processors, workflow.get(Stage.writers))
+    worker.execute()

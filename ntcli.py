@@ -35,10 +35,8 @@ def start():
 
     # generate_docs
     doc_parser = subparsers.add_parser('docgen', description='Generates documentation for framework classes.')
-    doc_parser.add_argument('-c', '--config_filename', default=None,
-                            help='Filename of the config which specifies additional packages.')
     doc_parser.add_argument('-d', '--doc_filename', default=None, help='Filename of the output doc file.')
-    doc_parser.set_defaults(func=lambda a: docgen(a.config_filename, a.doc_filename))
+    doc_parser.set_defaults(func=lambda a: docgen(a.doc_filename))
 
     args = parser.parse_args()
     args.func(args)

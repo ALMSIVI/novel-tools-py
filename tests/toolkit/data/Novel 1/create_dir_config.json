@@ -1,27 +1,25 @@
 {
-  "objects": {
-    "readers": [
-      {
-        "class": "MetadataJsonReader",
-        "metadata_filename": "../metadata.json"
-      },
-      {
-        "class": "DirectoryReader",
-        "read_contents": true,
-        "discard_chapters": false
-      }
-    ],
-    "matchers": [
-      {
-        "class": "CsvMatcher",
-        "csv_filename": "../list.csv"
-      }
-    ],
-    "writers": [
-      {
-        "class": "MarkdownWriter",
-        "use_title": true
-      }
-    ]
-  }
+  "readers": [
+    {
+      "class": "MetadataJsonReader",
+      "metadata_filename": "../metadata.json"
+    },
+    {
+      "class": "DirectoryReader",
+      "read_contents": true,
+      "discard_chapters": false
+    }
+  ],
+  "matchers": [
+    {
+      "class": "CsvMatcher",
+      "csv_filename": "../list.csv"
+    }
+  ],
+  "writers": [
+    {
+      "class": "MarkdownWriter",
+      "use_title": true
+    }
+  ]
 }

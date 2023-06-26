@@ -2,7 +2,7 @@ from pathlib import Path
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
 from typing import Iterator
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type
 from novel_tools.readers.markdown_reader import MarkdownReader
 
 

@@ -2,8 +2,7 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 from typing import Iterator
 from natsort import os_sorted
-from novel_tools.common import NovelData, Type
-from novel_tools.framework import Reader
+from novel_tools.framework import NovelData, Type, Reader
 from .text_reader import TextReader
 
 supported_extensions = ['.txt', '.md']

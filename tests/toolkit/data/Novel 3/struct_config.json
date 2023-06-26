@@ -1,43 +1,41 @@
 {
-  "objects": {
-    "readers": [
-      {
-        "class": "TextReader",
-        "verbose": true
-      }
-    ],
-    "matchers": [
-      {
-        "class": "NumberedMatcher",
-        "type": "chapter_title",
-        "regex": "^Songs of the North, part (.+)$",
-        "content_group": -1
-      }
-    ],
-    "validators": [],
-    "transformers": [
-      {
-        "class": "TypeTransformer"
-      },
-      {
-        "class": "TitleTransformer",
-        "units": [
-          {
-            "filter": {
-              "type": "chapter_title"
-            },
-            "format": "Songs of the North {index}"
-          }
-        ]
-      }
-    ],
-    "writers": [
-      {
-        "class": "CsvWriter",
-        "additional_fields": [
-          "line_num"
-        ]
-      }
-    ]
-  }
+  "readers": [
+    {
+      "class": "TextReader",
+      "verbose": true
+    }
+  ],
+  "matchers": [
+    {
+      "class": "NumberedMatcher",
+      "type": "chapter_title",
+      "regex": "^Songs of the North, part (.+)$",
+      "content_group": -1
+    }
+  ],
+  "validators": [],
+  "transformers": [
+    {
+      "class": "TypeTransformer"
+    },
+    {
+      "class": "TitleTransformer",
+      "units": [
+        {
+          "filter": {
+            "type": "chapter_title"
+          },
+          "format": "Songs of the North {index}"
+        }
+      ]
+    }
+  ],
+  "writers": [
+    {
+      "class": "CsvWriter",
+      "additional_fields": [
+        "line_num"
+      ]
+    }
+  ]
 }

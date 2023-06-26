@@ -1,16 +1,14 @@
 from pydantic import BaseModel, Field
 from abc import ABC
 from pathlib import Path
-from typing import Optional
-from novel_tools.framework import Writer
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type, Writer
 
 
 class Structure:
     """Recursive definition of a novel structure."""
 
     def __init__(self):
-        self.title: Optional[NovelData] = None
+        self.title: NovelData | None = None
         self.contents: list[NovelData] = []
         self.children: list[Structure] = []
 

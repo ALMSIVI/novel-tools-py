@@ -9,7 +9,7 @@ class Worker:
         self.processors = processors
         self.writers = writers
 
-    def work(self):
+    def execute(self):
         for reader in self.readers:
             for obj in reader.read():
                 for processor in self.processors:

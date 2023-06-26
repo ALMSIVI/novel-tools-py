@@ -1,28 +1,30 @@
 {
-  "objects": {
-    "readers": [
-      { "class": "MetadataJsonReader" },
-      {
-        "class": "DirectoryReader",
-        "read_contents": true,
-        "discard_chapters": false
-      }
-    ],
-    "matchers": [
-      {
-        "class": "CsvMatcher",
-        "types": {
-          "filename": "str"
-        },
-        "fields": ["filename"]
-      }
-    ],
-    "writers": [
-      {
-        "class": "MarkdownWriter",
-        "use_title": true,
-        "write_newline": true
-      }
-    ]
-  }
+  "readers": [
+    {
+      "class": "MetadataJsonReader"
+    },
+    {
+      "class": "DirectoryReader",
+      "read_contents": true,
+      "discard_chapters": false
+    }
+  ],
+  "matchers": [
+    {
+      "class": "CsvMatcher",
+      "types": {
+        "filename": "str"
+      },
+      "fields": [
+        "filename"
+      ]
+    }
+  ],
+  "writers": [
+    {
+      "class": "MarkdownWriter",
+      "use_title": true,
+      "write_newline": true
+    }
+  ]
 }

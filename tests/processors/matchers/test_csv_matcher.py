@@ -1,7 +1,7 @@
 from pathlib import Path
 from pytest import fixture, FixtureRequest, mark, raises
 from pytest_mock import MockerFixture
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type
 from novel_tools.processors.matchers.csv_matcher import CsvMatcher
 from novel_tools.utils import format_text
 

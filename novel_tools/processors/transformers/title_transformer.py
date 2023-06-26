@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Any
-from novel_tools.framework import Processor
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type, Processor
 
 
 class Unit(BaseModel):

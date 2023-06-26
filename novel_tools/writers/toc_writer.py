@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from pathlib import Path
-from novel_tools.framework import Writer
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type, Writer
 from novel_tools.utils import purify_name
 
 

@@ -1,46 +1,37 @@
+from pydantic import BaseModel, Field
 from pytest_mock import MockerFixture
-from novel_tools.common import ACC, FieldMetadata
+from novel_tools.utils import Stage
 from novel_tools.toolkit import docgen
 
 
-class StubACC(ACC):
-    """Docstring."""
+class StubOptions(BaseModel):
+    test1: str = Field(description='Test 1')
+    test2: int | None = Field(description='Test 2')
+    test3: bool = Field(default=True, description='Test 3')
 
-    @staticmethod
-    def required_fields() -> list[FieldMetadata]:
-        return [
-            FieldMetadata('test1', 'str', description='Test 1'),
-            FieldMetadata('test2', 'int', optional=True, description='Test 2'),
-            FieldMetadata('test3', 'bool', default=True, description='Test 3'),
-            FieldMetadata('test4', 'str', description='Test 4', options=['A', 'B']),
-            FieldMetadata('test5', 'obj', description='Test 5', properties=[
-                FieldMetadata('test6', 'float', description='Test 6'),
-                FieldMetadata('test7', 'list', description='Test 7')
-            ])
-        ]
+
+class StubStage:
+    """Docstring."""
+    pass
 
 
 docstring = '''
 - test1 (str): Test 1
 - test2 (int, optional): Test 2
 - test3 (bool, optional, default=True): Test 3
-- test4 (str, options=['A', 'B']): Test 4
-- test5 (obj): Test 5
-  Properties:
-  - test6 (float): Test 6
-  - test7 (list): Test 7
 '''[1:-1]
 
 
 def test_generate_docs(mocker: MockerFixture):
-    mocker.patch('novel_tools.toolkit.generate_docs.generate_classes', return_value={'Default': {'StubACC': StubACC}})
+    mocker.patch('novel_tools.toolkit.generate_docs.get_all_classes',
+                 return_value={Stage.readers: {'StubStage': (StubStage, StubOptions)}})
     m = mocker.patch('pathlib.Path.open', mocker.mock_open())
     handle = m().write
 
     docgen(None)
     handle.assert_has_calls([
-        mocker.call('## Default\n\n'),
-        mocker.call('### StubACC\n\n'),
+        mocker.call('## Readers\n\n'),
+        mocker.call('### StubStage\n\n'),
         mocker.call('**Description:**\n\n'),
         mocker.call('Docstring.'),
         mocker.call('\n'),

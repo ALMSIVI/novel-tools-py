@@ -12,7 +12,7 @@ have to contain the other fields from a NovelData.
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
 - in_dir (Path, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv file.
-- types (dict, optional, default={'line_num': 'int', 'source': 'Path'}): Type of each additional field to be fetched. Currently, int, bool and Path are supported.
+- types (dict[str, str], optional, default={'line_num': 'int', 'source': 'Path'}): Type of each additional field to be fetched. Currently, int, bool and Path are supported.
 - join_dir (list[str], optional, default=['source']): If the data corresponding to the given field names is type Path, it will be treated as a relative path and will be joined by `in_dir`.
 
 ### DirectoryReader
@@ -27,7 +27,7 @@ conventions, such as the first line of the chapter file being the title.
 - in_dir (Path): The working directory.
 - read_contents (bool): If set to True, will open the files to read the contents.
 - discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
-- default_volume (str, optional, default=None): If the novel does not have volumes but all chapters are stored in a directory, then the variable would store the directory name.
+- default_volume (str, optional): If the novel does not have volumes but all chapters are stored in a directory, then the variable would store the directory name.
 - intro_filename (str, optional, default=_intro.txt): The filename of the book/volume introduction file(s).
 - encoding (str, optional, default=utf-8): Encoding of the chapter file(s).
 - merge_newlines (bool, optional, default=False): If set to True, will merge two newline characters into one. Sometimes newline characters carry meanings, and we do not want decorative newlines to mix with those meaningful ones.
@@ -46,7 +46,7 @@ they will be treated as several paragraphs instead of one.
 - in_dir (Path, optional): The directory to read the text file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): The encoding of the file.
 - verbose (bool, optional, default=False): If set to True, additional information, including line number and raw line info, will be added to the data object.
-- levels (dict[str, int], optional, default={1: 'book_title', 2: 'volume_title', 3: 'chapter_title'}): Specifies what level the header should be for each type.
+- levels (dict[int, str], optional, default={1: 'book_title', 2: 'volume_title', 3: 'chapter_title'}): Specifies what level the header should be for each type.
 
 ### MetadataJsonReader
 
@@ -114,8 +114,8 @@ To determine the type of the line, the following three checks are done in order:
 
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file.
 - in_dir (Path, optional): The directory to read the csv file from. Required if the filename does not contain the path.
-- encoding (str, optional, default=utf-8): Encoding of the csv list file.
-- types (dict, optional, default={'line_num': 'int', 'source': 'Path'}): Type of each additional field to be fetched. See CsvReader for more details.
+- encoding (str, optional, default=utf-8): Encoding of the csv file.
+- types (dict[str, str], optional, default={'line_num': 'int', 'source': 'Path'}): Type of each additional field to be fetched. See CsvReader for more details.
 - join_dir (list[str], optional, default=['source']): Specifies fields names that need dir joining. See CsvReader for more details.
 - data_type (str, optional): If present, specifies the type of all the titles.
 
@@ -128,10 +128,10 @@ Matches a regular chapter/volume, with an index and/or a title.
 **Arguments:**
 
 - type (str): Specifies the type for this matcher.
-- regex (str): The regex to match for. It will contain two groups: the first group is the index, the second (optional) is the title.
+- regex (Pattern): The regex to match for. It will contain two groups: the first group is the index, the second (optional) is the title.
 - index_group (int, optional, default=0): The group index for the title's order/index (starting from 0).
 - content_group (int, optional, default=1): The group index for the title's content (starting from 0). Use -1 if there is no content.
-- tag (str, optional, default=None): The tag to append to matched data. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
+- tag (str, optional): The tag to append to matched data. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
 
 ### SpecialMatcher
 
@@ -180,35 +180,17 @@ Validates a chapter, potentially within a volume.
 
 **Arguments:**
 
-- overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one, and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored in the 'corrected_index' field. In either case, a field called 'error' will be created if a validation error occurs.
-- tag (str, optional, default=None): Only validate on the given tag. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
+- overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one, and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored in the 'corrected_index' field. In eithercase, a field called 'error' will be created if a validation error occurs.
+- tag (str, optional): Only validate on the given tag. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might b several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
 - begin_index (int, optional, default=1): The starting index to validate against.
 - discard_chapters (bool): If set to True, restart indexing at the beginning of each new volume.
-- volume_tag (str, optional, default=None): Only validates if the current volume is the given tag.
-
-### Validator
-
-**Description:**
-
-Validates whether the title indices are continuous, i.e., whether there exist duplicate of missing chapter indices.
-
-**Arguments:**
-
-- overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one, and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored in the 'corrected_index' field. In either case, a field called 'error' will be created if a validation error occurs.
-- tag (str, optional, default=None): Only validate on the given tag. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
-- begin_index (int, optional, default=1): The starting index to validate against.
+- volume_tag (str, optional): Only validates if the current volume is the given tag.
 
 ### VolumeValidator
 
 **Description:**
 
 Validates a volume.
-
-**Arguments:**
-
-- overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one, and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored in the 'corrected_index' field. In either case, a field called 'error' will be created if a validation error occurs.
-- tag (str, optional, default=None): Only validate on the given tag. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
-- begin_index (int, optional, default=1): The starting index to validate against.
 
 ## Transformers
 
@@ -240,7 +222,7 @@ punctuation symbols in the novel, or change from custom dividers to Markdown-sty
 
 **Arguments:**
 
-- units (list[{filter: dict[str, str], subs: list[{pattern: str, new: str}]}]): The list of processing units. `filter` is a dictionary with the fields as the key, and `subs` lists the operations to be performed if the data is not filtered. `pattern` is a regex describing the pattern, and `new` is the string to replace the pattern.
+- units (list[novel_tools.processors.transformers.pattern_transformer.Unit]): The list of processing units. `filter` is a dictionary with the fields as the key, and `subs` lists the operations to be performed if the data is not filtered. `pattern` is a regex describing the pattern, and `new` is the string to replace the pattern.
 
 ### TitleTransformer
 
@@ -258,7 +240,7 @@ is a title.
 
 **Arguments:**
 
-- units (list[{filter: dict[str, str], format: str | dict[str, str]}]): The list of processing units. `filter` is a dictionary with the fields as the key, and `format` can be either a string or a dict containing the format strings for each custom field. Please put the units with the most specific filters first, and leave the most generic last, to avoid short-circuiting.
+- units (list[novel_tools.processors.transformers.title_transformer.Unit]): The list of processing units. `filter` is a dictionary with the fields as the key, and `format` can be either a string or a dict containing the format strings for each custom field. Please put the units with the most specific filters first, and leave the most generic last, to avoid short-circuiting.
 
 ### TypeTransformer
 
@@ -294,7 +276,7 @@ can also use the same transformer to attach a 'filename' field, and the writer w
 - out_dir (Path): The working directory.
 - debug (bool, optional, default=False): If set to True, will print the error message to the terminal.
 - default_volume (str, optional, default=default): If the volume does not have volumes, specify the directory name to place the chapter files.
-- intro_filename (str, optional, default=_intro.txt): The filename of the book/volume introduction file(s).
+- intro_filename (str, optional, default=_intro.txt): The filename of the book/volume introduction file.
 
 ### EpubWriter
 

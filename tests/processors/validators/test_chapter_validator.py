@@ -1,5 +1,5 @@
 from pytest import fixture
-from novel_tools.common import NovelData, Type
+from novel_tools.framework import NovelData, Type
 from novel_tools.processors.validators.chapter_validator import ChapterValidator
 
 
