@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 import json
 from pathlib import Path
 from typing import Iterator
@@ -6,11 +6,11 @@ from novel_tools.framework import NovelData, Type, Reader
 
 
 class Options(BaseModel):
-    metadata_filename: str = Field(default='metadata.json',
-                                   description='Filename of the metadata json file. The metadata MUST contain a '
-                                               '\'title\' field.')
-    in_dir: Path | None = Field(description='The directory to read the metadata file from. Required if the filename '
-                                            'does not contain the path.')
+    metadata_filename: str = Field(default='metadata.json', description='Filename of the metadata json file. The '
+                                                                        'metadata MUST contain a \'title\' field.')
+    in_dir: DirectoryPath | None = Field(default=None, description='The directory to read the metadata file from. '
+                                                                   'Required if the filename does not contain the '
+                                                                   'path.')
     encoding: str = Field(default='utf-8', description='Encoding of the json file.')
 
 

@@ -1,21 +1,19 @@
-from pydantic import BaseModel, Field
-from pathlib import Path
+from pydantic import BaseModel, DirectoryPath, Field
 from novel_tools.framework import NovelData, Type, Processor
 from novel_tools.readers.csv_reader import CsvReader
 
 
 class Options(BaseModel):
     csv_filename: str = Field(default='list.csv', description='Filename of the csv list file.')
-    in_dir: Path | None = Field(
-        description='The directory to read the csv file from. Required if the filename does not contain the path.')
+    in_dir: DirectoryPath | None = Field(default=None, description='The directory to read the csv file from. Required '
+                                                                   'if the filename does not contain the path.')
     encoding: str = Field(default='utf-8', description='Encoding of the csv file.')
     types: dict[str, str] = Field(default={'line_num': 'int', 'source': 'Path'},
                                   description='Type of each additional field to be fetched. See CsvReader for more '
                                               'details.')
-    join_dir: list[str] = Field(default=['source'],
-                                description='Specifies fields names that need dir joining. See CsvReader for more '
-                                            'details.')
-    data_type: str | None = Field(description='If present, specifies the type of all the titles.')
+    join_dir: list[str] = Field(default=['source'], description='Specifies fields names that need dir joining. See '
+                                                                'CsvReader for more details.')
+    data_type: str | None = Field(default=None, description='If present, specifies the type of all the titles.')
 
 
 class CsvMatcher(Processor):
@@ -38,7 +36,7 @@ class CsvMatcher(Processor):
 
     def __init__(self, args):
         options = Options(**args)
-        self.list = list(CsvReader(options.dict()).read())
+        self.list = list(CsvReader(options.model_dump()).read())
         for title in self.list:
             if options.data_type is not None:
                 title.type = Type[options.data_type.upper()]

@@ -11,6 +11,13 @@ from pytest import fixture
 # Therefore, before running your tests in the IDE, check that for all your tests, the working directory is NOT the
 # 'test' directory, but the project root.
 
+@fixture
+def reader_directory():
+    """
+    Generates the test directories for the writer.
+    """
+    return Path('tests', 'readers', 'data')
+
 
 @fixture
 def writer_directory():

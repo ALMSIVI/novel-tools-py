@@ -7,13 +7,13 @@ from novel_tools.utils import purify_name
 class Options(BaseOptions):
     use_title: bool = Field(description='If set to True, will use the book title (if specified) as the Markdown '
                                         'filename.')
-    md_filename: str = Field(default='text.md',
-                             description='Filename of the output Markdown file, if `use_title` is False.')
+    md_filename: str = Field(default='text.md', description='Filename of the output Markdown file, if `use_title` is '
+                                                            'False.')
     levels: dict[str, int] = Field(default={'book_title': 1, 'volume_title': 2, 'chapter_title': 3},
                                    description='Specifies what level the header should be for each type.')
-    write_newline: bool = Field(default=False,
-                                description='If set to True, will insert a newline after a non-blank line. This will '
-                                            'avoid contents on consecutive lines being treated as the same paragraph.')
+    write_newline: bool = Field(default=False, description='If set to True, will insert a newline after a non-blank '
+                                                           'line. This will avoid contents on consecutive lines being '
+                                                           'treated as the same paragraph.')
 
 
 class MarkdownWriter(StructureWriter):

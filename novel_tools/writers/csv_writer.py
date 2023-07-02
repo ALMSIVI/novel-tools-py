@@ -1,5 +1,4 @@
-from pydantic import BaseModel, Field
-from pathlib import Path
+from pydantic import BaseModel, DirectoryPath, Field
 import csv
 from novel_tools.framework import NovelData, Writer
 from novel_tools.utils import purify_name
@@ -7,9 +6,9 @@ from novel_tools.utils import purify_name
 
 class Options(BaseModel):
     csv_filename: str = Field(default='list.csv', description='Filename of the output csv file.')
-    out_dir: Path = Field(description='The directory to write the csv file to.')
-    additional_fields: list[str] = Field(default=[],
-                                         description='Specifies additional fields to be included to the csv file.')
+    out_dir: DirectoryPath = Field(description='The directory to write the csv file to.')
+    additional_fields: list[str] = Field(default=[], description='Specifies additional fields to be included to the '
+                                                                 'csv file.')
 
 
 class CsvWriter(Writer):

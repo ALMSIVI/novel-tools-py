@@ -10,7 +10,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = '^3.10'
-pydantic = '^1.10.9'
+pydantic = '^2.0'
 natsort = '^8.4.0'
 Markdown = "^3.4.3"
 beautifulsoup4 = "^4.12.2"

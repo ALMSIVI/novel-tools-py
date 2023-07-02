@@ -4,17 +4,18 @@ from novel_tools.framework import NovelData, Processor
 
 
 class BaseOptions(BaseModel):
-    overwrite: bool = Field(default=True,
-                            description='If set to True, will overwrite the old index with the corrected one, and keep '
-                                        'the original index in the \'original_index\' field. If set to False, the '
-                                        'corrected index will be stored in the \'corrected_index\' field. In either'
-                                        'case, a field called \'error\' will be created if a validation error occurs.')
-    tag: str | None = Field(description='Only validate on the given tag. Sometimes there may exist several '
-                                        'independent sets of indices within the same book; for example, there might '
-                                        'be two different Introductions by different authors before the first '
-                                        'chapter, or there might b several interludes across the volume. In such '
-                                        'case, one can attach a tag to the data, and have a special Validator that '
-                                        'only checks for that tag.')
+    overwrite: bool = Field(default=True, description='If set to True, will overwrite the old index with the corrected '
+                                                      'one, and keep the original index in the \'original_index\' '
+                                                      'field. If set to False, the corrected index will be stored in '
+                                                      'the \'corrected_index\' field. In either case, a field called '
+                                                      '\'error\' will be created if a validation error occurs.')
+    tag: str | None = Field(default=None, description='Only validate on the given tag. Sometimes there may exist '
+                                                      'several independent sets of indices within the same book; for '
+                                                      'example, there might be two different Introductions by '
+                                                      'different authors before the first chapter, or there might be '
+                                                      'several interludes across the volume. In such case, one can '
+                                                      'attach a tag to the data, and have a special Validator that '
+                                                      'only checks for that tag.')
     begin_index: int = Field(default=1, description='The starting index to validate against.')
 
 

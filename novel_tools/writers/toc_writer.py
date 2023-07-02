@@ -1,15 +1,14 @@
-from pydantic import BaseModel, Field
-from pathlib import Path
+from pydantic import BaseModel, DirectoryPath, Field
 from novel_tools.framework import NovelData, Type, Writer
 from novel_tools.utils import purify_name
 
 
 class Options(BaseModel):
     toc_filename: str = Field(default='toc.txt', description='Filename of the output toc file.')
-    out_dir: Path = Field(description='The directory to write the toc file to.')
+    out_dir: DirectoryPath = Field(description='The directory to write the toc file to.')
     write_line_num: bool = Field(default=True, description='If set to True, will write line number to the toc.')
-    debug: bool = Field(default=False,
-                        description='If set to True, will write error information to the table of contents.')
+    debug: bool = Field(default=False, description='If set to True, will write error information to the table of '
+                                                   'contents.')
 
 
 class TocWriter(Writer):

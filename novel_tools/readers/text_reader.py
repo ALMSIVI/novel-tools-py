@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 from pathlib import Path
 from typing import Iterator
 from novel_tools.framework import NovelData, Reader
@@ -6,16 +6,15 @@ from novel_tools.framework import NovelData, Reader
 
 class Options(BaseModel):
     text_filename: str = Field(default='text.txt', description='The filename of the text.')
-    in_dir: Path | None = Field(description='The directory to read the text file from. Required if the filename does '
-                                            'not contain the path.')
+    in_dir: DirectoryPath | None = Field(default=None, description='The directory to read the text file from. Required '
+                                                                   'if the filename does not contain the path.')
     encoding: str = Field(default='utf-8', description='The encoding of the file.')
-    verbose: bool = Field(default=False,
-                          description='If set to True, additional information, including line number and raw line '
-                                      'info, will be added to the data object.')
-    merge_newlines: bool = Field(default=False,
-                                 description='If set to True, will merge two newline characters into one. Sometimes '
-                                             'newline characters carry meanings, and we do not want decorative '
-                                             'newlines to mix with those meaningful ones.')
+    verbose: bool = Field(default=False, description='If set to True, additional information, including line number '
+                                                     'and raw line info, will be added to the data object.')
+    merge_newlines: bool = Field(default=False, description='If set to True, will merge two newline characters into '
+                                                            'one. Sometimes newline characters carry meanings, and we '
+                                                            'do not want decorative newlines to mix with those '
+                                                            'meaningful ones.')
 
 
 class TextReader(Reader):

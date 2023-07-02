@@ -6,7 +6,7 @@ from novel_tools.toolkit import docgen
 
 class StubOptions(BaseModel):
     test1: str = Field(description='Test 1')
-    test2: int | None = Field(description='Test 2')
+    test2: int | None = Field(default=None, description='Test 2')
     test3: bool = Field(default=True, description='Test 3')
 
 

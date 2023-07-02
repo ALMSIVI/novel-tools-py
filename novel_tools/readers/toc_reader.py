@@ -1,14 +1,14 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 from pathlib import Path
 from typing import Iterator
 from novel_tools.framework import NovelData, Type, Reader
 
 
 class Options(BaseModel):
-    toc_filename: str = Field(default='toc.txt',
-                              description='Filename of the toc file. This file should be generated from `TocWriter`.')
-    in_dir: Path | None = Field(description='The directory to read the toc file from. Required if the filename does not'
-                                            ' contain the path.')
+    toc_filename: str = Field(default='toc.txt', description='Filename of the toc file. This file should be generated '
+                                                             'from `TocWriter`.')
+    in_dir: DirectoryPath | None = Field(default=None, description='The directory to read the toc file from. Required '
+                                                                   'if the filename does not contain the path.')
     encoding: str = Field(default='utf-8', description='Encoding of the toc file.')
     has_volume: bool = Field(description='Specifies whether the toc contains volumes.')
     discard_chapters: bool = Field(description='If set to True, will start from chapter 1 again when entering a '

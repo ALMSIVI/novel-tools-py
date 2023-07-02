@@ -5,7 +5,7 @@ from .__validator__ import Validator, BaseOptions
 
 class Options(BaseOptions):
     discard_chapters: bool = Field(description='If set to True, restart indexing at the beginning of each new volume.')
-    volume_tag: str | None = Field(description='Only validates if the current volume is the given tag.')
+    volume_tag: str | None = Field(default=None, description='Only validates if the current volume is the given tag.')
 
 
 class ChapterValidator(Validator):

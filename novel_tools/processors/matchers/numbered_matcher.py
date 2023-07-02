@@ -11,12 +11,13 @@ class Options(BaseModel):
     index_group: int = Field(default=0, description='The group index for the title\'s order/index (starting from 0).')
     content_group: int = Field(default=1, description='The group index for the title\'s content (starting from 0). '
                                                       'Use -1 if there is no content.')
-    tag: str | None = Field(description='The tag to append to matched data. Sometimes there may exist several '
-                                        'independent sets of indices within the same book; for example, there might '
-                                        'be two different Introductions by different authors before the first '
-                                        'chapter, or there might be several interludes across the volume. In such '
-                                        'case, one can attach a tag to the data, and have a special Validator that '
-                                        'only checks for that tag.')
+    tag: str | None = Field(default=None, description='The tag to append to matched data. Sometimes there may exist '
+                                                      'several independent sets of indices within the same book; for '
+                                                      'example, there might be two different Introductions by '
+                                                      'different authors before the first chapter, or there might be '
+                                                      'several interludes across the volume. In such case, one can '
+                                                      'attach a tag to the data, and have a special Validator that '
+                                                      'only checks for that tag.')
 
 
 class NumberedMatcher(Processor):

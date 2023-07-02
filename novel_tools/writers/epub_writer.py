@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import DirectoryPath, Field
 from datetime import datetime
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -11,27 +11,25 @@ from novel_tools.utils import purify_name
 
 
 class Options(BaseOptions):
-    in_dir: Path = Field(description='The directory that stores all the additional data, including stylesheets and/or '
-                                     'images.')
+    in_dir: DirectoryPath = Field(description='The directory that stores all the additional data, including '
+                                              'stylesheets and/or images.')
     encoding: str = Field(default='utf-8', description='Encoding of the metadata template file.')
-    include_nav: bool = Field(default=False,
-                              description='Whether a TOC will be placed after the cover page.')
-    stylesheet: str | None = Field(description='The stylesheet for the book. If it is not specified, a default one '
-                                               'will be used.')
-    cover: str = Field(default='cover.jpg',
-                       description='Cover image for the book. If it exists, a cover page will be added.')
+    include_nav: bool = Field(default=False, description='Whether a TOC will be placed after the cover page.')
+    stylesheet: str | None = Field(default=None, description='The stylesheet for the book. If it is not specified, a '
+                                                             'default one will be used.')
+    cover: str = Field(default='cover.jpg', description='Cover image for the book. If it exists, a cover page will be '
+                                                        'added.')
     cover_title: str = Field(default='Cover', description='Title for the cover page. Useful for localization.')
-    metadata_template: str | None = Field(description='The template for the metadata page. If it is not specified, '
-                                                      'a default one will be used.')
+    metadata_template: str | None = Field(default=None, description='The template for the metadata page. If it is not '
+                                                                    'specified, a default one will be used.')
     metadata_title: str = Field(default='Metadata', description='Title for the metadata page. Useful for localization.')
     author_separator: str = Field(default=', ', description='Separator for multiple authors on the metadata page.')
-    date_format: str = Field(default='%B %Y',
-                             description='Format for the data on the metadata page. For mor information, check the '
-                                         'documentation for datetime.')
-    volume_template: str | None = Field(description='The template for the volume page. If it is not specified, '
-                                                    'a default one will be used.')
-    chapter_template: str | None = Field(description='The template for the chapter page. If it is not specified, '
-                                                     'a default one will be used.')
+    date_format: str = Field(default='%B %Y', description='Format for the data on the metadata page. For more '
+                                                          'information, check the documentation for datetime.')
+    volume_template: str | None = Field(default=None, description='The template for the volume page. If it is not '
+                                                                  'specified, a default one will be used.')
+    chapter_template: str | None = Field(default=None, description='The template for the chapter page. If it is not '
+                                                                   'specified, a default one will be used.')
 
 
 class EpubWriter(StructureWriter):

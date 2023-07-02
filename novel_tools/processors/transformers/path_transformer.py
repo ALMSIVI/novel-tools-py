@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 from pathlib import Path
 from novel_tools.framework import NovelData, Processor
 
 
 class Options(BaseModel):
-    in_dir: Path = Field(description='The parent directory for all the novel data.')
+    in_dir: DirectoryPath = Field(description='The parent directory for all the novel data.')
     fields: list[str] = Field(default=['source'], description='A list of fields of type `Path` to transform.')
 
 

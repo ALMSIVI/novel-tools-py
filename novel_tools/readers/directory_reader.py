@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 from pathlib import Path
 from typing import Iterator
 from natsort import os_sorted
@@ -9,19 +9,20 @@ supported_extensions = ['.txt', '.md']
 
 
 class Options(BaseModel):
-    in_dir: Path = Field(description='The working directory.')
+    in_dir: DirectoryPath = Field(description='The working directory.')
     read_contents: bool = Field(description='If set to True, will open the files to read the contents.')
     discard_chapters: bool = Field(description='If set to True, will start from chapter 1 again when entering a new '
                                                'volume.')
-    default_volume: str | None = Field(description='If the novel does not have volumes but all chapters are stored in a'
-                                                   ' directory, then the variable would store the directory name.')
-    intro_filename: str = Field(default='_intro.txt',
-                                description='The filename of the book/volume introduction file(s).')
+    default_volume: str | None = Field(default=None, description='If the novel does not have volumes but all chapters '
+                                                                 'are stored in a directory, then the variable would '
+                                                                 'store the directory name.')
+    intro_filename: str = Field(default='_intro.txt', description='The filename of the book/volume introduction '
+                                                                  'file(s).')
     encoding: str = Field(default='utf-8', description='Encoding of the chapter file(s).')
-    merge_newlines: bool = Field(default=False,
-                                 description='If set to True, will merge two newline characters into one. Sometimes '
-                                             'newline characters carry meanings, and we do not want decorative '
-                                             'newlines to mix with those meaningful ones.')
+    merge_newlines: bool = Field(default=False, description='If set to True, will merge two newline characters into '
+                                                            'one. Sometimes newline characters carry meanings, and we '
+                                                            'do not want decorative newlines to mix with those '
+                                                            'meaningful ones.')
 
 
 class DirectoryReader(Reader):

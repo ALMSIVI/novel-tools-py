@@ -5,11 +5,9 @@ from novel_tools.utils import purify_name
 
 
 class Options(BaseOptions):
-    default_volume: str = Field(default='default',
-                                description='If the volume does not have volumes, specify the directory name to place '
-                                            'the chapter files.')
-    intro_filename: str = Field(default='_intro.txt',
-                                description='The filename of the book/volume introduction file.')
+    default_volume: str = Field(default='default', description='If the volume does not have volumes, specify the '
+                                                               'directory name to place the chapter files.')
+    intro_filename: str = Field(default='_intro.txt', description='The filename of the book/volume introduction file.')
 
 
 class DirectoryWriter(StructureWriter):

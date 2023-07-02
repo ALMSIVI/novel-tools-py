@@ -10,7 +10,7 @@ have to contain the other fields from a NovelData.
 **Arguments:**
 
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file. This file should be generated from `CsvWriter`, i.e., it must contain at least type, index and content.
-- in_dir (Path, optional): The directory to read the csv file from. Required if the filename does not contain the path.
+- in_dir (DirectoryPath, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv file.
 - types (dict[str, str], optional, default={'line_num': 'int', 'source': 'Path'}): Type of each additional field to be fetched. Currently, int, bool and Path are supported.
 - join_dir (list[str], optional, default=['source']): If the data corresponding to the given field names is type Path, it will be treated as a relative path and will be joined by `in_dir`.
@@ -43,7 +43,7 @@ they will be treated as several paragraphs instead of one.
 **Arguments:**
 
 - md_filename (str, optional, default=text.md): The filename of the markdown file.
-- in_dir (Path, optional): The directory to read the text file from. Required if the filename does not contain the path.
+- in_dir (DirectoryPath, optional): The directory to read the text file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): The encoding of the file.
 - verbose (bool, optional, default=False): If set to True, additional information, including line number and raw line info, will be added to the data object.
 - levels (dict[int, str], optional, default={1: 'book_title', 2: 'volume_title', 3: 'chapter_title'}): Specifies what level the header should be for each type.
@@ -58,7 +58,7 @@ populated with the other metadata.
 **Arguments:**
 
 - metadata_filename (str, optional, default=metadata.json): Filename of the metadata json file. The metadata MUST contain a 'title' field.
-- in_dir (Path, optional): The directory to read the metadata file from. Required if the filename does not contain the path.
+- in_dir (DirectoryPath, optional): The directory to read the metadata file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the json file.
 
 ### TextReader
@@ -70,7 +70,7 @@ Reads from a plain text file.
 **Arguments:**
 
 - text_filename (str, optional, default=text.txt): The filename of the text.
-- in_dir (Path, optional): The directory to read the text file from. Required if the filename does not contain the path.
+- in_dir (DirectoryPath, optional): The directory to read the text file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): The encoding of the file.
 - verbose (bool, optional, default=False): If set to True, additional information, including line number and raw line info, will be added to the data object.
 - merge_newlines (bool, optional, default=False): If set to True, will merge two newline characters into one. Sometimes newline characters carry meanings, and we do not want decorative newlines to mix with those meaningful ones.
@@ -84,7 +84,7 @@ Reads from a table of contents (toc) file.
 **Arguments:**
 
 - toc_filename (str, optional, default=toc.txt): Filename of the toc file. This file should be generated from `TocWriter`.
-- in_dir (Path, optional): The directory to read the toc file from. Required if the filename does not contain the path.
+- in_dir (DirectoryPath, optional): The directory to read the toc file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the toc file.
 - has_volume (bool): Specifies whether the toc contains volumes.
 - discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
@@ -113,7 +113,7 @@ To determine the type of the line, the following three checks are done in order:
 **Arguments:**
 
 - csv_filename (str, optional, default=list.csv): Filename of the csv list file.
-- in_dir (Path, optional): The directory to read the csv file from. Required if the filename does not contain the path.
+- in_dir (DirectoryPath, optional): The directory to read the csv file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the csv file.
 - types (dict[str, str], optional, default={'line_num': 'int', 'source': 'Path'}): Type of each additional field to be fetched. See CsvReader for more details.
 - join_dir (list[str], optional, default=['source']): Specifies fields names that need dir joining. See CsvReader for more details.
@@ -165,7 +165,7 @@ a csv file does.
 **Arguments:**
 
 - toc_filename (str, optional, default=toc.txt): Filename of the toc file. This file should be generated from `TocWriter`.
-- in_dir (Path, optional): The directory to read the toc file from. Required if the filename does not contain the path.
+- in_dir (DirectoryPath, optional): The directory to read the toc file from. Required if the filename does not contain the path.
 - encoding (str, optional, default=utf-8): Encoding of the toc file.
 - has_volume (bool): Specifies whether the toc contains volumes.
 - discard_chapters (bool): If set to True, will start from chapter 1 again when entering a new volume.
@@ -180,8 +180,8 @@ Validates a chapter, potentially within a volume.
 
 **Arguments:**
 
-- overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one, and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored in the 'corrected_index' field. In eithercase, a field called 'error' will be created if a validation error occurs.
-- tag (str, optional): Only validate on the given tag. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might b several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
+- overwrite (bool, optional, default=True): If set to True, will overwrite the old index with the corrected one, and keep the original index in the 'original_index' field. If set to False, the corrected index will be stored in the 'corrected_index' field. In either case, a field called 'error' will be created if a validation error occurs.
+- tag (str, optional): Only validate on the given tag. Sometimes there may exist several independent sets of indices within the same book; for example, there might be two different Introductions by different authors before the first chapter, or there might be several interludes across the volume. In such case, one can attach a tag to the data, and have a special Validator that only checks for that tag.
 - begin_index (int, optional, default=1): The starting index to validate against.
 - discard_chapters (bool): If set to True, restart indexing at the beginning of each new volume.
 - volume_tag (str, optional): Only validates if the current volume is the given tag.
@@ -319,7 +319,7 @@ and the writer will locate the images and add them to the epub.
 - metadata_template (str, optional): The template for the metadata page. If it is not specified, a default one will be used.
 - metadata_title (str, optional, default=Metadata): Title for the metadata page. Useful for localization.
 - author_separator (str, optional, default=, ): Separator for multiple authors on the metadata page.
-- date_format (str, optional, default=%B %Y): Format for the data on the metadata page. For mor information, check the documentation for datetime.
+- date_format (str, optional, default=%B %Y): Format for the data on the metadata page. For more information, check the documentation for datetime.
 - volume_template (str, optional): The template for the volume page. If it is not specified, a default one will be used.
 - chapter_template (str, optional): The template for the chapter page. If it is not specified, a default one will be used.
 

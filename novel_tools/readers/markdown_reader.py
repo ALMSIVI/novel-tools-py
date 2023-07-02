@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 from pathlib import Path
 from typing import Iterator
 from novel_tools.framework import NovelData, Type, Reader
@@ -6,12 +6,11 @@ from novel_tools.framework import NovelData, Type, Reader
 
 class Options(BaseModel):
     md_filename: str = Field(default='text.md', description='The filename of the markdown file.')
-    in_dir: Path | None = Field(description='The directory to read the text file from. Required if the filename does '
-                                            'not contain the path.')
+    in_dir: DirectoryPath | None = Field(default=None, description='The directory to read the text file from. Required '
+                                                                   'if the filename does not contain the path.')
     encoding: str = Field(default='utf-8', description='The encoding of the file.')
-    verbose: bool = Field(default=False,
-                          description='If set to True, additional information, including line number and raw line '
-                                      'info, will be added to the data object.')
+    verbose: bool = Field(default=False, description='If set to True, additional information, including line number '
+                                                     'and raw line info, will be added to the data object.')
     levels: dict[int, str] = Field(default={1: 'book_title', 2: 'volume_title', 3: 'chapter_title'},
                                    description='Specifies what level the header should be for each type.')
 

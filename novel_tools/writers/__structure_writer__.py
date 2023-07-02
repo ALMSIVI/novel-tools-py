@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 from abc import ABC
 from pathlib import Path
 from novel_tools.framework import NovelData, Type, Writer
@@ -14,7 +14,7 @@ class Structure:
 
 
 class BaseOptions(BaseModel):
-    out_dir: Path = Field(description='The working directory.')
+    out_dir: DirectoryPath = Field(description='The working directory.')
     debug: bool = Field(default=False, description='If set to True, will print the error message to the terminal.')
 
 

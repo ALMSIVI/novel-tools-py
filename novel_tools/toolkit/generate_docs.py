@@ -1,16 +1,41 @@
-from pydantic import BaseModel
-from pydantic.fields import ModelField
+from pydantic import BaseModel, DirectoryPath, FilePath
+from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefined
 from pathlib import Path
-from types import GenericAlias
+from typing import Any, Union, get_args, get_origin
+from types import GenericAlias, NoneType, UnionType
 from novel_tools.utils import get_all_classes, format_text
 
 
-def field_doc(field: ModelField) -> str:
-    name = field.name
-    field_type = str(field.outer_type_) if type(field.outer_type_) is GenericAlias else field.type_.__name__
-    optional = ', optional' if not field.required else ''
-    default = f', default={field.default}' if field.default is not None else ''
-    description = field.field_info.description
+def get_type(annotation: type) -> str:
+    if type(annotation) is GenericAlias:  # Example: list[str]
+        return str(annotation)
+
+    if get_origin(annotation) is UnionType or get_origin(annotation) is Union:
+        types = get_args(annotation)
+        if len(types) > 2 or types[-1] is not NoneType:  # Example: str | Path
+            return str(annotation)
+        # Example: str | None. We only want to display str because we will attach "optional" afterward.
+        return get_type(types[0])
+
+    if annotation is DirectoryPath:
+        return 'DirectoryPath'
+
+    if annotation is FilePath:
+        return 'FilePath'
+
+    return annotation.__name__  # Example: str
+
+
+def default_is_none(default: Any) -> bool:
+    return default is None or default is PydanticUndefined
+
+
+def field_doc(name: str, info: FieldInfo) -> str:
+    field_type = get_type(info.annotation)
+    optional = ', optional' if not info.is_required() else ''
+    default = f', default={info.default}' if not default_is_none(info.default) else ''
+    description = info.description
     return f'{name} ({field_type + optional + default}): {description}'
 
 
@@ -42,7 +67,8 @@ def docgen(doc_filename: str | None = None):
                 if stage_options is not None:
                     stage_options: BaseModel
                     f.write('\n**Arguments:**\n\n')
-                    fields = '\n'.join([f'- {field_doc(field)}' for field in stage_options.__fields__.values()])
+                    fields = '\n'.join(
+                        [f'- {field_doc(name, info)}' for name, info in stage_options.model_fields.items()])
                     f.write(fields)
                     f.write('\n')
                 f.write('\n')
