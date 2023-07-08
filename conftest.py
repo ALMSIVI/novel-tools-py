@@ -4,7 +4,7 @@ from pytest import fixture
 
 
 # When one (or GitHub) runs tests from the terminal, the working directory is set to the project root. However, when
-# one runs the tests from an IDE (without changing run/debug configurations) , the working directory is set to
+# one runs the tests from an IDE (without changing run/debug configurations), the working directory is set to
 # 'tests' one level under the root directory. This messes up with functions and classes that rely on the current working
 # directory, as well as integration tests that need to compare contents between directories and files.
 #
