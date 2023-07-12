@@ -1,22 +1,16 @@
 from copy import deepcopy
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 
 
-class Type(Enum):
-    BOOK_TITLE = auto()
-    BOOK_INTRO = auto()
-    VOLUME_TITLE = auto()
-    VOLUME_INTRO = auto()
-    CHAPTER_TITLE = auto()
-    CHAPTER_CONTENT = auto()
-    UNRECOGNIZED = auto()
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return self.name
+class Type(str, Enum):
+    BOOK_TITLE = 'BOOK_TITLE'
+    BOOK_INTRO = 'BOOK_INTRO'
+    VOLUME_TITLE = 'VOLUME_TITLE'
+    VOLUME_INTRO = 'VOLUME_INTRO'
+    CHAPTER_TITLE = 'CHAPTER_TITLE'
+    CHAPTER_CONTENT = 'CHAPTER_CONTENT'
+    UNRECOGNIZED = 'UNRECOGNIZED'
 
 
 class Index:
