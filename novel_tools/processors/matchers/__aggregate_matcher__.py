@@ -15,8 +15,7 @@ class AggregateMatcher(Processor):
     def process(self, data: NovelData) -> NovelData:
         for matcher in self.matchers:
             new_data = matcher.process(data)
-            if new_data.get('matched', False):
-                new_data.pop('matched')
+            if new_data.matched:
                 return new_data
 
         return data

@@ -56,26 +56,18 @@ class CsvMatcher(Processor):
 
         next_title = self.list[self.list_index]
 
-        # First, check for `source` (if it exists). This is usually populated if we use a DirectoryWriter or multiple
-        # TextReaders. If we only have one TextReader, there is only one file, so source is not necessary, and we can
-        # simply omit this field when we write the results using a CsvWriter. If `source` exist and match, compare
-        # `line_num`.
-        if next_title.has('source') and data.has('source'):
-            if next_title.get('source') != data.get('source') or next_title.get('line_num') != data.get('line_num'):
+        if next_title.source is not None and data.source is not None:
+            if next_title.source.file is not None and next_title.source.line_num is not None \
+                    and data.source.file is not None and data.source.line_num is not None:
+                return data if next_title.source != data.source else self.__merge(next_title, data)
+
+            if next_title.source.file is not None and data.source.file is not None \
+                    and next_title.source.file != data.source.file:
                 return data
-            return self.__merge(next_title, data)
+            if next_title.source.line_num is not None and data.source.line_num is not None:
+                return data if next_title.source.line_num != data.source.line_num else self.__merge(next_title, data)
 
-        # If we only have one TextReader and don't have `source` in the csv, we simply compare line_num.
-        if next_title.has('line_num') and data.has('line_num'):
-            if next_title.get('line_num') != data.get('line_num'):
-                return data
-            return self.__merge(next_title, data)
-
-        # If the csv is not created from a CsvWriter and doesn't have `line_num`, we will use raw and/or content.
-        if next_title.get('raw', next_title.content) == data.get('raw', data.content):
-            return self.__merge(next_title, data)
-
-        return data
+        return data if next_title.content.raw != data.content.raw else self.__merge(next_title, data)
 
     def __merge(self, title: NovelData, data: NovelData) -> NovelData:
         self.list_index += 1
@@ -86,6 +78,8 @@ class CsvMatcher(Processor):
             self.indices[data_type] = 0
         self.indices[data_type] += 1
 
+        new_data = NovelData()
+        new_data.content =
         others = data.others | title.others
         return NovelData(title.content, data_type, title.index or self.indices[data_type],
                          list_index=self.list_index, matched=True, **others)
