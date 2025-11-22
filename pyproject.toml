@@ -1,32 +1,40 @@
-[tool.poetry]
-name = 'novel_tools'
-version = '0.3.0'
-description = 'Python tools for formatting novels.'
-authors = ['Yue Wu <wuyuejl97@gmail.com>']
-license = 'WTFPL'
-packages = [
-    { include = 'novel_tools' },
+[project]
+name = "novel_tools"
+version = "0.3.0"
+description = "Python tools for formatting novels."
+authors = [{ name = "Yue Wu", email = "wuyuejl97@gmail.com" }]
+requires-python = ">=3.10,<4"
+license = "WTFPL"
+dependencies = [
+    "pydantic>=2.0,<3",
+    "natsort>=8.4.0,<9",
+    "Markdown>=3.4.3,<4",
+    "beautifulsoup4>=4.12.2,<5",
+    "ebooklib",
 ]
 
-[tool.poetry.dependencies]
-python = '^3.10'
-pydantic = '^2.0'
-natsort = '^8.4.0'
-Markdown = "^3.4.3"
-beautifulsoup4 = "^4.12.2"
+[project.scripts]
+cli = "ntcli:start"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4.0,<8",
+    "pytest-mock>=3.11.1,<4",
+    "ruff>=0.14.0,<0.15",
+]
+
+[tool.uv.sources]
 ebooklib = { git = "https://github.com/ALMSIVI/ebooklib" }
 
-[tool.poetry.dev-dependencies]
-pytest = "^7.4.0"
-pytest-mock = '^3.11.1'
-ruff = '^0.0.275'
+[tool.hatch.build.targets.sdist]
+include = ["novel_tools"]
 
-[tool.poetry.scripts]
-cli = 'ntcli:start'
+[tool.hatch.build.targets.wheel]
+include = ["novel_tools"]
 
 [build-system]
-requires = ['poetry-core>=1.0.0']
-build-backend = 'poetry.core.masonry.api'
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 markers = [
@@ -37,3 +45,6 @@ markers = [
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.format]
+quote-style = 'single'
